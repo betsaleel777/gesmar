@@ -31,7 +31,7 @@
                 <a href="dashboard-one.html" class="sidebar-logo mg-b-40"><span>Gesmar</span></a>
                 <h4 class="signin-title">Bienvenue Dans Digital Market Gesmar</h4>
                 <h5 class="signin-subtitle">Prière vous connectez</h5>
-                <form method="POST" action="{{ route('login') }}">
+                <form method="POST" action="{{ route('connexion') }}">
                     @csrf
                     <div class="signin-form">
                         <div class="form-group">
@@ -78,7 +78,7 @@
             new PerfectScrollbar('.signin-sidebar', {
                 suppressScrollX: true
             });
-        })
+        });
     </script>
 </body>
 

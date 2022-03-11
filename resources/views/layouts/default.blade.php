@@ -6,6 +6,7 @@
     @include('partials.sidebar')
     <div class="content">
         @include('partials.header')
+        @include('partials.flash')
         @yield('content')
     </div>
 </body>

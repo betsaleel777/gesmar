@@ -21,7 +21,20 @@
     <div class="content-body">
         <div class="row row-sm">
             <div class="col-sm-2">
-                @include('parametre.partials.menu')
+                <div class="pd-y-10 pd-x-20">
+                    <button id="mailComposeBtn" class="btn btn-block btn-brand-01">Menu</button>
+                    <nav class="nav nav-classic flex-column tx-13 mg-t-20">
+                        <a href="{{ route('admin.user.index') }}" class="nav-link"><i data-feather="inbox"></i>
+                            <span>Utilisateurs</span> <span class="badge">00</span>
+                        </a>
+                        <a href="" class="nav-link"><i data-feather="monitor"></i> <span>Rôles</span> <span
+                                class="badge">00</span>
+                        </a>
+                        <a href="" class="nav-link"><i data-feather="clock"></i> <span>Permissions</span> <span
+                                class="badge">00</span>
+                        </a>
+                    </nav>
+                </div>
             </div>
             <div class="col-sm-10">
                 <div class="pd-y-10 pd-x-10">
@@ -49,7 +62,7 @@
                             <table id="example1" class="table">
                                 <thead>
                                     <tr>
-                                        <th class="wd-20p">Nom</th>
+                                        <th class="wd-20p">Name</th>
                                         <th class="wd-25p">Email</th>
                                         <th class="wd-20p">Statut</th>
                                         <th class="wd-15p">Créer le</th>
@@ -61,24 +74,13 @@
                                         <tr>
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->email }}</td>
-                                            <td>
-                                                @if ($user->status === $user::CONNECTED)
-                                                    <span class="badge badge-success-light">{{ $user->status }}</span>
-                                                @else
-                                                    <span class="badge badge-danger-light">{{ $user->status }}</span>
-                                                @endif
-                                            </td>
+                                            <td><span class="badge badge-primary">{{ $user->status }}</span></td>
                                             <td>{{ $user->created_at }}</td>
                                             <td>
                                                 <div class="row">
                                                     <div class="col-sm-1">
-                                                        <a
-                                                            href="{{ route('admin.user.setting', ['id' => $user->id, 'panel' => $user::ACTIVE_PANEL['info']]) }}">
-                                                            <i width="18px" heigth="18px" data-feather="settings"></i></a>
-                                                    </div>
-                                                    <div class="col-sm-1">
                                                         <a href="#modal{{ $user->id }}" data-toggle="modal">
-                                                            <i width="18px" heigth="18px" data-feather="trash-2"></i></a>
+                                                            <i width="18px" heigth="18px" data-feather="rotate-cw"></i></a>
                                                     </div>
                                                 </div>
                                                 <div class="modal fade" id="modal{{ $user->id }}" tabindex="-1"
@@ -88,7 +90,7 @@
                                                             <div class="modal-header">
                                                                 <h6 class="modal-title" id="exampleModalLabel">
                                                                     Confirmation
-                                                                    de suppression
+                                                                    de restauration
                                                                 </h6>
                                                                 <button type="button" class="close"
                                                                     data-dismiss="modal" aria-label="Close">
@@ -96,15 +98,14 @@
                                                                 </button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <p class="mg-b-0">Voulez vous réelement supprimer
-                                                                    le compte de l'utilisateur <b>{{ $user->name }}</b>
-                                                                </p>
+                                                                <p class="mg-b-0">Voulez vous réelement restauré
+                                                                    l'utilisateur {{ $user->name }}</p>
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-primary"
                                                                     data-dismiss="modal">Close</button>
-                                                                <a href="{{ route('admin.user.trash', $user->id) }}"
-                                                                    class="btn btn-danger">Confirmer</a>
+                                                                <a href="{{ route('admin.user.restore', $user->id) }}"
+                                                                    class="btn btn-success">Restaurer</a>
                                                             </div>
                                                         </div>
                                                     </div>
