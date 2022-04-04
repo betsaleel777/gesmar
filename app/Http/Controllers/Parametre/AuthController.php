@@ -6,15 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
-    public function index()
-    {
-        return view('auth.login');
-    }
-
     public function login(Request $request)
     {
         $request->validate([
@@ -26,19 +20,24 @@ class AuthController extends Controller
             $user = User::where('email', $request->email)->first();
             $user->connecter();
             $user->save();
-            Session::put('user', $user);
-            return redirect('/')->with('success', 'Bienvenue dans Gesmar, gestion digital de marché');
+            $request->session()->regenerate();
+        } else {
+            return response()->json(['message' => 'Invalid login details', 'credentials' => $credentials], 401);
         }
-        return redirect()->route('login')->with('error', 'Les informations de connections ne sont pas valides');
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        $user = User::find(session('user')->id);
+        $user = User::find($request->id);
         $user->deconnecter();
         $user->save();
-        Session::flush();
         Auth::logout();
-        return redirect('login');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    }
+
+    public function me(Request $request)
+    {
+        return response()->json($request->user());
     }
 }

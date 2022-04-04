@@ -7,17 +7,15 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionsController extends Controller
 {
-    public function index()
+    public function all()
     {
         $permissions = Permission::get();
-        $titre = 'Permissions';
-        return view('parametre.permission.index', compact('permissions', 'titre'));
+        return response()->json(['permissions' => $permissions]);
     }
 
     public function show(int $id)
     {
         $permission = Permission::with('roles')->find($id);
-        $titre = $permission->name;
-        return view('parametre.permission.show', compact('permission', 'titre'));
+        return response()->json(['permission' => $permission]);
     }
 }

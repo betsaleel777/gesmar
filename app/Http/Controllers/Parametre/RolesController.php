@@ -4,46 +4,36 @@ namespace App\Http\Controllers\Parametre;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RolesController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    public function index()
+    public function all()
     {
         $roles = Role::with('permissions')->get();
-        $titre = 'Rôles';
-        return view('parametre.role.index', compact('roles', 'titre'));
+        return response()->json(['roles' => $roles]);
     }
 
     public function show(int $id)
     {
         $role = Role::with('permissions')->find($id);
-        return view('parametre.role.show', compact('roles', 'titre'));
+        return response()->json(['role' => $role]);
     }
 
-    public function add()
-    {
-        $titre = 'Créer un rôle';
-        $permissions = Permission::get();
-        return view('parametre.role.add', compact('titre', 'permissions'));
-    }
-
-    public function insert(Request $request)
+    public function store(Request $request)
     {
         $rules = ['name' => 'required|unique:roles,name'];
         $this->validate($request, $rules);
-        $data = Role::create($request->all());
-        $role = Role::find($data->id);
-        $role->syncPermissions($request->permissions);
+        $role = new Role();
+        $role->name = $request->name;
+        $role->save();
+        $role = Role::find($role->id);
+        if (!empty($request->permissions)) {
+            $role->syncPermissions($request->permissions);
+        }
         $message = "Le rôle $request->name a été crée avec succès.";
-        return redirect()->route('admin.role.index')->with('success', $message);
+        return response()->json(['message' => $message]);
     }
 
     public function update(int $id, Request $request)
@@ -53,8 +43,10 @@ class RolesController extends Controller
         $role = Role::find($id);
         $role->name = $request->name;
         $role->save();
-        $role->syncPermissions($request->permissions);
+        if (!empty($request->permissions)) {
+            $role->syncPermissions($request->permissions);
+        }
         $message = "Le rôle a été modifié avec succès.";
-        return redirect()->route('admin.role.index')->with('success', $message);
+        return response()->json(['message' => $message]);
     }
 }

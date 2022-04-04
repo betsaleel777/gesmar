@@ -6,30 +6,31 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class UtilisateursController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    public function index()
+    public function all()
     {
         $users = User::get();
-        $titre = 'Utilisateurs';
-        return view('parametre.utilisateur.index', compact('titre', 'users'));
+        return response()->json(['users' => $users]);
     }
 
-    public function add()
+    public function trashed()
     {
-        $titre = 'Créer utilisateur';
-        return view('parametre.utilisateur.add', compact('titre'));
+        $users = User::onlyTrashed()->get();
+        return response()->json(['users' => $users]);
     }
 
-    public function insert(Request $request)
+    public function show(int $id)
+    {
+        $user = User::withTrashed()->find($id);
+        $permissions = $user->getAllPermissions()->all();
+        $role = $user->getRoleNames();
+        return response()->json(['user' => $user, 'permissions' => $permissions, 'role' => $role]);
+    }
+
+    public function store(Request $request)
     {
         $request->validate(User::RULES);
         $user = new User($request->all());
@@ -39,82 +40,62 @@ class UtilisateursController extends Controller
         $user->deconnecter();
         $user->save();
         $message = "L'utilisateur $request->name a été crée avec succès.";
-        return redirect()->route('admin.user.index')->with('success', $message);
+        return response()->json(['message' => $message, 'request' => $request->all()]);
     }
 
-    public function informations(Request $request)
+    public function profile(Request $request)
     {
         $validator = Validator::make($request->all(), User::infosRules($request->id));
         $user = User::find($request->id);
         if ($validator->fails()) {
-            return redirect()->route('admin.user.setting', ['id' => $user->id, 'panel' => $request->panel])->withErrors($validator)->withInput();
+            return response()->json(['errors' => $validator->errors()], 422);
         } else {
             $user->name = $request->name;
             $user->adresse = $request->adresse;
             $user->description = $request->description;
-            if ($request->hasFile('avatar')) {
-                !empty($user->avatar) ? Storage::delete('storage/' . $user->avatar) : null;
-                $path = substr($request->file('avatar')->store('public/user-' . $request->id), 7);
+            if ($request->hasFile('image')) {
+                unlink(public_path() . '/storage/' . $user->avatar);
+                $path = substr($request->file('image')->store('public/user-' . $request->id), 7);
                 $user->avatar = $path;
             }
             $user->save();
-            $message = "Utilisateur a été modifié avec succes.";
-            return redirect()->route('admin.user.setting', ['id' => $user->id, 'panel' => $request->panel])->with('success', $message);
+            $message = "Utilisateur a été modifié avec succes. \n
+            Un rechargement de la page est nécessaire pour constater le rafraîchissement de l'image.";
+            return response()->json(['message' => $message]);
         }
     }
 
     public function notifications(Request $request)
     {
-
+        $message = "";
+        return response()->json(['message' => $message]);
     }
 
-    public function securite(Request $request)
+    public function security(Request $request)
     {
-        $validator = Validator::make($request->all(), User::SECURITE_RULE);
+        $validator = Validator::make($request->all(), User::SECURITY_RULES);
         $user = User::find($request->id);
         if ($validator->fails()) {
-            return redirect()->route('admin.user.setting', ['id' => $user->id, 'panel' => $request->panel])->withErrors($validator)->withInput();
+            return response()->json(['errors' => $validator->errors()], 422);
         } else {
             if (!Hash::check($request->oldPassword, $user->password)) {
                 $message = "Ancien mot de passe incorrecte.";
-                return redirect()->route('admin.user.setting', ['id' => $user->id, 'panel' => $request->panel])->with('error', $message);
+                return response()->json(['message' => $message], 400);
             } else {
                 if (!empty($request->password)) {
                     $user->password = Hash::make($request->password);
                 }
                 $user->save();
                 $message = "Utilisateur a été modifié avec succes.";
-                return redirect()->route('admin.user.setting', ['id' => $user->id, 'panel' => $request->panel])->with('success', $message);
+                return response()->json(['message' => $message]);
             }
         }
 
     }
 
-    public function permissions(Request $request)
+    public function autoriser(Request $request)
     {
 
-    }
-
-    public function show(int $id)
-    {
-        $user = User::find($id);
-        $titre = $user->name;
-        return view('parametre.utilisateur.show', compact('titre', 'user'));
-    }
-
-    public function setting(int $id, string $panel)
-    {
-        $user = User::find($id);
-        $titre = $user->name;
-        $active = $panel;
-        return view('parametre.utilisateur.setting', compact('titre', 'user', 'active'));
-    }
-
-    public function archive()
-    {
-        $users = User::onlyTrashed()->get();
-        $titre = 'Utilisateurs Archivés';
-        return view('parametre.utilisateur.archive', compact('titre', 'users'));
     }
 
     public function trash(int $id)
@@ -122,7 +103,7 @@ class UtilisateursController extends Controller
         $user = User::find($id);
         $user->delete();
         $message = "L'utilisateur $user->name a été supprimé avec succès.";
-        return redirect()->back()->with('success', $message);
+        return response()->json(['message' => $message]);
     }
 
     public function restore(int $id)
@@ -130,6 +111,6 @@ class UtilisateursController extends Controller
         $user = User::withTrashed()->find($id);
         $user->restore();
         $message = "L'utilisateur $user->name a été restauré avec succès.";
-        return redirect()->back()->with('success', $message);
+        return response()->json(['message' => $message]);
     }
 }

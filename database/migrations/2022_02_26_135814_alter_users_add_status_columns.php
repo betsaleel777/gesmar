@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('status', 30)->default('non connecté');
+            $table->string('connected', 30)->default(false);
         });
     }
 

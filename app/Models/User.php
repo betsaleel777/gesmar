@@ -21,7 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'status',
+        'connected',
         'description',
         'adresse',
         'password',
@@ -29,8 +29,6 @@ class User extends Authenticatable
     ];
 
     protected $dates = ['created_at'];
-    const CONNECTED = 'connecté';
-    const DISCONNECTED = 'pas connecté';
     const RULES = [
         'name' => 'required|max:150|unique:users,name',
         'email' => 'required|email|unique:users,email',
@@ -38,16 +36,9 @@ class User extends Authenticatable
         'adresse' => 'required',
         'password' => 'required|min:6|confirmed',
     ];
-    const SECURITE_RULE = [
+    const SECURITY_RULES = [
         'oldPassword' => 'required|min:6',
         'password' => 'required|min:6|confirmed',
-    ];
-    const ACTIVE_PANEL = [
-        'info' => 'information',
-        'perm' => 'permission',
-        'noti' => 'notification',
-        'secu' => 'securite',
-        'comp' => 'compte',
     ];
 
     public static function infosRules(int $id)
@@ -60,12 +51,12 @@ class User extends Authenticatable
 
     public function deconnecter()
     {
-        $this->attributes['status'] = self::DISCONNECTED;
+        $this->attributes['connected'] = false;
     }
 
     public function connecter()
     {
-        $this->attributes['status'] = self::CONNECTED;
+        $this->attributes['connected'] = true;
     }
     /**
      * The attributes that should be hidden for serialization.
