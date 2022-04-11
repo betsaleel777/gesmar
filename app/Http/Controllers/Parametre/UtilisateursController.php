@@ -93,6 +93,13 @@ class UtilisateursController extends Controller
     }
 
     public function autoriserDirect(Request $request)
+<<<<<<< HEAD
+    {
+        $user = User::with('roles')->find($request->id);
+        $rolePermissions = $user->getPermissionsViaRoles()->all();
+        $message = "";
+        // attribuer des permissions directes
+=======
     {
         $user = User::with('roles')->find($request->id);
         $rolePermissions = $user->getPermissionsViaRoles()->all();
@@ -120,13 +127,54 @@ class UtilisateursController extends Controller
     {
         $this->validate($request, ['role' => 'required']);
         $user = User::with('roles')->find($request->id);
+        $rolePermissions = $user->getPermissionsViaRoles()->all();
+        $message = "";
+// attribuer des permissions directes
+>>>>>>> main
+        $directPermissions = [];
+        if (count($rolePermissions) > 0) {
+            $ids = array_column($rolePermissions, 'id');
+            $directPermissions = array_filter($request->permissions, function ($permission) use ($ids) {
+                return !in_array($permission['id'], $ids);
+            }, ARRAY_FILTER_USE_BOTH);
+            if (count($directPermissions) > 0) {
+                $permissions = array_column($directPermissions, 'id');
+                $user->givePermissionTo([$permissions]);
+                $message .= "Les permissions ont été accordées directement à l'utilisateur $user->name";
+            }
+        }
+<<<<<<< HEAD
+        return response()->json([
+            'message' => $message,
+            'directs' => $directPermissions,
+            'requete' => $request->all(),
+        ]);
+    }
+    public function autoriserByRole(Request $request)
+    {
+        $this->validate($request, ['role' => 'required']);
+        $user = User::with('roles')->find($request->id);
+=======
+//attribuer le role
+>>>>>>> main
         $newRole = Role::find($request->role);
         if (count($user->roles->all()) > 0) {
             $user->removeRole($user->roles->first());
         }
         $user->assignRole($newRole);
+<<<<<<< HEAD
         $message = "Le role $newRole->name, a été attribué avec succès à l'utilisateur $user->name";
         return response()->json(['message' => $message]);
+=======
+        $message .= "Le role $newRole->name, a été attribué avec succès à l'utilisateur $user->name";
+        return response()->json([
+            'message' => $message,
+            'directs' => $directPermissions,
+            'roles' => $rolePermissions,
+            'requete' => $request->all(),
+        ]);
+
+>>>>>>> main
     }
 
     public function trash(int $id)
