@@ -46,7 +46,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/', [PermissionsController::class, 'all']);
         Route::get('/show/{id}', [PermissionsController::class, 'show']);
     });
-    Route::prefix('sites')->group(function () {
+    Route::prefix('marches')->group(function () {
         Route::get('/', [SitesController::class, 'all']);
         Route::get('/trashed', [SitesController::class, 'trashed']);
         Route::post('/store', [SitesController::class, 'store']);

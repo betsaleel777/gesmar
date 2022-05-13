@@ -43,7 +43,7 @@ class NiveausController extends Controller
     public function trashed()
     {
         $niveaus = Niveau::onlyTrashed()->get();
-        return response()->json(['users' => $niveaus]);
+        return response()->json(['niveaus' => $niveaus]);
     }
 
     public function show(int $id)

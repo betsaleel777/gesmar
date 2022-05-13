@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('sites', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 50)->unique();
             $table->string('nom', 255)->unique();
             $table->string('commune', 80);
             $table->string('ville', 80);
