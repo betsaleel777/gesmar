@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/', [SitesController::class, 'all']);
         Route::get('/trashed', [SitesController::class, 'trashed']);
         Route::post('/store', [SitesController::class, 'store']);
+        Route::post('/push', [SitesController::class, 'push']);
         Route::get('{id}', [SitesController::class, 'show']);
         Route::delete('{id}', [SitesController::class, 'trash']);
         Route::get('/restore/{id}', [SitesController::class, 'restore']);
@@ -57,7 +58,9 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     Route::prefix('pavillons')->group(function () {
         Route::get('/', [PavillonsController::class, 'all']);
         Route::get('/trashed', [PavillonsController::class, 'trashed']);
+        Route::get('/marche/{id}', [PavillonsController::class, 'getByMarche']);
         Route::post('/store', [PavillonsController::class, 'store']);
+        Route::post('/push', [PavillonsController::class, 'push']);
         Route::get('{id}', [PavillonsController::class, 'show']);
         Route::delete('{id}', [PavillonsController::class, 'trash']);
         Route::get('/restore/{id}', [PavillonsController::class, 'restore']);

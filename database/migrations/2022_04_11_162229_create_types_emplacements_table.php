@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('emplacements', function (Blueprint $table) {
             $table->id();
-            $table->string('nom', 255)->unique();
+            $table->string('nom', 255);
             $table->unsignedMediumInteger('superficie')->default(0);
             $table->unsignedInteger('loyer')->default(0);
             $table->unsignedInteger('pas_porte')->default(0);

@@ -10,19 +10,18 @@ class Pavillon extends Model
     use SoftDeletes;
 
     protected $fillable = ['nom', 'code', 'site_id'];
-
     protected $dates = ['created_at'];
+
     const RULES = [
-        'nom' => 'required|max:150|unique:pavillons,nom',
-        'code' => 'required|email|unique:pavillons,code',
+        'nom' => 'required|max:150',
+    ];
+    const PUSH_RULES = [
+        'nombre' => 'required|numeric',
     ];
 
-    public static function edit_rules(int $id)
+    public function getCodeAttribute()
     {
-        return [
-            'nom' => 'required|max:150|unique:pavillons,nom,' . $id,
-            'code' => 'required|email|unique:pavillons,code,,' . $id,
-        ];
+        return str_pad($this->id, 2, '0', STR_PAD_LEFT);
     }
 
     public function site()

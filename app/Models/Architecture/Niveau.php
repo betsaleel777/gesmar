@@ -12,16 +12,19 @@ class Niveau extends Model
     protected $fillable = ['nom', 'code', 'pavillon_id'];
 
     protected $dates = ['created_at'];
+
     const RULES = [
         'nom' => 'required|max:150|unique:niveaus,nom',
-        'code' => 'required|email|unique:niveaus,code',
+    ];
+
+    const PUSH_RULES = [
+        'nombre' => 'required|numeric',
     ];
 
     public static function edit_rules(int $id)
     {
         return [
             'nom' => 'required|max:150|unique:niveaus,nom,' . $id,
-            'code' => 'required|email|unique:niveaus,code,,' . $id,
         ];
     }
 

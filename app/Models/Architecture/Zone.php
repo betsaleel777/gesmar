@@ -13,16 +13,12 @@ class Zone extends Model
 
     protected $dates = ['created_at'];
     const RULES = [
-        'nom' => 'required|max:150|unique:zones,nom',
-        'code' => 'required|email|unique:zones,code',
+        'nom' => 'required|max:150',
     ];
 
-    public static function edit_rules(int $id)
+    public function getCodeAttribute()
     {
-        return [
-            'nom' => 'required|max:150|unique:zones,nom,' . $id,
-            'code' => 'required|email|unique:zones,code,,' . $id,
-        ];
+        return str_pad($this->id, 4, '0', STR_PAD_LEFT);
     }
 
     public function niveau()

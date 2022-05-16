@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('pavillons', function (Blueprint $table) {
             $table->id();
-            $table->string('nom', 255)->unique();
+            $table->string('nom', 255);
             $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();

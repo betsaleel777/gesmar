@@ -14,7 +14,7 @@ class Emplacement extends Model
     protected $dates = ['created_at'];
 
     const RULES = [
-        'nom' => 'required|max:255|unique:emplacements,nom',
+        'nom' => 'required|max:255',
         'code' => 'required|email|unique:emplacements,code',
         'pays' => 'required',
         'commune' => 'required',
@@ -24,7 +24,7 @@ class Emplacement extends Model
     public static function edit_rules(int $id)
     {
         return [
-            'nom' => 'required|max:150|unique:emplacements,nom,' . $id,
+            'nom' => 'required|max:150',
             'code' => 'required|email|unique:emplacements,code,' . $id,
             'pays' => 'required',
             'commune' => 'required',

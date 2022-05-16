@@ -23,6 +23,16 @@ class SitesController extends Controller
         return response()->json(['message' => $message]);
     }
 
+    public function push(Request $request)
+    {
+        $request->validate(Site::RULES);
+        $marche = new Site($request->all());
+        $marche->save();
+        $message = "Le marche $request->nom a été crée avec succès.";
+        $freshMarche = $marche->fresh();
+        return response()->json(['message' => $message, 'marche' => $freshMarche]);
+    }
+
     public function trash(int $id)
     {
         $marche = Site::find($id);
