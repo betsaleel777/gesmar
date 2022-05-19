@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Parametre\Architecture\NiveausController;
+use App\Http\Controllers\Parametre\Architecture\EmplacementsController;
+use App\Http\Controllers\Parametre\Architecture\NiveauxController;
 use App\Http\Controllers\Parametre\Architecture\PavillonsController;
 use App\Http\Controllers\Parametre\Architecture\SitesController;
 use App\Http\Controllers\Parametre\Architecture\TypeEmplacementsController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Parametre\AuthController;
 use App\Http\Controllers\Parametre\PermissionsController;
 use App\Http\Controllers\Parametre\RolesController;
 use App\Http\Controllers\Parametre\UtilisateursController;
+use App\Models\Architecture\TypeEmplacement;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +55,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::post('/push', [SitesController::class, 'push']);
         Route::get('{id}', [SitesController::class, 'show']);
         Route::delete('{id}', [SitesController::class, 'trash']);
+        Route::put('{id}', [SitesController::class, 'update']);
         Route::get('/restore/{id}', [SitesController::class, 'restore']);
     });
     Route::prefix('pavillons')->group(function () {
@@ -62,31 +65,48 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::post('/store', [PavillonsController::class, 'store']);
         Route::post('/push', [PavillonsController::class, 'push']);
         Route::get('{id}', [PavillonsController::class, 'show']);
+        Route::put('{id}', [PavillonsController::class, 'update']);
         Route::delete('{id}', [PavillonsController::class, 'trash']);
         Route::get('/restore/{id}', [PavillonsController::class, 'restore']);
     });
-    Route::prefix('niveaus')->group(function () {
-        Route::get('/', [NiveausController::class, 'all']);
-        Route::get('/trashed', [NiveausController::class, 'trashed']);
-        Route::post('/store', [NiveausController::class, 'store']);
-        Route::get('{id}', [NiveausController::class, 'show']);
-        Route::delete('{id}', [NiveausController::class, 'trash']);
-        Route::get('/restore/{id}', [NiveausController::class, 'restore']);
+    Route::prefix('niveaux')->group(function () {
+        Route::get('/', [NiveauxController::class, 'all']);
+        Route::get('/trashed', [NiveauxController::class, 'trashed']);
+        Route::post('/store', [NiveauxController::class, 'store']);
+        Route::post('/push', [NiveauxController::class, 'push']);
+        Route::get('{id}', [NiveauxController::class, 'show']);
+        Route::delete('{id}', [NiveauxController::class, 'trash']);
+        Route::put('{id}', [NiveauxController::class, 'update']);
+        Route::get('/restore/{id}', [NiveauxController::class, 'restore']);
     });
     Route::prefix('zones')->group(function () {
         Route::get('/', [ZonesController::class, 'all']);
         Route::get('/trashed', [ZonesController::class, 'trashed']);
         Route::post('/store', [ZonesController::class, 'store']);
+        Route::post('/push', [ZonesController::class, 'push']);
         Route::get('{id}', [ZonesController::class, 'show']);
         Route::delete('{id}', [ZonesController::class, 'trash']);
+        Route::put('{id}', [ZonesController::class, 'update']);
         Route::get('/restore/{id}', [ZonesController::class, 'restore']);
     });
-    Route::prefix('type_emplacements')->group(function () {
-        Route::get('/', [TypeEmplacementsController::class, 'all']);
-        Route::get('/trashed', [TypeEmplacementsController::class, 'trashed']);
-        Route::post('/store', [TypeEmplacementsController::class, 'store']);
-        Route::get('{id}', [TypeEmplacementsController::class, 'show']);
-        Route::delete('{id}', [TypeEmplacementsController::class, 'trash']);
-        Route::get('/restore/{id}', [TypeEmplacementsController::class, 'restore']);
+    Route::prefix('emplacements')->group(function () {
+        Route::get('/', [EmplacementsController::class, 'all']);
+        Route::get('/trashed', [EmplacementsController::class, 'trashed']);
+        Route::post('/store', [EmplacementsController::class, 'store']);
+        Route::get('{id}', [EmplacementsController::class, 'show']);
+        Route::delete('{id}', [EmplacementsController::class, 'trash']);
+        Route::put('{id}', [EmplacementsController::class, 'update']);
+        Route::get('/restore/{id}', [EmplacementsController::class, 'restore']);
+
+        Route::prefix('types')->group(function () {
+            Route::get('/', [TypeEmplacementsController::class, 'all']);
+            Route::get('/trashed', [TypeEmplacementsController::class, 'trashed']);
+            Route::post('/store', [TypeEmplacementsController::class, 'store']);
+            Route::get('{id}', [TypeEmplacementsController::class, 'show']);
+            Route::delete('{id}', [TypeEmplacementsController::class, 'trash']);
+            Route::put('{id}', [TypeEmplacement::class, 'update']);
+            Route::get('/restore/{id}', [TypeEmplacementsController::class, 'restore']);
+        });
+
     });
 });

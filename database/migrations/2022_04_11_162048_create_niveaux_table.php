@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('niveaus', function (Blueprint $table) {
+        Schema::create('niveaux', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 1);
             $table->string('nom', 255);
             $table->foreignId('pavillon_id')->constrained('pavillons')->onDelete('cascade')->onUpdate('cascade');
             $table->softDeletes();

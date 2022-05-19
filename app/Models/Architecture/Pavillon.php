@@ -11,17 +11,23 @@ class Pavillon extends Model
 
     protected $fillable = ['nom', 'code', 'site_id'];
     protected $dates = ['created_at'];
+    protected $appends = ['code'];
 
     const RULES = [
         'nom' => 'required|max:150',
+        'site_id' => 'required',
+    ];
+    const MIDDLE_RULES = [
+        'site_id' => 'required',
+        'nombre' => 'required|numeric|min:1',
     ];
     const PUSH_RULES = [
-        'nombre' => 'required|numeric',
+        'nombre' => 'required|numeric|min:1',
     ];
 
     public function getCodeAttribute()
     {
-        return str_pad($this->id, 2, '0', STR_PAD_LEFT);
+        return str_pad($this->attributes['code'], 2, '0', STR_PAD_LEFT);
     }
 
     public function site()
@@ -29,7 +35,7 @@ class Pavillon extends Model
         return $this->belongsTo(Site::class);
     }
 
-    public function niveaus()
+    public function niveaux()
     {
         return $this->hasMany(Niveau::class);
     }

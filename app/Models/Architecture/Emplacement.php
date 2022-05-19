@@ -9,31 +9,31 @@ class Emplacement extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['nom', 'code', 'pays', 'ville', 'commune', 'postale'];
+    protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'reserved', 'busy', 'loyer', 'pas_porte'];
 
     protected $dates = ['created_at'];
 
     const RULES = [
         'nom' => 'required|max:255',
-        'code' => 'required|email|unique:emplacements,code',
-        'pays' => 'required',
-        'commune' => 'required',
-        'ville' => 'required',
+        'superficie' => 'required',
+        'loyer' => 'required',
+        'pas_porte' => 'required',
+        'zone_id' => 'required',
+        'type_emplacement_id' => 'required',
     ];
 
-    public static function edit_rules(int $id)
+    public function getCodeAttribute()
     {
-        return [
-            'nom' => 'required|max:150',
-            'code' => 'required|email|unique:emplacements,code,' . $id,
-            'pays' => 'required',
-            'commune' => 'required',
-            'ville' => 'required',
-        ];
+        return str_pad($this->attributes['code'], 3, '0', STR_PAD_LEFT);
     }
 
-    public function pavillons()
+    public function zone()
     {
-        return $this->hasMany(Pavillon::class);
+        return $this->hasMany(Zone::class);
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(TypeEmplacement::class);
     }
 }

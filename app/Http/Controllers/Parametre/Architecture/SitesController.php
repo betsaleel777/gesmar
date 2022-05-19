@@ -19,7 +19,21 @@ class SitesController extends Controller
         $request->validate(Site::RULES);
         $marche = new Site($request->all());
         $marche->save();
-        $message = "Le marche $request->nom a été crée avec succès.";
+        $message = "Le marché $request->nom a été crée avec succès.";
+        return response()->json(['message' => $message]);
+    }
+
+    public function update(int $id, Request $request)
+    {
+        $request->validate(Site::edit_rules($id));
+        $marche = Site::find($id);
+        $marche->nom = $request->nom;
+        $marche->ville = $request->ville;
+        $marche->pays = $request->pays;
+        $marche->commune = $request->commune;
+        $marche->postale = $request->postale;
+        $marche->save();
+        $message = "Le marché $request->nom a été crée avec succès.";
         return response()->json(['message' => $message]);
     }
 
@@ -28,7 +42,7 @@ class SitesController extends Controller
         $request->validate(Site::RULES);
         $marche = new Site($request->all());
         $marche->save();
-        $message = "Le marche $request->nom a été crée avec succès.";
+        $message = "Le marché $request->nom a été crée avec succès.";
         $freshMarche = $marche->fresh();
         return response()->json(['message' => $message, 'marche' => $freshMarche]);
     }

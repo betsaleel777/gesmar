@@ -14,19 +14,16 @@ class Niveau extends Model
     protected $dates = ['created_at'];
 
     const RULES = [
-        'nom' => 'required|max:150|unique:niveaus,nom',
+        'nom' => 'required|max:150',
+        'pavillon_id' => 'required',
     ];
-
+    const MIDDLE_RULES = [
+        'pavillon_id' => 'required',
+        'nombre' => 'required|numeric|min:1',
+    ];
     const PUSH_RULES = [
-        'nombre' => 'required|numeric',
+        'nombre' => 'required|numeric|min:1',
     ];
-
-    public static function edit_rules(int $id)
-    {
-        return [
-            'nom' => 'required|max:150|unique:niveaus,nom,' . $id,
-        ];
-    }
 
     public function pavillon()
     {
