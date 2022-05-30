@@ -17,7 +17,6 @@ class Emplacement extends Model
         'nom' => 'required|max:255',
         'superficie' => 'required',
         'loyer' => 'required',
-        'pas_porte' => 'required',
         'zone_id' => 'required',
         'type_emplacement_id' => 'required',
     ];
@@ -29,7 +28,7 @@ class Emplacement extends Model
 
     public function zone()
     {
-        return $this->hasMany(Zone::class);
+        return $this->belongsTo(Zone::class);
     }
 
     public function type()

@@ -35,7 +35,7 @@ class NiveauxController extends Controller
 
     public function all()
     {
-        $niveaux = Niveau::with('pavillon')->get();
+        $niveaux = Niveau::with('pavillon.site')->get();
         return response()->json(['niveaux' => $niveaux]);
     }
 

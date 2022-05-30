@@ -10,7 +10,6 @@ use App\Http\Controllers\Parametre\AuthController;
 use App\Http\Controllers\Parametre\PermissionsController;
 use App\Http\Controllers\Parametre\RolesController;
 use App\Http\Controllers\Parametre\UtilisateursController;
-use App\Models\Architecture\TypeEmplacement;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -97,16 +96,14 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', [EmplacementsController::class, 'trash']);
         Route::put('{id}', [EmplacementsController::class, 'update']);
         Route::get('/restore/{id}', [EmplacementsController::class, 'restore']);
-
-        Route::prefix('types')->group(function () {
-            Route::get('/', [TypeEmplacementsController::class, 'all']);
-            Route::get('/trashed', [TypeEmplacementsController::class, 'trashed']);
-            Route::post('/store', [TypeEmplacementsController::class, 'store']);
-            Route::get('{id}', [TypeEmplacementsController::class, 'show']);
-            Route::delete('{id}', [TypeEmplacementsController::class, 'trash']);
-            Route::put('{id}', [TypeEmplacement::class, 'update']);
-            Route::get('/restore/{id}', [TypeEmplacementsController::class, 'restore']);
-        });
-
+    });
+    Route::prefix('types')->group(function () {
+        Route::get('/', [TypeEmplacementsController::class, 'all']);
+        Route::get('/trashed', [TypeEmplacementsController::class, 'trashed']);
+        Route::post('/store', [TypeEmplacementsController::class, 'store']);
+        Route::get('{id}', [TypeEmplacementsController::class, 'show']);
+        Route::delete('{id}', [TypeEmplacementsController::class, 'trash']);
+        Route::put('{id}', [TypeEmplacementsController::class, 'update']);
+        Route::get('/restore/{id}', [TypeEmplacementsController::class, 'restore']);
     });
 });

@@ -35,7 +35,7 @@ class ZonesController extends Controller
 
     public function all()
     {
-        $zones = Zone::with('niveau')->get();
+        $zones = Zone::with('niveau.pavillon.site')->get();
         return response()->json(['zones' => $zones]);
     }
 
@@ -97,7 +97,7 @@ class ZonesController extends Controller
 
     public function show(int $id)
     {
-        $zone = Zone::withTrashed()->find($id);
+        $zone = Zone::with('niveau.pavillon.site')->withTrashed()->find($id);
         return response()->json(['zone' => $zone]);
     }
 
