@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\TypeEmplacement as Type;
 use Illuminate\Http\Request;
 
-class TypeEmplacementsController extends Controller
+class TypeEmplacementsController extends Controller implements StandardControllerInterface
 {
     public function all()
     {
@@ -24,7 +25,7 @@ class TypeEmplacementsController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    public function update(Request $request, int $id)
+    public function update(int $id, Request $request)
     {
         $request->validate(Type::RULES);
         $type = Type::find($id);

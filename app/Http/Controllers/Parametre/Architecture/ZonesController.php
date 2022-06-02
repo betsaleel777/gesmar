@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Niveau;
 use App\Models\Architecture\Zone;
 use Illuminate\Http\Request;
 
-class ZonesController extends Controller
+class ZonesController extends Controller implements StandardControllerInterface
 {
     public static function getMany(array $ids)
     {
@@ -19,17 +20,19 @@ class ZonesController extends Controller
         return $zones;
     }
 
-    private static function pusher(int $site, int $nombre)
+    private static function pusher(array $niveaux, int $nombre)
     {
-        $start = (int) Niveau::find($site)->zones->count();
-        $fin = $start + $nombre;
-        while ($start < $fin) {
-            $start++;
-            $zone = new Zone();
-            $zone->niveau_id = $site;
-            $zone->nom = 'zone ' . $start;
-            $zone->code = $start;
-            $zone->save();
+        foreach ($niveaux as $niveau) {
+            $start = (int) Niveau::find($niveau)->zones->count();
+            $fin = $start + $nombre;
+            while ($start < $fin) {
+                $start++;
+                $zone = new Zone();
+                $zone->niveau_id = $niveau;
+                $zone->nom = 'zone ' . $start;
+                $zone->code = $start;
+                $zone->save();
+            }
         }
     }
 
@@ -43,7 +46,7 @@ class ZonesController extends Controller
     {
         if ($request->automatiq) {
             $request->validate(Zone::MIDDLE_RULES);
-            self::pusher($request->pavillon_id, $request->nombre);
+            self::pusher($request->niveaux, $request->nombre);
         } else {
             $request->validate(Zone::RULES);
             $zone = new Zone($request->all());
@@ -57,7 +60,7 @@ class ZonesController extends Controller
     public function push(Request $request)
     {
         $request->validate(Zone::PUSH_RULES);
-        self::pusher($request->id, $request->nombre);
+        self::pusher($request->niveaux, $request->nombre);
         $message = "$request->nombre zones ont été crée avec succès.";
         return response()->json(['message' => $message, 'zones' => self::getMany($request->niveaux)]);
     }

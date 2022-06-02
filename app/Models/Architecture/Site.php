@@ -10,7 +10,6 @@ class Site extends Model
     use SoftDeletes;
 
     protected $fillable = ['nom', 'pays', 'ville', 'commune', 'postale'];
-
     protected $dates = ['created_at'];
 
     const RULES = [
@@ -33,5 +32,10 @@ class Site extends Model
     public function pavillons()
     {
         return $this->hasMany(Pavillon::class);
+    }
+
+    public function equipements()
+    {
+        return $this->hasMany(Equipement::class);
     }
 }

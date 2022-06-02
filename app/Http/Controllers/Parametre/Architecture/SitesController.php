@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Site;
 use Illuminate\Http\Request;
 
-class SitesController extends Controller
+class SitesController extends Controller implements StandardControllerInterface
 {
     public function all()
     {

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
 use Illuminate\Http\Request;
 
-class EmplacementsController extends Controller
+class EmplacementsController extends Controller implements StandardControllerInterface
 {
     private static function codeGenerate(int $id)
     {

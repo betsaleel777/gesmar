@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Pavillon;
 use App\Models\Architecture\Site;
 use Illuminate\Http\Request;
 
-class PavillonsController extends Controller
+class PavillonsController extends Controller implements StandardControllerInterface
 {
     private static function pusher(int $site, int $nombre)
     {

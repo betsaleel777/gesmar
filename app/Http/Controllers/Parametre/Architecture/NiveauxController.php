@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Niveau;
 use App\Models\Architecture\Pavillon;
 use Illuminate\Http\Request;
 
-class NiveauxController extends Controller
+class NiveauxController extends Controller implements StandardControllerInterface
 {
     private static function getMany(array $ids)
     {
@@ -19,17 +20,19 @@ class NiveauxController extends Controller
         return $niveaux;
     }
 
-    private static function pusher(int $site, int $nombre)
+    private static function pusher(array $pavillons, int $nombre)
     {
-        $start = (int) Pavillon::find($site)->niveaux->count();
-        $fin = $start + $nombre;
-        while ($start < $fin) {
-            $start++;
-            $niveau = new Niveau();
-            $niveau->pavillon_id = $site;
-            $niveau->nom = 'niveau ' . $start;
-            $niveau->code = $start;
-            $niveau->save();
+        foreach ($pavillons as $pavillon) {
+            $start = (int) Pavillon::find($pavillon)->niveaux->count();
+            $fin = $start + $nombre;
+            while ($start < $fin) {
+                $start++;
+                $niveau = new Niveau();
+                $niveau->pavillon_id = $pavillon;
+                $niveau->nom = 'niveau ' . $start;
+                $niveau->code = $start;
+                $niveau->save();
+            }
         }
     }
 
@@ -54,7 +57,7 @@ class NiveauxController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    public function update(Request $request, int $id)
+    public function update(int $id, Request $request)
     {
         $request->validate(Niveau::RULES);
         $niveau = Niveau::find($id);
@@ -68,7 +71,7 @@ class NiveauxController extends Controller
     public function push(Request $request)
     {
         $request->validate(Niveau::PUSH_RULES);
-        self::pusher($request->id, $request->nombre);
+        self::pusher($request->pavillons, $request->nombre);
         $message = "$request->nombre niveaux ont été crée avec succès.";
         return response()->json(['message' => $message, 'niveaux' => self::getMany($request->pavillons)]);
     }

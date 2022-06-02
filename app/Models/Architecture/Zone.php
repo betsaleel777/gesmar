@@ -10,7 +10,6 @@ class Zone extends Model
     use SoftDeletes;
 
     protected $fillable = ['nom', 'code', 'niveau_id'];
-
     protected $dates = ['created_at'];
     protected $appends = ['code'];
 

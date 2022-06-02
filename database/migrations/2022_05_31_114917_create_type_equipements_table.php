@@ -13,12 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('zones', function (Blueprint $table) {
+        Schema::create('type_equipements', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 4);
-            $table->string('nom', 255);
-            $table->foreignId('niveau_id')->constrained('niveaux')->onDelete('cascade')->onUpdate('cascade');
+            $table->string('nom', 50);
+            $table->unsignedMediumInteger('frais_penalite');
             $table->softDeletes();
+            $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -30,6 +30,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('zones');
+        Schema::table('type_equipements', function (Blueprint $table) {
+            //
+        });
     }
 };
