@@ -21,7 +21,6 @@ return new class extends Migration
             $table->unsignedInteger('prix_fixe');
             $table->unsignedInteger('frais_facture');
             $table->unsignedInteger('index');
-            $table->foreignId('emplacement_id')->constrained('emplacements')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('type_equipement_id')->constrained('type_equipements')->onDelete('cascade')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();

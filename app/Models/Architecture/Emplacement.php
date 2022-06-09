@@ -33,6 +33,6 @@ class Emplacement extends Model
 
     public function type()
     {
-        return $this->belongsTo(TypeEmplacement::class);
+        return $this->belongsTo(TypeEmplacement::class, 'type_emplacement_id');
     }
 }

@@ -21,7 +21,7 @@ class TypeEquipementsController extends Controller implements StandardController
         $type = new TypeEquipement($request->all());
         $type->save();
         $message = "Le type d'équipement $request->nom a été enrgistré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => $message, 'id' => $type->id]);
     }
 
     public function update(int $id, Request $request)

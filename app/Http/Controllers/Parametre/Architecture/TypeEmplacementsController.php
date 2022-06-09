@@ -22,7 +22,7 @@ class TypeEmplacementsController extends Controller implements StandardControlle
         $type->code = (int) Type::get()->count() + 1;
         $type->save();
         $message = "Le type d'emplacement $request->nom a été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => $message, 'id' => $type->id]);
     }
 
     public function update(int $id, Request $request)

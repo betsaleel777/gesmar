@@ -13,11 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('type_emplacements', function (Blueprint $table) {
-            $table->id();
-            $table->string('nom', 255);
-            $table->softDeletes();
-            $table->timestamps();
+        Schema::table('equipements', function (Blueprint $table) {
+            $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -28,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('types_emplacements');
+        Schema::table('equipements', function (Blueprint $table) {
+            //
+        });
     }
 };

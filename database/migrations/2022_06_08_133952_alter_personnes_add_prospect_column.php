@@ -13,11 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('type_emplacements', function (Blueprint $table) {
-            $table->id();
-            $table->string('nom', 255);
-            $table->softDeletes();
-            $table->timestamps();
+        Schema::table('personnes', function (Blueprint $table) {
+            $table->boolean('prospect')->default(true);
         });
     }
 
@@ -28,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('types_emplacements');
+        Schema::table('personnes', function (Blueprint $table) {
+            //
+        });
     }
 };

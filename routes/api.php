@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\Exploitation\Reception\ClientsController;
+use App\Http\Controllers\Exploitation\Reception\ContratsController;
+use App\Http\Controllers\Exploitation\Reception\ProspectsController;
+use App\Http\Controllers\Exploitation\Reception\TypeContratsController;
+use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
 use App\Http\Controllers\Parametre\Architecture\EmplacementsController;
 use App\Http\Controllers\Parametre\Architecture\EquipementsController;
 use App\Http\Controllers\Parametre\Architecture\NiveauxController;
@@ -55,6 +60,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::post('/store', [SitesController::class, 'store']);
         Route::post('/push', [SitesController::class, 'push']);
         Route::get('{id}', [SitesController::class, 'show']);
+        Route::get('/structure/{id}', [SitesController::class, 'showStructure']);
+        Route::get('/structure', [SitesController::class, 'structure']);
         Route::delete('{id}', [SitesController::class, 'trash']);
         Route::put('{id}', [SitesController::class, 'update']);
         Route::get('/restore/{id}', [SitesController::class, 'restore']);
@@ -126,5 +133,60 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', [TypeEquipementsController::class, 'trash']);
         Route::put('{id}', [TypeEquipementsController::class, 'update']);
         Route::get('/restore/{id}', [TypeEquipementsController::class, 'restore']);
+    });
+});
+
+Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
+    Route::prefix('receptions')->group(function () {
+        Route::prefix('prospects')->group(function () {
+            Route::get('/', [ProspectsController::class, 'all']);
+            Route::get('/trashed', [ProspectsController::class, 'trashed']);
+            Route::get('/marche/{id}', [ProspectsController::class, 'getByMarche']);
+            Route::post('/store', [ProspectsController::class, 'store']);
+            Route::get('{id}', [ProspectsController::class, 'show']);
+            Route::put('{id}', [ProspectsController::class, 'update']);
+            Route::delete('{id}', [ProspectsController::class, 'trash']);
+            Route::get('/restore/{id}', [ProspectsController::class, 'restore']);
+        });
+        Route::prefix('clients')->group(function () {
+            Route::get('/', [ClientsController::class, 'all']);
+            Route::get('/trashed', [ClientsController::class, 'trashed']);
+            Route::get('/marche/{id}', [ClientsController::class, 'getByMarche']);
+            Route::post('/store', [ClientsController::class, 'store']);
+            Route::get('{id}', [ClientsController::class, 'show']);
+            Route::put('{id}', [ClientsController::class, 'update']);
+            Route::delete('{id}', [ClientsController::class, 'trash']);
+            Route::get('/restore/{id}', [ClientsController::class, 'restore']);
+        });
+        Route::prefix('contrats')->group(function () {
+            Route::get('/', [ContratsController::class, 'all']);
+            Route::get('/trashed', [ContratsController::class, 'trashed']);
+            Route::get('/marche/{id}', [ContratsController::class, 'getByMarche']);
+            Route::post('/store', [ContratsController::class, 'store']);
+            Route::get('{id}', [ContratsController::class, 'show']);
+            Route::put('{id}', [ContratsController::class, 'update']);
+            Route::delete('{id}', [ContratsController::class, 'trash']);
+            Route::get('/restore/{id}', [ContratsController::class, 'restore']);
+        });
+        Route::prefix('contrat/types')->group(function () {
+            Route::get('/', [TypeContratsController::class, 'all']);
+            Route::get('/trashed', [TypeContratController::class, 'trashed']);
+            Route::get('/marche/{id}', [TypeContratController::class, 'getByMarche']);
+            Route::post('/store', [TypeContratController::class, 'store']);
+            Route::get('{id}', [TypeContratController::class, 'show']);
+            Route::put('{id}', [TypeContratController::class, 'update']);
+            Route::delete('{id}', [TypeContratController::class, 'trash']);
+            Route::get('/restore/{id}', [TypeContratController::class, 'restore']);
+        });
+        Route::prefix('personne/types')->group(function () {
+            Route::get('/', [TypePersonnesController::class, 'all']);
+            Route::get('/trashed', [TypePersonnesController::class, 'trashed']);
+            Route::get('/marche/{id}', [TypePersonnesController::class, 'getByMarche']);
+            Route::post('/store', [TypePersonnesController::class, 'store']);
+            Route::get('{id}', [TypePersonnesController::class, 'show']);
+            Route::put('{id}', [TypePersonnesController::class, 'update']);
+            Route::delete('{id}', [TypePersonnesController::class, 'trash']);
+            Route::get('/restore/{id}', [TypePersonnesController::class, 'restore']);
+        });
     });
 });

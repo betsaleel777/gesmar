@@ -2,6 +2,8 @@
 
 namespace App\Models\Architecture;
 
+use App\Models\Exploitation\Contrat;
+use App\Models\Exploitation\Personne;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -38,4 +40,15 @@ class Site extends Model
     {
         return $this->hasMany(Equipement::class);
     }
+
+    public function personnes()
+    {
+        return $this->hasMany(Personne::class);
+    }
+
+    public function contrats()
+    {
+        return $this->hasMany(Contrat::class);
+    }
+
 }

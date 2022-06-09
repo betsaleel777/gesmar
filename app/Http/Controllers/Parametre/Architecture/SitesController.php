@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Site;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class SitesController extends Controller implements StandardControllerInterface
 {
@@ -74,5 +75,66 @@ class SitesController extends Controller implements StandardControllerInterface
     {
         $marche = Site::withTrashed()->find($id);
         return response()->json(['marche' => $marche]);
+    }
+
+    public function showStructure(int $id)
+    {
+        return response()->json(['structure' => self::structurer($id)]);
+    }
+
+    public function structure()
+    {
+        return response()->json(['structure' => self::structurer()]);
+    }
+
+    private static function structurer(int $id = null)
+    {
+        if (empty($id)) {
+            $sites = Site::select('id', 'nom')->with([
+                'pavillons' => function ($query) {$query->withCount('niveaux');},
+                'pavillons.niveaux' => function ($query) {$query->withCount('zones');},
+                'pavillons.niveaux.zones' => function ($query) {$query->withCount('emplacements');},
+                'pavillons.niveaux.zones.emplacements',
+            ])->withCount('pavillons')->get();
+        } else {
+            $sites = Site::select('id', 'nom')->with([
+                'pavillons' => function ($query) {$query->withCount('niveaux');},
+                'pavillons.niveaux' => function ($query) {$query->withCount('zones');},
+                'pavillons.niveaux.zones' => function ($query) {$query->withCount('emplacements');},
+                'pavillons.niveaux.zones.emplacements',
+            ])->withCount('pavillons')->find($id)->get();
+        }
+
+        $structure = $sites->map(function ($site) {
+            return new Collection([
+                'name' => $site->nom,
+                'value' => $site->pavillons_count,
+                'children' => $site->pavillons->map(function ($pavillon) {
+                    return new Collection([
+                        'name' => $pavillon->nom,
+                        'value' => $pavillon->niveaux_count,
+                        'children' => $pavillon->niveaux->map(function ($niveau) {
+                            return new Collection([
+                                'name' => $niveau->nom,
+                                'value' => $niveau->zones_count,
+                                'children' => $niveau->zones->map(function ($zone) {
+                                    return new Collection([
+                                        'name' => $zone->nom,
+                                        'value' => $zone->emplacements_count,
+                                        'children' => $zone->emplacements->map(function ($emplacement) {
+                                            return new Collection([
+                                                'name' => $emplacement->nom,
+                                                'value' => 0,
+                                            ]);
+                                        }),
+                                    ]);
+                                }),
+                            ]);
+                        }),
+                    ]);
+                }),
+            ]);
+        });
+        return $structure;
     }
 }

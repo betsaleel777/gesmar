@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('emplacements', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 3);
+            $table->string('code', 10);
             $table->string('nom', 255);
             $table->unsignedMediumInteger('superficie')->default(0);
             $table->unsignedInteger('loyer')->default(0);
-            $table->unsignedInteger('pas_porte')->default(0);
+            $table->unsignedInteger('pas_porte')->nullable()->default(0);
             $table->boolean('busy')->default(false);
             $table->boolean('reserved')->default(false);
             $table->foreignId('type_emplacement_id')->constrained('type_emplacements')->onDelete('cascade')->onUpdate('cascade');
