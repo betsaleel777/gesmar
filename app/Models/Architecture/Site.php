@@ -51,4 +51,9 @@ class Site extends Model
         return $this->hasMany(Contrat::class);
     }
 
+    public function abonnements()
+    {
+        return $this->hasMany(Abonnement::class);
+    }
+
 }

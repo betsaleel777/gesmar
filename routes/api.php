@@ -115,6 +115,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', [AbonnementsController::class, 'trash']);
         Route::put('{id}', [AbonnementsController::class, 'update']);
         Route::get('/restore/{id}', [AbonnementsController::class, 'restore']);
+        Route::get('/indexing/{id}', [AbonnementsController::class, 'lastIndex']);
     });
     Route::prefix('equipements')->group(function () {
         Route::get('/', [EquipementsController::class, 'all']);

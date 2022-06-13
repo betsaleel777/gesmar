@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Abonnement extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['code', 'equipement', 'emplacement', 'index_depart', 'index_fin', 'date_resiliation'];
+    protected $fillable = ['code', 'equipement', 'emplacement', 'index_depart', 'index_fin', 'date_resiliation', 'site_id'];
     protected $appends = ['status'];
     protected $dates = ['created_at'];
     const PROGRESSING = 'en cours';
@@ -20,6 +20,7 @@ class Abonnement extends Model
         'index_depart' => 'required|numeric',
         'index_fin' => 'nullable|numeric',
         'date_resiliation' => 'required',
+        'site_id' => 'required',
     ];
 
     public function getStatusAttributes()

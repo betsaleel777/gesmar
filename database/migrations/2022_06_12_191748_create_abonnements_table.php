@@ -15,6 +15,13 @@ return new class extends Migration
     {
         Schema::create('abonnements', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 10)->unique();
+            $table->unsignedInteger('index_depart');
+            $table->unsignedInteger('index_fin')->nullable();
+            $table->dateTime('date_resiliation')->nullable();
+            $table->foreignId('equipement_id')->constrained('equipements')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('emplacement_id')->constrained('emplacements')->onDelete('cascade')->onUpdate('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
