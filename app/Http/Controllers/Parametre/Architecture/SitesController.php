@@ -108,26 +108,33 @@ class SitesController extends Controller implements StandardControllerInterface
         $structure = $sites->map(function ($site) {
             return new Collection([
                 'name' => $site->nom,
-                'value' => $site->pavillons_count,
+                'value' => (int) $site->pavillons_count,
                 'children' => $site->pavillons->map(function ($pavillon) {
                     return new Collection([
                         'name' => $pavillon->nom,
-                        'value' => $pavillon->niveaux_count,
+                        'value' => (int) $pavillon->niveaux_count,
                         'children' => $pavillon->niveaux->map(function ($niveau) {
                             return new Collection([
                                 'name' => $niveau->nom,
-                                'value' => $niveau->zones_count,
+                                'value' => (int) $niveau->zones_count,
                                 'children' => $niveau->zones->map(function ($zone) {
-                                    return new Collection([
-                                        'name' => $zone->nom,
-                                        'value' => $zone->emplacements_count,
-                                        'children' => $zone->emplacements->map(function ($emplacement) {
-                                            return new Collection([
-                                                'name' => $emplacement->nom,
-                                                'value' => 0,
-                                            ]);
-                                        }),
-                                    ]);
+                                    if ((int) $zone->emplacements_count === 0) {
+                                        return new Collection([
+                                            'name' => $zone->nom,
+                                            'value' => 1,
+                                        ]);
+                                    } else {
+                                        return new Collection([
+                                            'name' => $zone->nom,
+                                            'value' => (int) $zone->emplacements_count,
+                                            'children' => $zone->emplacements->map(function ($emplacement) {
+                                                return new Collection([
+                                                    'name' => $emplacement->code,
+                                                    'value' => 1,
+                                                ]);
+                                            }),
+                                        ]);
+                                    }
                                 }),
                             ]);
                         }),

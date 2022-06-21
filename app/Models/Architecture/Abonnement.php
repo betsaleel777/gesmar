@@ -2,28 +2,39 @@
 
 namespace App\Models\Architecture;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Abonnement extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['code', 'equipement', 'emplacement', 'index_depart', 'index_fin', 'date_resiliation', 'site_id'];
+    protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'date_resiliation', 'site_id'];
     protected $appends = ['status'];
     protected $dates = ['created_at'];
     const PROGRESSING = 'en cours';
     const STOPPED = 'résilié';
     const RULES = [
-        'code' => 'required',
-        'equipement' => 'required',
-        'emplacement' => 'required',
+        'equipement_id' => 'required',
+        'emplacement_id' => 'required',
         'index_depart' => 'required|numeric',
-        'index_fin' => 'nullable|numeric',
-        'date_resiliation' => 'required',
         'site_id' => 'required',
     ];
+    const FINISH_RULES = [
+        'index_fin' => 'required|numeric',
+    ];
 
-    public function getStatusAttributes()
+    public function stop()
+    {
+        $this->attributes['date_resiliation'] = Carbon::now();
+    }
+
+    public function process()
+    {
+        $this->attributes['date_resiliation'] = null;
+    }
+
+    public function getStatusAttribute()
     {
         return empty($this->attributes['date_resiliation']) ? self::PROGRESSING : self::STOPPED;
     }
@@ -46,5 +57,10 @@ class Abonnement extends Model
     public function emplacement()
     {
         return $this->belongsTo(Emplacement::class);
+    }
+
+    public function site()
+    {
+        return $this->belongsTo(Site::class);
     }
 }

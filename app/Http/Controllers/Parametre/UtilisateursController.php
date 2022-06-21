@@ -35,9 +35,10 @@ class UtilisateursController extends Controller
         $request->validate(User::RULES);
         $user = new User($request->all());
         $user->password = Hash::make($request->password);
-        $path = substr($request->file('avatar')->store('public/user-' . $request->id), 7);
-        $user->avatar = $path;
         $user->deconnecter();
+        $user->save();
+        $path = substr($request->file('avatar')->store('public/user-' . $user->id), 7);
+        $user->avatar = $path;
         $user->save();
         $message = "L'utilisateur $request->name a été crée avec succès.";
         return response()->json(['message' => $message]);
@@ -53,7 +54,7 @@ class UtilisateursController extends Controller
             $user->name = $request->name;
             $user->adresse = $request->adresse;
             $user->description = $request->description;
-            if ($request->hasFile('image')) {
+            if ($request->hasFile('image') and !empty($user->avatar)) {
                 unlink(public_path() . '/storage/' . $user->avatar);
                 $path = substr($request->file('image')->store('public/user-' . $request->id), 7);
                 $user->avatar = $path;

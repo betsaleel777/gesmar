@@ -13,15 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('contrats', function (Blueprint $table) {
+        Schema::create('service_annexes', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 10)->unique();
-            $table->string('adresse', 255);
-            $table->string('contact', 20);
-            $table->string('email', 255);
-            $table->string('ville', 80);
+            $table->string('nom', 250);
+            $table->unsignedInteger('prix');
+            $table->longText('description')->nullable();
             $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('type_personne_id')->constrained('type_personnes')->onDelete('cascade')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -34,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('contrats');
+        Schema::dropIfExists('service_annexes');
     }
 };

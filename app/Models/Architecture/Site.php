@@ -2,7 +2,8 @@
 
 namespace App\Models\Architecture;
 
-use App\Models\Exploitation\Contrat;
+use App\Models\Exploitation\ContratAnnexe;
+use App\Models\Exploitation\ContratEmplacement;
 use App\Models\Exploitation\Personne;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -46,14 +47,24 @@ class Site extends Model
         return $this->hasMany(Personne::class);
     }
 
-    public function contrats()
+    public function contratsAnnexes()
     {
-        return $this->hasMany(Contrat::class);
+        return $this->hasMany(ContratAnnexe::class);
+    }
+
+    public function contratsEmplacements()
+    {
+        return $this->hasMany(ContratEmplacement::class);
     }
 
     public function abonnements()
     {
         return $this->hasMany(Abonnement::class);
+    }
+
+    public function servicesAnnexes()
+    {
+        return $this->hasMany(ServiceAnnexe::class);
     }
 
 }

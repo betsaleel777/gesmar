@@ -15,7 +15,8 @@ class EmplacementsController extends Controller implements StandardControllerInt
         $zone = Zone::with('niveau.pavillon', 'emplacements')->find($id);
         $rang = (int) $zone->emplacements->count() + 1;
         $place = str_pad($rang, 3, '0', STR_PAD_LEFT);
-        return $zone->niveau->pavillon->code . $zone->niveau->code . $zone->code . $place;
+        $code = $zone->niveau->pavillon->code . $zone->niveau->code . $zone->code . $place;
+        return ['code' => $code, 'rang' => $rang];
     }
 
     public function all()
@@ -34,7 +35,8 @@ class EmplacementsController extends Controller implements StandardControllerInt
     {
         $request->validate(Emplacement::RULES);
         $emplacement = new Emplacement($request->all());
-        $emplacement->code = self::codeGenerate($request->zone_id);
+        ['code' => $code] = self::codeGenerate($request->zone_id);
+        $emplacement->code = $code;
         $emplacement->save();
         $message = "L'emplacement $request->nom a été crée avec succès.";
         return response()->json(['message' => $message]);
@@ -74,6 +76,23 @@ class EmplacementsController extends Controller implements StandardControllerInt
         $emplacement = Emplacement::find($id);
         $emplacement->delete();
         $message = "L'emplacement $emplacement->nom a été supprimé avec succès.";
+        return response()->json(['message' => $message]);
+    }
+
+    public function push(Request $request)
+    {
+        $request->validate(Emplacement::PUSH_RULES);
+        $compteur = $request->nombre;
+        while ($compteur > 0) {
+            $emplacement = new Emplacement($request->all());
+            $emplacement->code = self::codeGenerate($request->zone_id);
+            ['code' => $code, 'rang' => $rang] = self::codeGenerate($request->zone_id);
+            $emplacement->code = $code;
+            $emplacement->nom = 'EMPLACEMENT ' . $rang;
+            $emplacement->save();
+            $compteur--;
+        }
+        $message = "$request->nombre emplacements ont été crées avec succès.";
         return response()->json(['message' => $message]);
     }
 }

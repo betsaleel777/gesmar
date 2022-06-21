@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('equipements', function (Blueprint $table) {
-            $table->string('status', 15);
+        Schema::create('contrat_annexes', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
         });
     }
 
@@ -25,8 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('equipements', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('contrat_annexes');
     }
 };

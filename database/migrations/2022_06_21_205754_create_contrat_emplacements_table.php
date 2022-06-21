@@ -13,11 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('type_contrats', function (Blueprint $table) {
+        Schema::create('contrat_emplacements', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
-            $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
-            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('type_contrats');
+        Schema::dropIfExists('contrat_emplacements');
     }
 };

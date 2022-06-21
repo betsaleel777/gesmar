@@ -29,6 +29,7 @@ class EquipementsController extends Controller implements StandardControllerInte
         ['code' => $code, 'rang' => $rang] = self::codeGenerate($request->site_id);
         $equipement->code = $code;
         $equipement->nom = 'EQUIPEMENT ' . $rang;
+        $equipement->free();
         $equipement->save();
         $message = "L'équipement $equipement->nom a été enregistré avec succès.";
         return response()->json(['message' => $message]);

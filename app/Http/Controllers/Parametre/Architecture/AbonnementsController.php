@@ -14,10 +14,10 @@ class AbonnementsController extends Controller implements StandardControllerInte
 
     private static function codeGenerate(int $site)
     {
-        $site = Site::with('abonnements')->find($site);
+        $site = Site::with(['abonnements' => function ($query) {$query->withTrashed();}])->find($site);
         $rang = (int) $site->abonnements->count() + 1;
         $place = str_pad($rang, 6, '0', STR_PAD_LEFT);
-        return 'AB' . str_pad($site, 2, '0', STR_PAD_LEFT) . $place;
+        return 'AB' . str_pad($site->id, 2, '0', STR_PAD_LEFT) . $place;
     }
 
     public function all()
@@ -32,6 +32,9 @@ class AbonnementsController extends Controller implements StandardControllerInte
         $abonnement = new Abonnement($request->all());
         $abonnement->code = self::codeGenerate($request->site_id);
         $abonnement->save();
+        $equipement = Equipement::find($request->equipement_id);
+        $equipement->busy();
+        $equipement->save();
         $message = "L'abonnement $request->code a été crée avec succès.";
         return response()->json(['message' => $message]);
     }
@@ -48,6 +51,9 @@ class AbonnementsController extends Controller implements StandardControllerInte
     public function trash(int $id)
     {
         $abonnement = Abonnement::find($id);
+        $equipement = Equipement::find($abonnement->equipement_id);
+        $equipement->free();
+        $equipement->save();
         $abonnement->delete();
         $message = "L'abonnement $abonnement->code a été supprimé avec succès.";
         return response()->json(['message' => $message]);
@@ -76,7 +82,22 @@ class AbonnementsController extends Controller implements StandardControllerInte
     public function lastIndex(int $id)
     {
         $abonnement = Abonnement::with('emplacement', 'equipement.type')->where('equipement_id', $id)->orderBy('id', 'DESC')->first();
-        if (empty($abonnement->index)) {$equipement = Equipement::find($id);}
-        return response()->json(['index' => $abonnement->index ?? $equipement->index]);
+        if (empty($abonnement->index_depart)) {$equipement = Equipement::find($id);}
+        return response()->json(['index' => $abonnement->index_fin ?? $abonnement->index_depart ?? $equipement->index]);
     }
+
+    public function finish(int $id, Request $request)
+    {
+        $request->validate(Abonnement::FINISH_RULES);
+        $abonnement = Abonnement::find($id);
+        $abonnement->index_fin = $request->index_fin;
+        $abonnement->stop();
+        $equipement = Equipement::find($abonnement->equipement_id);
+        $equipement->free();
+        $equipement->save();
+        $abonnement->save();
+        $message = "L'abonnement $request->code a été résilié avec succès.";
+        return response()->json(['message' => $message]);
+    }
+
 }
