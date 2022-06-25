@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Exploitation\Reception\ClientsController;
-use App\Http\Controllers\Exploitation\Reception\ContratsController;
+use App\Http\Controllers\Exploitation\Reception\ContratsAnnexesController;
+use App\Http\Controllers\Exploitation\Reception\ContratsEmplacementsController;
+use App\Http\Controllers\Exploitation\Reception\PersonnesController;
 use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
 use App\Http\Controllers\Parametre\Architecture\AbonnementsController;
@@ -101,6 +103,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     Route::prefix('emplacements')->group(function () {
         Route::get('/', [EmplacementsController::class, 'all']);
         Route::get('/trashed', [EmplacementsController::class, 'trashed']);
+        Route::get('/marche/{id}', [EmplacementsController::class, 'getByMarche']);
         Route::post('/store', [EmplacementsController::class, 'store']);
         Route::post('/push', [EmplacementsController::class, 'push']);
         Route::get('{id}', [EmplacementsController::class, 'show']);
@@ -122,6 +125,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     Route::prefix('annexes')->group(function () {
         Route::get('/', [ServiceAnnexesController::class, 'all']);
         Route::get('/trashed', [ServiceAnnexesController::class, 'trashed']);
+        Route::get('/marche/{id}', [ServiceAnnexesController::class, 'getByMarche']);
         Route::post('/store', [ServiceAnnexesController::class, 'store']);
         Route::get('{id}', [ServiceAnnexesController::class, 'show']);
         Route::delete('{id}', [ServiceAnnexesController::class, 'trash']);
@@ -160,10 +164,18 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
 
 Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
     Route::prefix('receptions')->group(function () {
+        Route::prefix('personnes')->group(function () {
+            Route::get('/', [PersonnesController::class, 'leadsAndCustomers']);
+            Route::post('/store', [PersonnesController::class, 'store']);
+            Route::get('/marche/{id}', [PersonnesController::class, 'getByMarche']);
+            Route::get('{id}', [PersonnesController::class, 'show']);
+            Route::put('{id}', [PersonnesController::class, 'update']);
+            Route::delete('{id}', [PersonnesController::class, 'trash']);
+            Route::get('/restore/{id}', [PersonnesController::class, 'restore']);
+        });
         Route::prefix('prospects')->group(function () {
             Route::get('/', [ProspectsController::class, 'all']);
             Route::get('/trashed', [ProspectsController::class, 'trashed']);
-            Route::get('/marche/{id}', [ProspectsController::class, 'getByMarche']);
             Route::post('/store', [ProspectsController::class, 'store']);
             Route::get('{id}', [ProspectsController::class, 'show']);
             Route::put('{id}', [ProspectsController::class, 'update']);
@@ -173,7 +185,6 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
         Route::prefix('clients')->group(function () {
             Route::get('/', [ClientsController::class, 'all']);
             Route::get('/trashed', [ClientsController::class, 'trashed']);
-            Route::get('/marche/{id}', [ClientsController::class, 'getByMarche']);
             Route::post('/store', [ClientsController::class, 'store']);
             Route::get('{id}', [ClientsController::class, 'show']);
             Route::put('{id}', [ClientsController::class, 'update']);
@@ -181,14 +192,24 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::get('/restore/{id}', [ClientsController::class, 'restore']);
         });
         Route::prefix('contrats')->group(function () {
-            Route::get('/', [ContratsController::class, 'all']);
-            Route::get('/trashed', [ContratsController::class, 'trashed']);
-            Route::get('/marche/{id}', [ContratsController::class, 'getByMarche']);
-            Route::post('/store', [ContratsController::class, 'store']);
-            Route::get('{id}', [ContratsController::class, 'show']);
-            Route::put('{id}', [ContratsController::class, 'update']);
-            Route::delete('{id}', [ContratsController::class, 'trash']);
-            Route::get('/restore/{id}', [ContratsController::class, 'restore']);
+            Route::prefix('annexes')->group(function () {
+                Route::get('/', [ContratsAnnexesController::class, 'all']);
+                Route::get('/trashed', [ContratsAnnexesController::class, 'trashed']);
+                Route::post('/store', [ContratsAnnexesController::class, 'store']);
+                Route::get('{id}', [ContratsAnnexesController::class, 'show']);
+                Route::put('{id}', [ContratsAnnexesController::class, 'update']);
+                Route::delete('{id}', [ContratsAnnexesController::class, 'trash']);
+                Route::get('/restore/{id}', [ContratsAnnexesController::class, 'restore']);
+            });
+            Route::prefix('emplacements')->group(function () {
+                Route::get('/', [ContratsEmplacementsController::class, 'all']);
+                Route::get('/trashed', [ContratsEmplacementsController::class, 'trashed']);
+                Route::post('/store', [ContratsEmplacementsController::class, 'store']);
+                Route::get('{id}', [ContratsEmplacementsController::class, 'show']);
+                Route::put('{id}', [ContratsEmplacementsController::class, 'update']);
+                Route::delete('{id}', [ContratsEmplacementsController::class, 'trash']);
+                Route::get('/restore/{id}', [ContratsEmplacementsController::class, 'restore']);
+            });
         });
         Route::prefix('personne/types')->group(function () {
             Route::get('/', [TypePersonnesController::class, 'all']);

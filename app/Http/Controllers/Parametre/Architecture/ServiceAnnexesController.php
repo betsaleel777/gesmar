@@ -61,4 +61,10 @@ class ServiceAnnexesController extends Controller implements StandardControllerI
         $message = "Le service annexe $annexe->nom a été supprimé avec succès.";
         return response()->json(['message' => $message]);
     }
+
+    public function getByMarche(int $id)
+    {
+        $annexes = ServiceAnnexe::with('site')->where('site_id', $id)->get();
+        return response()->json(['annexes' => $annexes]);
+    }
 }

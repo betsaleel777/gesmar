@@ -15,6 +15,18 @@ return new class extends Migration
     {
         Schema::create('contrat_annexes', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 10)->unique();
+            $table->date('debut');
+            $table->date('fin');
+            $table->longText('usage')->nullable();
+            $table->dateTime('date_acompte')->nullable();
+            $table->dateTime('date_solde')->nullable();
+            $table->dateTime('date_proforma')->nullable();
+            $table->string('attachment', 255)->nullable();
+            $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('personne_id')->constrained('personnes')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('annexe_id')->constrained('service_annexes')->onDelete('cascade')->onUpdate('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

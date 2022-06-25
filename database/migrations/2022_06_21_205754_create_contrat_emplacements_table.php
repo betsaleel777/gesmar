@@ -15,6 +15,17 @@ return new class extends Migration
     {
         Schema::create('contrat_emplacements', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 10)->unique();
+            $table->date('debut');
+            $table->longText('usage')->nullable();
+            $table->dateTime('date_acompte')->nullable();
+            $table->dateTime('date_solde')->nullable();
+            $table->dateTime('date_proforma')->nullable();
+            $table->string('attachment', 255)->nullable();
+            $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('personne_id')->constrained('personnes')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('emplacement_id')->constrained('emplacements')->onDelete('cascade')->onUpdate('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

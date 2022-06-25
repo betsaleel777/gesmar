@@ -7,6 +7,7 @@ use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EmplacementsController extends Controller implements StandardControllerInterface
 {
@@ -94,5 +95,13 @@ class EmplacementsController extends Controller implements StandardControllerInt
         }
         $message = "$request->nombre emplacements ont été crées avec succès.";
         return response()->json(['message' => $message]);
+    }
+
+    public function getByMarche(int $id)
+    {
+        $emplacements = DB::table('emplacements')->select('emplacements.*')->join('zones', 'zones.id', '=', 'emplacements.zone_id')
+            ->join('niveaux', 'zones.niveau_id', '=', 'niveaux.id')->join('pavillons', 'niveaux.pavillon_id', '=', 'pavillons.id')
+            ->where('pavillons.site_id', $id)->get();
+        return response()->json(['emplacements' => $emplacements]);
     }
 }
