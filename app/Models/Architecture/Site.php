@@ -13,7 +13,6 @@ class Site extends Model
     use SoftDeletes;
 
     protected $fillable = ['nom', 'pays', 'ville', 'commune', 'postale'];
-    protected $dates = ['created_at'];
 
     const RULES = [
         'nom' => 'required|max:255|unique:sites,nom',

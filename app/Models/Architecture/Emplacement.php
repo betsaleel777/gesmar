@@ -12,8 +12,6 @@ class Emplacement extends Model
 
     protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'reserved', 'busy', 'loyer', 'pas_porte'];
 
-    protected $dates = ['created_at'];
-
     const RULES = [
         'nom' => 'required|max:255',
         'superficie' => 'required',

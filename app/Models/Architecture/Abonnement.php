@@ -11,7 +11,6 @@ class Abonnement extends Model
     use SoftDeletes;
     protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'date_resiliation', 'site_id'];
     protected $appends = ['status'];
-    protected $dates = ['created_at'];
     const PROGRESSING = 'en cours';
     const STOPPED = 'résilié';
     const RULES = [

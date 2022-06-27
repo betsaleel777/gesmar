@@ -11,7 +11,6 @@ class TypeEmplacement extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = ['nom', 'site_id', 'prefix', 'code'];
-    protected $dates = ['created_at'];
     protected $appends = ['code'];
 
     const RULES = [

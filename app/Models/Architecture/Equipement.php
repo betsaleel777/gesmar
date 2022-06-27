@@ -25,7 +25,6 @@ class Equipement extends Model
         'date_libre',
     ];
     protected $appends = ['status'];
-    protected $dates = ['created_at'];
     const FREE = 'libre';
     const BUSY = 'occupé';
     const DAMAGING = 'abimé';

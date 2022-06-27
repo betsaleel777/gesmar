@@ -11,7 +11,6 @@ class TypeEquipement extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = ['nom', 'site_id', 'frais_penalite'];
-    protected $dates = ['created_at'];
 
     const RULES = [
         'nom' => 'required|max:150',

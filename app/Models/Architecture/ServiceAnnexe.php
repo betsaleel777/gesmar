@@ -11,7 +11,6 @@ class ServiceAnnexe extends Model
     use SoftDeletes;
 
     protected $fillable = ['nom', 'site_id', 'prix', 'description', 'mode'];
-    protected $dates = ['created_at'];
 
     const RULES = [
         'nom' => 'required|max:250',

@@ -10,7 +10,6 @@ class Pavillon extends Model
     use SoftDeletes;
 
     protected $fillable = ['nom', 'code', 'site_id'];
-    protected $dates = ['created_at'];
     protected $appends = ['code'];
 
     const RULES = [
