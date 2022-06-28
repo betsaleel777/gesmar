@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('termes_contrats', function (Blueprint $table) {
             $table->id();
             $table->string('code', 10)->unique();
+            $table->string('type', 20);
             $table->longText('contenu');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');

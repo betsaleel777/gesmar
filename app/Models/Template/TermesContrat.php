@@ -2,6 +2,8 @@
 
 namespace App\Models\Template;
 
+use App\Models\Architecture\Site;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,14 +12,16 @@ class TermesContrat extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['code', 'user_id', 'site_id', 'contenu', 'date_using'];
-    protected $appends = ['status', 'type'];
+    protected $fillable = ['code', 'user_id', 'site_id', 'contenu', 'date_using', 'type'];
+    protected $appends = ['status'];
 
-    const RULES = [
-        'site_id' => 'required',
-        'contenu' => 'required',
-    ];
+    const RULES = ['site_id' => 'required', 'contenu' => 'required'];
     private const USING = 'en utilisation';
+
+    public function __construct($attributes = array())
+    {
+        parent::__construct($attributes);
+    }
 
     public function generate(string $prefixe): void
     {

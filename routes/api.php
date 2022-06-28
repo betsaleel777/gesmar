@@ -19,6 +19,8 @@ use App\Http\Controllers\Parametre\Architecture\ZonesController;
 use App\Http\Controllers\Parametre\AuthController;
 use App\Http\Controllers\Parametre\PermissionsController;
 use App\Http\Controllers\Parametre\RolesController;
+use App\Http\Controllers\Parametre\Template\TermesContratsAnnexesController;
+use App\Http\Controllers\Parametre\Template\TermesContratsEmplacementsController;
 use App\Http\Controllers\Parametre\UtilisateursController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +36,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::middleware('auth:sanctum')->get('user', [AuthController::class, 'me']);
+Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
 Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     Route::prefix('users')->group(function () {
         Route::get('/', [UtilisateursController::class, 'all']);
@@ -158,6 +161,26 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', [TypeEmplacementsController::class, 'trash']);
         Route::put('{id}', [TypeEmplacementsController::class, 'update']);
         Route::get('/restore/{id}', [TypeEmplacementsController::class, 'restore']);
+    });
+    Route::prefix('termes')->group(function () {
+        Route::prefix('annexes')->group(function () {
+            Route::get('/', [TermesContratsAnnexesController::class, 'allAnnexes']);
+            Route::get('/trashed', [TermesContratsAnnexesController::class, 'trashedAnnexes']);
+            Route::post('/store', [TermesContratsAnnexesController::class, 'store']);
+            Route::get('{id}', [TermesContratsAnnexesController::class, 'show']);
+            Route::delete('{id}', [TermesContratsAnnexesController::class, 'trash']);
+            Route::put('{id}', [TermesContratsAnnexesController::class, 'update']);
+            Route::get('/restore/{id}', [TermesContratsAnnexesController::class, 'restore']);
+        });
+        Route::prefix('emplacements')->group(function () {
+            Route::get('/', [TermesContratsEmplacementsController::class, 'allBails']);
+            Route::get('/trashed', [TermesContratsEmplacementsController::class, 'trashedBails']);
+            Route::post('/store', [TermesContratsEmplacementsController::class, 'store']);
+            Route::get('{id}', [TermesContratsEmplacementsController::class, 'show']);
+            Route::delete('{id}', [TermesContratsEmplacementsController::class, 'trash']);
+            Route::put('{id}', [TermesContratsEmplacementsController::class, 'update']);
+            Route::get('/restore/{id}', [TermesContratsEmplacementsController::class, 'restore']);
+        });
     });
 
 });

@@ -16,5 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::controller(AuthController::class)->group(function () {
     Route::get('dashboard', 'dashboard');
     Route::post('login', 'login');
-    Route::post('logout', 'logout');
+    Route::post('deconnecter', 'deconnecter');
+    // Route::post('logout', 'logout');
 });

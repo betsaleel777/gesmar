@@ -26,11 +26,15 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(Request $request)
+    public function deconnecter(Request $request)
     {
         $user = User::find($request->id);
         $user->deconnecter();
         $user->save();
+    }
+
+    public function logout(Request $request)
+    {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

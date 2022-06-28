@@ -28,7 +28,6 @@ class User extends Authenticatable
         'avatar',
     ];
 
-    protected $dates = ['created_at'];
     const RULES = [
         'name' => 'required|max:150|unique:users,name',
         'email' => 'required|email|unique:users,email',
