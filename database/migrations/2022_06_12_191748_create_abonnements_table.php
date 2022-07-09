@@ -21,7 +21,6 @@ return new class extends Migration
             $table->dateTime('date_resiliation')->nullable();
             $table->foreignId('equipement_id')->constrained('equipements')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('emplacement_id')->constrained('emplacements')->onDelete('cascade')->onUpdate('cascade');
-            $table->softDeletes();
             $table->timestamps();
         });
     }

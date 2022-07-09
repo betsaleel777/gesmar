@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
 use Illuminate\Http\Request;
 
-class AbonnementsController extends Controller implements StandardControllerInterface
+class AbonnementsController extends Controller
 {
 
-    private static function codeGenerate(int $site)
+    private static function codeGenerate(int $site): String
     {
         $site = Site::with(['abonnements' => function ($query) {$query->withTrashed();}])->find($site);
         $rang = (int) $site->abonnements->count() + 1;
@@ -48,30 +47,30 @@ class AbonnementsController extends Controller implements StandardControllerInte
         return response()->json(['message' => $message]);
     }
 
-    public function trash(int $id)
-    {
-        $abonnement = Abonnement::find($id);
-        $equipement = Equipement::find($abonnement->equipement_id);
-        $equipement->free();
-        $equipement->save();
-        $abonnement->delete();
-        $message = "L'abonnement $abonnement->code a été supprimé avec succès.";
-        return response()->json(['message' => $message]);
-    }
+    // public function trash(int $id)
+    // {
+    //     $abonnement = Abonnement::find($id);
+    //     $equipement = Equipement::find($abonnement->equipement_id);
+    //     $equipement->free();
+    //     $equipement->save();
+    //     $abonnement->delete();
+    //     $message = "L'abonnement $abonnement->code a été supprimé avec succès.";
+    //     return response()->json(['message' => $message]);
+    // }
 
-    public function restore(int $id)
-    {
-        $abonnement = Abonnement::withTrashed()->find($id);
-        $abonnement->restore();
-        $message = "L'abonnement $abonnement->code a été restauré avec succès.";
-        return response()->json(['message' => $message]);
-    }
+    // public function restore(int $id)
+    // {
+    //     $abonnement = Abonnement::withTrashed()->find($id);
+    //     $abonnement->restore();
+    //     $message = "L'abonnement $abonnement->code a été restauré avec succès.";
+    //     return response()->json(['message' => $message]);
+    // }
 
-    public function trashed()
-    {
-        $abonnements = Abonnement::with('emplacement', 'equipement.type')->onlyTrashed()->get();
-        return response()->json(['abonnements' => $abonnements]);
-    }
+    // public function trashed()
+    // {
+    //     $abonnements = Abonnement::with('emplacement', 'equipement.type')->onlyTrashed()->get();
+    //     return response()->json(['abonnements' => $abonnements]);
+    // }
 
     public function show(int $id)
     {

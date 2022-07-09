@@ -3,13 +3,12 @@
 namespace App\Models\Architecture;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class Abonnement extends Model
+class Abonnement extends Pivot
 {
-    use SoftDeletes;
     protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'date_resiliation', 'site_id'];
+    protected $table = 'abonnements';
     protected $appends = ['status'];
     const PROGRESSING = 'en cours';
     const STOPPED = 'résilié';

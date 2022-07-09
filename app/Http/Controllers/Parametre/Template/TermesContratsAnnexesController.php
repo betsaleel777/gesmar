@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Parametre\Template;
 
 use App\Models\Template\TermesContratAnnexe;
+use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Http\Request;
 
 class TermesContratsAnnexesController extends TermesContratsController
 {
     public function allAnnexes()
     {
-        $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'date_using', 'type')
+        $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'date_using', 'type', 'created_at')
             ->with('site', 'user')->isAnnexe()->get();
         return response()->json(['termes' => $termes]);
     }
@@ -35,8 +36,22 @@ class TermesContratsAnnexesController extends TermesContratsController
 
     public function trashedAnnexes()
     {
-        $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'date_using', 'type')
+        $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'date_using', 'type', 'created_at')
             ->with('site', 'user')->onlyTrashed()->isAnnexe()->get();
         return response()->json(['termes' => $termes]);
+    }
+
+    public function pdf(int $id)
+    {
+        $terme = TermesContratAnnexe::with('site', 'user')->find($id);
+        $filename = 'exampleContrat.pdf';
+        $html = $terme->contenu;
+        $pdf = new TCPDF;
+        $pdf::SetTitle('Example de Contrat');
+        $pdf::setCellHeightRatio(0.7);
+        $pdf::AddPage();
+        $pdf::writeHTML($html, true, false, true, false, '');
+        $pdf::Output(public_path($filename), 'F');
+        return response()->json(['pdf' => public_path($filename)]);
     }
 }

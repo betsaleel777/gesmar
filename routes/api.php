@@ -168,6 +168,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
             Route::get('/trashed', [TermesContratsAnnexesController::class, 'trashedAnnexes']);
             Route::post('/store', [TermesContratsAnnexesController::class, 'store']);
             Route::get('{id}', [TermesContratsAnnexesController::class, 'show']);
+            Route::get('/pdf/{id}', [TermesContratsAnnexesController::class, 'pdf']);
             Route::delete('{id}', [TermesContratsAnnexesController::class, 'trash']);
             Route::put('{id}', [TermesContratsAnnexesController::class, 'update']);
             Route::get('/restore/{id}', [TermesContratsAnnexesController::class, 'restore']);
@@ -177,6 +178,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
             Route::get('/trashed', [TermesContratsEmplacementsController::class, 'trashedBails']);
             Route::post('/store', [TermesContratsEmplacementsController::class, 'store']);
             Route::get('{id}', [TermesContratsEmplacementsController::class, 'show']);
+            Route::get('/pdf/{id}', [TermesContratsAnnexesController::class, 'pdf']);
             Route::delete('{id}', [TermesContratsEmplacementsController::class, 'trash']);
             Route::put('{id}', [TermesContratsEmplacementsController::class, 'update']);
             Route::get('/restore/{id}', [TermesContratsEmplacementsController::class, 'restore']);
@@ -229,6 +231,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
                 Route::get('/trashed', [ContratsEmplacementsController::class, 'trashed']);
                 Route::post('/store', [ContratsEmplacementsController::class, 'store']);
                 Route::get('{id}', [ContratsEmplacementsController::class, 'show']);
+                Route::get('/details/{id}', [ContratsEmplacementsController::class, 'details']);
                 Route::put('{id}', [ContratsEmplacementsController::class, 'update']);
                 Route::delete('{id}', [ContratsEmplacementsController::class, 'trash']);
                 Route::get('/restore/{id}', [ContratsEmplacementsController::class, 'restore']);

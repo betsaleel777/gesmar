@@ -43,6 +43,12 @@ class Emplacement extends Model
         return $this->belongsTo(TypeEmplacement::class, 'type_emplacement_id');
     }
 
+    public function equipements()
+    {
+        return $this->belongsToMany(Equipement::class, 'abonnements')->wherePivotNull('date_resiliation')
+            ->using(Abonnement::class)->withTimestamps();
+    }
+
     public function pacte()
     {
         return $this->belongsTo(ContratEmplacement::class);
