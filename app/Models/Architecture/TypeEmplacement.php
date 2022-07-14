@@ -10,7 +10,7 @@ class TypeEmplacement extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['nom', 'site_id', 'prefix', 'code'];
+    protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid'];
     protected $appends = ['code'];
 
     const RULES = [

@@ -29,10 +29,7 @@ class TypeEmplacementsController extends Controller implements StandardControlle
     {
         $request->validate(Type::RULES);
         $type = Type::find($id);
-        $type->nom = $request->nom;
-        $type->prefix = $request->prefix;
-        $type->site_id = $request->site_id;
-        $type->save();
+        $type->update($request->all());
         $message = "Le type d'emplacement $request->nom a été modifié avec succès.";
         return response()->json(['message' => $message]);
     }

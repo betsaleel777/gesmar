@@ -1,11 +1,18 @@
 <?php
 
 use App\Http\Controllers\Exploitation\Reception\ClientsController;
+use App\Http\Controllers\Exploitation\Reception\ContratController;
 use App\Http\Controllers\Exploitation\Reception\ContratsAnnexesController;
 use App\Http\Controllers\Exploitation\Reception\ContratsEmplacementsController;
 use App\Http\Controllers\Exploitation\Reception\PersonnesController;
 use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
+use App\Http\Controllers\Finance\ChequeController;
+use App\Http\Controllers\Finance\Facture\FactureAnnexeController;
+use App\Http\Controllers\Finance\Facture\FactureEquipementController;
+use App\Http\Controllers\Finance\Facture\FactureInitialeController;
+use App\Http\Controllers\Finance\Facture\FactureLoyerController;
+use App\Http\Controllers\Finance\PaiementLigneController;
 use App\Http\Controllers\Parametre\Architecture\AbonnementsController;
 use App\Http\Controllers\Parametre\Architecture\EmplacementsController;
 use App\Http\Controllers\Parametre\Architecture\EquipementsController;
@@ -190,7 +197,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
 Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
     Route::prefix('receptions')->group(function () {
         Route::prefix('personnes')->group(function () {
-            Route::get('/', [PersonnesController::class, 'leadsAndCustomers']);
+            Route::get('/', [PersonnesController::class, 'all']);
             Route::post('/store', [PersonnesController::class, 'store']);
             Route::get('/marche/{id}', [PersonnesController::class, 'getByMarche']);
             Route::get('{id}', [PersonnesController::class, 'show']);
@@ -217,6 +224,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::get('/restore/{id}', [ClientsController::class, 'restore']);
         });
         Route::prefix('contrats')->group(function () {
+            Route::get('/', [ContratController::class, 'all']);
             Route::prefix('annexes')->group(function () {
                 Route::get('/', [ContratsAnnexesController::class, 'all']);
                 Route::get('/trashed', [ContratsAnnexesController::class, 'trashed']);
@@ -247,5 +255,66 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::delete('{id}', [TypePersonnesController::class, 'trash']);
             Route::get('/restore/{id}', [TypePersonnesController::class, 'restore']);
         });
+    });
+});
+Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
+    Route::prefix('factures')->group(function () {
+        Route::prefix('annexes')->group(function () {
+            Route::get('/', [FactureAnnexeController::class, 'all']);
+            Route::post('/store', [FactureAnnexeController::class, 'store']);
+            Route::get('/marche/{id}', [FactureAnnexeController::class, 'getByMarche']);
+            Route::get('{id}', [FactureAnnexeController::class, 'show']);
+            Route::put('{id}', [FactureAnnexeController::class, 'update']);
+            Route::delete('{id}', [FactureAnnexeController::class, 'trash']);
+            Route::get('/restore/{id}', [FactureAnnexeController::class, 'restore']);
+        });
+        Route::prefix('loyers')->group(function () {
+            Route::get('/', [FactureLoyerController::class, 'all']);
+            Route::get('/trashed', [FactureLoyerController::class, 'trashed']);
+            Route::post('/store', [FactureLoyerController::class, 'store']);
+            Route::get('/marche/{id}', [FactureLoyerController::class, 'getByMarche']);
+            Route::get('{id}', [FactureLoyerController::class, 'show']);
+            Route::put('{id}', [FactureLoyerController::class, 'update']);
+            Route::delete('{id}', [FactureLoyerController::class, 'trash']);
+            Route::get('/restore/{id}', [FactureLoyerController::class, 'restore']);
+        });
+        Route::prefix('initiales')->group(function () {
+            Route::get('/', [FactureInitialeController::class, 'all']);
+            Route::get('/trashed', [FactureInitialeController::class, 'trashed']);
+            Route::post('/store', [FactureInitialeController::class, 'store']);
+            Route::get('/marche/{id}', [FactureInitialeController::class, 'getByMarche']);
+            Route::get('{id}', [FactureInitialeController::class, 'show']);
+            Route::put('{id}', [FactureInitialeController::class, 'update']);
+            Route::delete('{id}', [FactureInitialeController::class, 'trash']);
+            Route::get('/restore/{id}', [FactureInitialeController::class, 'restore']);
+        });
+        Route::prefix('equipements')->group(function () {
+            Route::get('/', [FactureEquipementController::class, 'all']);
+            Route::get('/trashed', [FactureEquipementController::class, 'trashed']);
+            Route::post('/store', [FactureEquipementController::class, 'store']);
+            Route::get('/marche/{id}', [FactureEquipementController::class, 'getByMarche']);
+            Route::get('{id}', [FactureEquipementController::class, 'show']);
+            Route::put('{id}', [FactureEquipementController::class, 'update']);
+            Route::delete('{id}', [FactureEquipementController::class, 'trash']);
+            Route::get('/restore/{id}', [FactureEquipementController::class, 'restore']);
+        });
+    });
+    Route::prefix('cheques')->group(function () {
+        Route::get('/', [ChequeController::class, 'all']);
+        Route::post('/store', [ChequeController::class, 'store']);
+        Route::get('/marche/{id}', [ChequeController::class, 'getByMarche']);
+        Route::get('{id}', [ChequeController::class, 'show']);
+        Route::put('{id}', [ChequeController::class, 'update']);
+        Route::delete('{id}', [ChequeController::class, 'trash']);
+        Route::get('/restore/{id}', [ChequeController::class, 'restore']);
+    });
+    Route::prefix('paiementsLignes')->group(function () {
+        Route::get('/', [PaiementLigneController::class, 'all']);
+        Route::post('/store', [PaiementLigneController::class, 'store']);
+        Route::get('/marche/{id}', [PaiementLigneController::class, 'getByMarche']);
+        Route::get('{id}', [PaiementLigneController::class, 'show']);
+        Route::put('{id}', [PaiementLigneController::class, 'update']);
+        Route::delete('{id}', [PaiementLigneController::class, 'trash']);
+        Route::get('/restore/{id}', [PaiementLigneController::class, 'restore']);
     });
 });

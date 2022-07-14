@@ -10,7 +10,7 @@ class Emplacement extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'reserved', 'busy', 'loyer', 'pas_porte'];
+    protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'reserved', 'busy', 'loyer', 'pas_porte', 'caution'];
 
     const RULES = [
         'nom' => 'required|max:255',

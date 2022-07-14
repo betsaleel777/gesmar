@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('contrat_emplacements', function (Blueprint $table) {
+        Schema::create('contrats', function (Blueprint $table) {
             $table->id();
             $table->string('code', 10)->unique();
             $table->date('debut');
+            $table->date('fin');
             $table->longText('usage')->nullable();
             $table->dateTime('date_acompte')->nullable();
             $table->dateTime('date_solde')->nullable();
@@ -24,7 +25,8 @@ return new class extends Migration
             $table->string('attachment', 255)->nullable();
             $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('personne_id')->constrained('personnes')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('emplacement_id')->constrained('emplacements')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('emplacement_id')->nullable()->constrained('emplacements')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('annexe_id')->nullable()->constrained('service_annexes')->onDelete('cascade')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -37,6 +39,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('contrat_emplacements');
+        Schema::dropIfExists('contrats');
     }
 };
