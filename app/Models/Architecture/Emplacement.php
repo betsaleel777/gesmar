@@ -2,7 +2,7 @@
 
 namespace App\Models\Architecture;
 
-use App\Models\Exploitation\ContratEmplacement;
+use App\Models\Exploitation\Contrat;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -49,8 +49,8 @@ class Emplacement extends Model
             ->using(Abonnement::class)->withTimestamps();
     }
 
-    public function pacte()
+    public function contrat()
     {
-        return $this->belongsTo(ContratEmplacement::class);
+        return $this->belongsTo(Contrat::class);
     }
 }

@@ -112,6 +112,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     });
     Route::prefix('emplacements')->group(function () {
         Route::get('/', [EmplacementsController::class, 'all']);
+        Route::get('/equipables', [EmplacementsController::class, 'equipables']);
         Route::get('/trashed', [EmplacementsController::class, 'trashed']);
         Route::get('/marche/{id}', [EmplacementsController::class, 'getByMarche']);
         Route::post('/store', [EmplacementsController::class, 'store']);
@@ -228,6 +229,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::prefix('annexes')->group(function () {
                 Route::get('/', [ContratsAnnexesController::class, 'all']);
                 Route::get('/trashed', [ContratsAnnexesController::class, 'trashed']);
+                Route::get('/valider/{id}', [ContratsAnnexesController::class, 'valider']);
                 Route::post('/store', [ContratsAnnexesController::class, 'store']);
                 Route::get('{id}', [ContratsAnnexesController::class, 'show']);
                 Route::put('{id}', [ContratsAnnexesController::class, 'update']);
@@ -237,6 +239,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::prefix('emplacements')->group(function () {
                 Route::get('/', [ContratsEmplacementsController::class, 'all']);
                 Route::get('/trashed', [ContratsEmplacementsController::class, 'trashed']);
+                Route::get('/valider/{id}', [ContratsEmplacementsController::class, 'valider']);
                 Route::post('/store', [ContratsEmplacementsController::class, 'store']);
                 Route::get('{id}', [ContratsEmplacementsController::class, 'show']);
                 Route::get('/details/{id}', [ContratsEmplacementsController::class, 'details']);

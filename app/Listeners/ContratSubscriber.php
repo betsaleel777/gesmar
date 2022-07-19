@@ -2,18 +2,17 @@
 
 namespace App\Listeners;
 
-use App\Events\ContratAnnexeAcompted;
-use App\Events\ContratAnnexeRegistred;
-use App\Events\ContratBailAcompted;
-use App\Events\ContratBailRegistred;
+use App\Events\ContratRegistred;
+use App\Events\FactureStatusChange;
 use App\Models\Architecture\Emplacement;
+use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Personne;
-use App\Models\Finance\Facture\Facture;
+use App\Models\Finance\Facture;
 
 class ContratSubscriber
 {
 
-    public function createFactureAnnexe(ContratAnnexeRegistred $event)
+    private function createFactureAnnexe(ContratRegistred $event)
     {
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
@@ -22,7 +21,7 @@ class ContratSubscriber
         $facture->save();
     }
 
-    public function createFactureInitiale(ContratBailRegistred $event)
+    private function createFactureInitiale(ContratRegistred $event)
     {
         $emplacement = Emplacement::with('type')->find($event->contrat->emplacement_id);
         $facture = new Facture();
@@ -40,13 +39,19 @@ class ContratSubscriber
             $personne->save();
         }
         $facture->save();
-
     }
 
-    public function firstPaiementDone(ContratBailAcompted $event)
+    public function updateFactureStatus(FactureStatusChange $event)
     {
-        $event->contrat->accompte();
-        $event->contrat->save();
+        if ($event->status === Facture::SHEDULABLE) {
+            $event->facture->planifier();
+            $event->facture->save();
+        }
+    }
+
+    public function createFacture(ContratRegistred $event)
+    {
+        $event->contrat->isAnnexe() ? $this->createFactureAnnexe($event) : $this->createFactureInitiale($event);
     }
 
     /**
@@ -58,16 +63,12 @@ class ContratSubscriber
     public function subscribe($events)
     {
         $events->listen(
-            ContratAnnexeRegistred::class,
-            [ContratSubscriber::class, 'createFactureAnnexe']
+            ContratRegistred::class,
+            [ContratSubscriber::class, 'createFacture']
         );
         $events->listen(
-            ContratBailRegistred::class,
-            [ContratSubscriber::class, 'createFactureInitiale']
-        );
-        $events->listen(
-            ContratAnnexeAcompted::class,
-            [ContratSubscriber::class, 'firstPaiementDone']
+            FactureStatusChange::class,
+            [ContratSubscriber::class, 'updateFactureStatus']
         );
     }
 }

@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Models\Finance\Facture;
+namespace App\Models\Finance;
 
-use App\Events\ContratBailAcompted;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Exploitation\Contrat;
@@ -15,11 +14,13 @@ class Facture extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'code', 'contrat_id', 'date_soldee', 'annexe_id', 'date_facture',
-        'equipement_id', 'avance', 'caution', 'pas_porte', 'date_facture',
-        'periode',
+        'code', 'contrat_id', 'date_soldee', 'annexe_id', 'date_facture', 'index_debut', 'index_fin',
+        'equipement_id', 'avance', 'caution', 'pas_porte', 'date_plan', 'periode',
     ];
-    protected const PAID = 'soldée';
+    protected $appends = ['status'];
+    private const PAID = 'payée';
+    private const UNPAID = 'impayée';
+    const SHEDULABLE = 'planifiable';
     const RULES = [
         'contrat_id' => 'required',
     ];
@@ -44,17 +45,21 @@ class Facture extends Model
         return array_merge(self::RULES, ['periode' => 'required']);
     }
 
-    public function setPaid(): void
+    public function payer(): void
     {
         $this->attributes['date_soldee'] = Carbon::now();
-        // contrat lié doit aussi être soldé
     }
 
-    public function setValider(): void
+    public function planifier(): void
     {
-        $this->attributes['date_facture'] = Carbon::now();
-        $contrat = Contrat::find($this->contrat_id);
-        $contrat->type() === Contrat::CONTRAT_BAIL ? ContratBailAcompted::dispatch($contrat) : null;
+        $this->attributes['date_plan'] = Carbon::now();
+    }
+
+    public function getStatusAttribute()
+    {
+        if ($this->attributes['date_plan']) {
+            return self::SHEDULABLE;
+        }
     }
 
     // scopes
@@ -91,7 +96,7 @@ class Facture extends Model
 
     public function scopeIsLoyer($query)
     {
-        return $query->whereNotNull('periode');
+        return $query->whereNotNull('periode')->whereNull('equipement_id');
     }
 
     // relations

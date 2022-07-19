@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
-use App\Models\Finance\Facture\Facture;
+use App\Models\Finance\Facture;
 use Illuminate\Http\Request;
 
 class FactureLoyerController extends Controller
@@ -39,14 +39,6 @@ class FactureLoyerController extends Controller
         $facture->codeGenerate(LOYER_PREFIXE);
         $facture->save();
         $message = "La facture de loyer: $facture->code a été crée avec succès.";
-        return response()->json(['message' => $message]);
-    }
-
-    public function valider(int $id)
-    {
-        $facture = Facture::find($id);
-        $facture->valider();
-        $message = "La facture de loyer: $facture->code a été validée avec succès.";
         return response()->json(['message' => $message]);
     }
 }

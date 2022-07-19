@@ -25,6 +25,9 @@ return new class extends Migration
             $table->foreignId('annexe_id')->nullable()->constrained('service_annexes')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('equipement_id')->nullable()->constrained('equipements')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('contrat_id')->constrained('contrats')->onDelete('cascade')->onUpdate('cascade');
+            $table->unique(['contrat_id', 'annexe_id']);
+            $table->unsignedInteger('index_depart')->nullable();
+            $table->unsignedInteger('index_fin')->nullable();
             $table->timestamps();
         });
     }

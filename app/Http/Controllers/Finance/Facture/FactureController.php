@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
-use App\Models\Finance\Facture\Facture;
+use App\Models\Finance\Facture;
 
 class FactureController extends Controller
 {

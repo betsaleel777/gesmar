@@ -2,25 +2,27 @@
 
 namespace App\Events;
 
-use App\Models\Exploitation\Contrat;
+use App\Models\Finance\Facture;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ContratAnnexeRegistred
+class FactureStatusChange
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $contrat;
+    public $facture;
+    public $status;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Contrat $contrat)
+    public function __construct(Facture $facture, string $status)
     {
-        $this->contrat = $contrat;
+        $this->facture = $facture;
+        $this->status = $status;
     }
 
     /**

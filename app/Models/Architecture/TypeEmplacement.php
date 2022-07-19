@@ -10,7 +10,7 @@ class TypeEmplacement extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid'];
+    protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'equipable'];
     protected $appends = ['code'];
 
     const RULES = [
@@ -24,9 +24,14 @@ class TypeEmplacement extends Model
         return $this->attributes['prefix'] . str_pad($this->attributes['code'], 2, '0', STR_PAD_LEFT);
     }
 
+    public function scopeEquipables($query)
+    {
+        return $query->where('equipable', true);
+    }
+
     public function emplacements()
     {
-        return $this->hasMany(Emplacement::class);
+        return $this->hasMany(Emplacement::class, 'type_emplacement_id');
     }
 
     public function site()

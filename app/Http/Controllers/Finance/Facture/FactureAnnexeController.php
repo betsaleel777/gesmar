@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Finance\Facture;
 
-use App\Models\Finance\Facture\Facture;
+use App\Models\Finance\Facture;
 use Illuminate\Http\Request;
 
 class FactureAnnexeController extends FactureController
@@ -38,14 +38,6 @@ class FactureAnnexeController extends FactureController
         $facture->codeGenerate(ANNEXE_PREFIXE);
         $facture->save();
         $message = "La facture annexe: $facture->code a été crée avec succès.";
-        return response()->json(['message' => $message]);
-    }
-
-    public function valider(int $id)
-    {
-        $facture = Facture::find($id);
-        $facture->valider();
-        $message = "La facture annexe $facture->code a été validée avec succès.";
         return response()->json(['message' => $message]);
     }
 }

@@ -19,8 +19,8 @@ return new class extends Migration
             $table->date('debut');
             $table->date('fin');
             $table->longText('usage')->nullable();
-            $table->dateTime('date_acompte')->nullable();
-            $table->dateTime('date_solde')->nullable();
+            $table->dateTime('date_attente')->nullable();
+            $table->dateTime('date_encours')->nullable();
             $table->dateTime('date_proforma')->nullable();
             $table->string('attachment', 255)->nullable();
             $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');

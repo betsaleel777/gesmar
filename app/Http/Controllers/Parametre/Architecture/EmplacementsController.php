@@ -26,6 +26,15 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['emplacements' => $emplacements]);
     }
 
+    public function equipables()
+    {
+        $emplacements = DB::table('emplacements')->select('emplacements.*', 'pavillons.site_id')->join('zones', 'zones.id', '=', 'emplacements.zone_id')
+            ->join('niveaux', 'zones.niveau_id', '=', 'niveaux.id')->join('pavillons', 'niveaux.pavillon_id', '=', 'pavillons.id')
+            ->join('type_emplacements', 'type_emplacements.id', '=', 'emplacements.type_emplacement_id')
+            ->where('type_emplacements.equipable', true)->get();
+        return response()->json(['emplacements' => $emplacements]);
+    }
+
     public function show(int $id)
     {
         $emplacement = Emplacement::with('type', 'zone.niveau.pavillon.site')->find($id);

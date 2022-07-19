@@ -13,7 +13,7 @@ class AbonnementsController extends Controller
 
     private static function codeGenerate(int $site): String
     {
-        $site = Site::with(['abonnements' => function ($query) {$query->withTrashed();}])->find($site);
+        $site = Site::with('abonnements')->find($site);
         $rang = (int) $site->abonnements->count() + 1;
         $place = str_pad($rang, 6, '0', STR_PAD_LEFT);
         return 'AB' . str_pad($site->id, 2, '0', STR_PAD_LEFT) . $place;
