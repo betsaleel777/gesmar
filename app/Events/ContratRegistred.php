@@ -12,14 +12,13 @@ use Illuminate\Queue\SerializesModels;
 class ContratRegistred
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $contrat;
-    public $avance;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Contrat $contrat, $avance = 0)
+    public function __construct(public Contrat $contrat, public int $avance = 0)
     {
         $this->contrat = $contrat;
         $this->avance = $avance;
@@ -28,9 +27,9 @@ class ContratRegistred
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return \Illuminate\Broadcasting\Channel|array
+     * @return \Illuminate\Broadcasting\Channel
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
         return new PrivateChannel('channel-name');
     }

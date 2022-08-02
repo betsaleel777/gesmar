@@ -10,10 +10,4 @@ class DashbaordController extends Controller
     {
         $this->middleware('auth');
     }
-
-    public function index()
-    {
-        $titre = "Statistiques & données";
-        return view('decisionnel.dashboard', compact('titre'));
-    }
 }

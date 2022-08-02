@@ -5,30 +5,33 @@ namespace App\Http\Controllers\Parametre\Architecture;
 use App\Http\Controllers\Controller;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Site;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 class SitesController extends Controller implements StandardControllerInterface
 {
-    public function all()
+    public function all(): JsonResponse
     {
         $marches = Site::get();
+
         return response()->json(['marches' => $marches]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $request->validate(Site::RULES);
         $marche = new Site($request->all());
         $marche->save();
         $message = "Le marché $request->nom a été crée avec succès.";
+
         return response()->json(['message' => $message]);
     }
 
-    public function update(int $id, Request $request)
+    public function update(int $id, Request $request): JsonResponse
     {
         $request->validate(Site::edit_rules($id));
-        $marche = Site::find($id);
+        $marche = Site::findOrFail($id);
         $marche->nom = $request->nom;
         $marche->ville = $request->ville;
         $marche->pays = $request->pays;
@@ -36,73 +39,97 @@ class SitesController extends Controller implements StandardControllerInterface
         $marche->postale = $request->postale;
         $marche->save();
         $message = "Le marché $request->nom a été crée avec succès.";
+
         return response()->json(['message' => $message]);
     }
 
-    public function push(Request $request)
+    public function push(Request $request): JsonResponse
     {
         $request->validate(Site::RULES);
         $marche = new Site($request->all());
         $marche->save();
         $message = "Le marché $request->nom a été crée avec succès.";
         $freshMarche = $marche->fresh();
+
         return response()->json(['message' => $message, 'marche' => $freshMarche]);
     }
 
-    public function trash(int $id)
+    public function trash(int $id): JsonResponse
     {
-        $marche = Site::find($id);
+        $marche = Site::findOrFail($id);
         $marche->delete();
         $message = "Le marché $marche->nom a été supprimé avec succès.";
+
         return response()->json(['message' => $message]);
     }
 
-    public function restore(int $id)
+    public function restore(int $id): JsonResponse
     {
         $marche = Site::withTrashed()->find($id);
         $marche->restore();
         $message = "Le marché $marche->nom a été restauré avec succès.";
+
         return response()->json(['message' => $message]);
     }
 
-    public function trashed()
+    public function trashed(): JsonResponse
     {
         $marches = Site::onlyTrashed()->get();
+
         return response()->json(['marches' => $marches]);
     }
 
-    public function show(int $id)
+    public function show(int $id): JsonResponse
     {
         $marche = Site::withTrashed()->find($id);
+
         return response()->json(['marche' => $marche]);
     }
 
-    public function showStructure(int $id)
+    public function showStructure(int $id): JsonResponse
     {
         return response()->json(['structure' => self::structurer($id)]);
     }
 
-    public function structure()
+    public function structure(): JsonResponse
     {
         return response()->json(['structure' => self::structurer()]);
     }
 
-    private static function structurer(int $id = null)
+    /**
+     * Undocumented function
+     *
+     * @param  int|null  $id
+     * @return Collection<int, mixed>
+     */
+    private static function structurer(int $id = null): Collection
     {
         if (empty($id)) {
             $sites = Site::select('id', 'nom')->with([
-                'pavillons' => function ($query) {$query->withCount('niveaux');},
-                'pavillons.niveaux' => function ($query) {$query->withCount('zones');},
-                'pavillons.niveaux.zones' => function ($query) {$query->withCount('emplacements');},
+                'pavillons' => function ($query) {
+                $query->withCount('niveaux');
+                },
+                'pavillons.niveaux' => function ($query) {
+                $query->withCount('zones');
+                },
+                'pavillons.niveaux.zones' => function ($query) {
+                $query->withCount('emplacements');
+                },
                 'pavillons.niveaux.zones.emplacements',
             ])->withCount('pavillons')->get();
         } else {
             $sites = Site::select('id', 'nom')->with([
-                'pavillons' => function ($query) {$query->withCount('niveaux');},
-                'pavillons.niveaux' => function ($query) {$query->withCount('zones');},
-                'pavillons.niveaux.zones' => function ($query) {$query->withCount('emplacements');},
+                'pavillons' => function ($query) {
+                $query->withCount('niveaux');
+                },
+                'pavillons.niveaux' => function ($query) {
+                $query->withCount('zones');
+                },
+                'pavillons.niveaux.zones' => function ($query) {
+                $query->withCount('emplacements');
+                },
                 'pavillons.niveaux.zones.emplacements',
-            ])->withCount('pavillons')->find($id)->get();
+            ])->withCount('pavillons')->findOrFail($id)->get();
         }
 
         $structure = $sites->map(function ($site) {
@@ -142,6 +169,7 @@ class SitesController extends Controller implements StandardControllerInterface
                 }),
             ]);
         });
+
         return $structure;
     }
 }

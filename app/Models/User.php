@@ -9,6 +9,9 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @mixin IdeHelperUser
+ */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -35,28 +38,41 @@ class User extends Authenticatable
         'adresse' => 'required',
         'password' => 'required|min:6|confirmed',
     ];
+
     const SECURITY_RULES = [
         'oldPassword' => 'required|min:6',
         'password' => 'required|min:6|confirmed',
     ];
 
-    public static function infosRules(int $id)
+    /**
+     * Undocumented function
+     *
+     * @param  int  $id
+     * @return array<string, string>
+     */
+    public static function infosRules(int $id): array
     {
         return [
-            'name' => 'required|max:150|unique:users,name,' . $id,
+            'name' => 'required|max:150|unique:users,name,'.$id,
             'adresse' => 'required',
         ];
     }
 
-    public function deconnecter()
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function disconnect(): void
     {
         $this->attributes['connected'] = false;
     }
 
-    public function connecter()
+    public function connect(): void
     {
         $this->attributes['connected'] = true;
     }
+
     /**
      * The attributes that should be hidden for serialization.
      *

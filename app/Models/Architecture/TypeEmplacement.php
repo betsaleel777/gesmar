@@ -2,15 +2,24 @@
 
 namespace App\Models\Architecture;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @mixin IdeHelperTypeEmplacement
+ */
 class TypeEmplacement extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'equipable'];
+
     protected $appends = ['code'];
 
     const RULES = [
@@ -19,22 +28,45 @@ class TypeEmplacement extends Model
         'prefix' => 'required|max:5|min:2|alpha',
     ];
 
-    public function getCodeAttribute()
+    /**
+     * Undocumented function
+     *
+     * @return Attribute{get:(callable(): string)}
+     */
+    protected function code(): Attribute
     {
-        return $this->attributes['prefix'] . str_pad($this->attributes['code'], 2, '0', STR_PAD_LEFT);
+        return new Attribute(
+            get:fn() => $this->attributes['prefix'] . str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
+        );
     }
 
-    public function scopeEquipables($query)
+    /**
+     * Undocumented function
+     *
+     * @param  Builder<TypeEmplacement>  $query
+     * @return Builder<TypeEmplacement>
+     */
+    public function scopeEquipables(Builder $query): Builder
     {
         return $query->where('equipable', true);
     }
 
-    public function emplacements()
+    /**
+     * Undocumented function
+     *
+     * @return HasMany<int, Collection<int, Emplacement>>
+     */
+    public function emplacements(): HasMany
     {
         return $this->hasMany(Emplacement::class, 'type_emplacement_id');
     }
 
-    public function site()
+    /**
+     * Undocumented function
+     *
+     * @return BelongsTo<Site>
+     */
+    public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class);
     }

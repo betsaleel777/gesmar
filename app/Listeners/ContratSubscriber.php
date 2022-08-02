@@ -5,14 +5,12 @@ namespace App\Listeners;
 use App\Events\ContratRegistred;
 use App\Events\FactureStatusChange;
 use App\Models\Architecture\Emplacement;
-use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Personne;
 use App\Models\Finance\Facture;
 
 class ContratSubscriber
 {
-
-    private function createFactureAnnexe(ContratRegistred $event)
+    private function createFactureAnnexe(ContratRegistred $event): void
     {
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
@@ -21,9 +19,9 @@ class ContratSubscriber
         $facture->save();
     }
 
-    private function createFactureInitiale(ContratRegistred $event)
+    private function createFactureInitiale(ContratRegistred $event): void
     {
-        $emplacement = Emplacement::with('type')->find($event->contrat->emplacement_id);
+        $emplacement = Emplacement::with('type')->findOrFail($event->contrat->emplacement_id);
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
         $facture->codeGenerate(INITIALE_PREFIXE);
@@ -31,17 +29,19 @@ class ContratSubscriber
         $facture->avance = $event->avance;
         $facture->pas_porte = (int) $emplacement->pas_porte;
         if ((bool) $emplacement->type->auto_valid === true) {
-            $facture->setValider();
-            $event->contrat->acompte();
+            $facture->planifier();
+            $event->contrat->valider();
             $event->contrat->save();
-            $personne = Personne::find($event->contrat->personne_id);
+            $personne = Personne::findOrFail($event->contrat->personne_id);
             $personne->client();
             $personne->save();
+            $emplacement->occuper();
+            $emplacement->save();
         }
         $facture->save();
     }
 
-    public function updateFactureStatus(FactureStatusChange $event)
+    public function updateFactureStatus(FactureStatusChange $event): void
     {
         if ($event->status === Facture::SHEDULABLE) {
             $event->facture->planifier();
@@ -49,7 +49,7 @@ class ContratSubscriber
         }
     }
 
-    public function createFacture(ContratRegistred $event)
+    public function createFacture(ContratRegistred $event): void
     {
         $event->contrat->isAnnexe() ? $this->createFactureAnnexe($event) : $this->createFactureInitiale($event);
     }

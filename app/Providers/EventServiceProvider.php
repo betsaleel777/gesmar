@@ -21,6 +21,11 @@ class EventServiceProvider extends ServiceProvider
         ],
     ];
 
+    /**
+     * Undocumented variable
+     *
+     * @var array<int, class-string>
+     */
     protected $subscribe = [
         ContratSubscriber::class,
     ];

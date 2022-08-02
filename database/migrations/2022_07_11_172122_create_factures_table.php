@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('factures', function (Blueprint $table) {
             $table->id();
             $table->string('code', 10)->unique();
-            $table->string('periode', 10)->nullable();
+            $table->date('periode')->nullable();
             $table->unsignedTinyInteger('avance')->nullable();
             $table->unsignedTinyInteger('caution')->nullable();
             $table->unsignedInteger('pas_porte')->nullable();

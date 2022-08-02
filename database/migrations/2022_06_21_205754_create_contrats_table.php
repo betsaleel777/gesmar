@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('code', 10)->unique();
             $table->date('debut');
             $table->date('fin');
-            $table->longText('usage')->nullable();
             $table->dateTime('date_attente')->nullable();
             $table->dateTime('date_encours')->nullable();
             $table->dateTime('date_proforma')->nullable();

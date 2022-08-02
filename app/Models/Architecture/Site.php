@@ -2,12 +2,16 @@
 
 namespace App\Models\Architecture;
 
-use App\Models\Exploitation\ContratAnnexe;
-use App\Models\Exploitation\ContratEmplacement;
+use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Personne;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @mixin IdeHelperSite
+ */
 class Site extends Model
 {
     use SoftDeletes;
@@ -21,7 +25,7 @@ class Site extends Model
         'ville' => 'required',
     ];
 
-    public static function edit_rules(int $id)
+    public static function edit_rules(int $id): array
     {
         return [
             'nom' => 'required|max:150|unique:sites,nom,' . $id,
@@ -31,39 +35,63 @@ class Site extends Model
         ];
     }
 
-    public function pavillons()
+    /**
+     * Undocumented function
+     *
+     * @return HasMany<int Collection<int,Pavillon>>
+     */
+    public function pavillons(): HasMany
     {
         return $this->hasMany(Pavillon::class);
     }
 
-    public function equipements()
+    /**
+     * Undocumented function
+     *
+     * @return HasMany<int, Collection<int,Equipement>>
+     */
+    public function equipements(): HasMany
     {
         return $this->hasMany(Equipement::class);
     }
 
-    public function personnes()
+    /**
+     * Undocumented function
+     *
+     * @return HasMany<int, Collection<int, Personne>>
+     */
+    public function personnes(): HasMany
     {
         return $this->hasMany(Personne::class);
     }
 
-    public function contratsAnnexes()
+    /**
+     * Undocumented function
+     *
+     * @return HasMany<int, Collection<int, Contrat>>
+     */
+    public function contrats(): HasMany
     {
-        return $this->hasMany(ContratAnnexe::class);
+        return $this->hasMany(Contrat::class);
     }
 
-    public function contratsEmplacements()
-    {
-        return $this->hasMany(ContratEmplacement::class);
-    }
-
-    public function abonnements()
+    /**
+     * Undocumented function
+     *
+     * @return HasMany<int, Collection<int, Abonnement>>
+     */
+    public function abonnements(): HasMany
     {
         return $this->hasMany(Abonnement::class);
     }
 
-    public function servicesAnnexes()
+    /**
+     * Undocumented function
+     *
+     * @return HasMany<int, Collection<int, ServiceAnnexe>>
+     */
+    public function servicesAnnexes(): HasMany
     {
         return $this->hasMany(ServiceAnnexe::class);
     }
-
 }

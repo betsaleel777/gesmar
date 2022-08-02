@@ -2,11 +2,17 @@
 
 namespace App\Models\Architecture;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
+/**
+ * @mixin IdeHelperEquipement
+ */
 class Equipement extends Model
 {
     use HasFactory, SoftDeletes;
@@ -24,10 +30,20 @@ class Equipement extends Model
         'date_abime',
         'date_libre',
     ];
+
+    /**
+     * Undocumented variable
+     *
+     * @var array<int, string>
+     */
     protected $appends = ['status'];
+
     const FREE = 'libre';
+
     const BUSY = 'occupé';
+
     const DAMAGING = 'abimé';
+
     const RULES = [
         'prix_unitaire' => 'required|numeric',
         'prix_fixe' => 'required|numeric',
@@ -37,31 +53,23 @@ class Equipement extends Model
         'site_id' => 'required',
     ];
 
-    public function getStatusAttribute()
+    /**
+     * Undocumented function
+     *
+     * @return Attribute{get:(callable(): string)}
+     */
+    protected function status(): Attribute
     {
-        if (empty($this->attributes['date_occupe']) and empty($this->attributes['date_abime'])) {
-            return self::FREE;
-        }
-
-        if (!empty($this->attributes['date_occupe'])) {
-            return self::BUSY;
-        }
-
-    }
-
-    public function socpeIsFree($query)
-    {
-        return $query->whereNotNull('date_libre');
-    }
-
-    public function socpeIsDamaged($query)
-    {
-        return $query->whereNotNull('date_abime');
-    }
-
-    public function socpeIsBusy($query)
-    {
-        return $query->whereNotNull('date_occupe');
+        return new Attribute(
+            get:function () {
+                if (empty($this->attributes['date_occupe']) and empty($this->attributes['date_abime'])) {
+                    return self::FREE;
+                }
+                if (!empty($this->attributes['date_occupe'])) {
+                    return self::BUSY;
+                }
+            }
+        );
     }
 
     public function busy(): void
@@ -85,12 +93,55 @@ class Equipement extends Model
         $this->attributes['date_occupe'] = null;
     }
 
-    public function type()
+    /**
+     * Undocumented function
+     *
+     * @param  Builder<Equipement>  $query
+     * @return Builder<Equipement>
+     */
+    public function socpeIsFree(Builder $query): Builder
+    {
+        return $query->whereNotNull('date_libre');
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param  Builder<Equipement>  $query
+     * @return Builder<Equipement>
+     */
+    public function socpeIsDamaged(Builder $query): Builder
+    {
+        return $query->whereNotNull('date_abime');
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param  Builder<Equipement>  $query
+     * @return Builder<Equipement>
+     */
+    public function socpeIsBusy(Builder $query): Builder
+    {
+        return $query->whereNotNull('date_occupe');
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return BelongsTo<TypeEquipement>
+     */
+    public function type(): BelongsTo
     {
         return $this->belongsTo(TypeEquipement::class, 'type_equipement_id');
     }
 
-    public function site()
+    /**
+     * Undocumented function
+     *
+     * @return BelongsTo<Site>
+     */
+    public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class);
     }

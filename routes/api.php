@@ -114,7 +114,10 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/', [EmplacementsController::class, 'all']);
         Route::get('/equipables', [EmplacementsController::class, 'equipables']);
         Route::get('/trashed', [EmplacementsController::class, 'trashed']);
+        Route::get('/rental/{date}', [EmplacementsController::class, 'getRentalbyMonth']);
         Route::get('/marche/{id}', [EmplacementsController::class, 'getByMarche']);
+        Route::get('/marche/free/{id}', [EmplacementsController::class, 'getFreeByMarche']);
+        Route::get('/marche/busy/{id}', [EmplacementsController::class, 'getBusyByMarche']);
         Route::post('/store', [EmplacementsController::class, 'store']);
         Route::post('/push', [EmplacementsController::class, 'push']);
         Route::get('{id}', [EmplacementsController::class, 'show']);
@@ -147,6 +150,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/', [EquipementsController::class, 'all']);
         Route::get('/trashed', [EquipementsController::class, 'trashed']);
         Route::post('/store', [EquipementsController::class, 'store']);
+        Route::post('/types', [EquipementsController::class, 'getFromTypesAndBail']);
         Route::get('{id}', [EquipementsController::class, 'show']);
         Route::delete('{id}', [EquipementsController::class, 'trash']);
         Route::put('{id}', [EquipementsController::class, 'update']);
@@ -172,8 +176,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     });
     Route::prefix('termes')->group(function () {
         Route::prefix('annexes')->group(function () {
-            Route::get('/', [TermesContratsAnnexesController::class, 'allAnnexes']);
-            Route::get('/trashed', [TermesContratsAnnexesController::class, 'trashedAnnexes']);
+            Route::get('/', [TermesContratsAnnexesController::class, 'all']);
+            Route::get('/trashed', [TermesContratsAnnexesController::class, 'trashed']);
             Route::post('/store', [TermesContratsAnnexesController::class, 'store']);
             Route::get('{id}', [TermesContratsAnnexesController::class, 'show']);
             Route::get('/pdf/{id}', [TermesContratsAnnexesController::class, 'pdf']);
@@ -182,8 +186,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
             Route::get('/restore/{id}', [TermesContratsAnnexesController::class, 'restore']);
         });
         Route::prefix('emplacements')->group(function () {
-            Route::get('/', [TermesContratsEmplacementsController::class, 'allBails']);
-            Route::get('/trashed', [TermesContratsEmplacementsController::class, 'trashedBails']);
+            Route::get('/', [TermesContratsEmplacementsController::class, 'all']);
+            Route::get('/trashed', [TermesContratsEmplacementsController::class, 'trashed']);
             Route::post('/store', [TermesContratsEmplacementsController::class, 'store']);
             Route::get('{id}', [TermesContratsEmplacementsController::class, 'show']);
             Route::get('/pdf/{id}', [TermesContratsAnnexesController::class, 'pdf']);
@@ -192,7 +196,6 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
             Route::get('/restore/{id}', [TermesContratsEmplacementsController::class, 'restore']);
         });
     });
-
 });
 
 Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {

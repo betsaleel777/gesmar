@@ -12,14 +12,13 @@ use Illuminate\Queue\SerializesModels;
 class FactureStatusChange
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $facture;
-    public $status;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Facture $facture, string $status)
+    public function __construct(public Facture $facture, public string $status)
     {
         $this->facture = $facture;
         $this->status = $status;
@@ -28,9 +27,9 @@ class FactureStatusChange
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return \Illuminate\Broadcasting\Channel|array
+     * @return \Illuminate\Broadcasting\Channel
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
         return new PrivateChannel('channel-name');
     }

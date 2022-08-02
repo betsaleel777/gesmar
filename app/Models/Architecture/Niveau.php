@@ -2,9 +2,15 @@
 
 namespace App\Models\Architecture;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @mixin IdeHelperNiveau
+ */
 class Niveau extends Model
 {
     use SoftDeletes;
@@ -25,12 +31,22 @@ class Niveau extends Model
         'nombre' => 'required|numeric|min:1',
     ];
 
-    public function pavillon()
+    /**
+     * Undocumented function
+     *
+     * @return BelongsTo<Pavillon>
+     */
+    public function pavillon(): BelongsTo
     {
         return $this->belongsTo(Pavillon::class);
     }
 
-    public function zones()
+    /**
+     * Undocumented function
+     *
+     * @return HasMany<int,Collection<int, Zone>>
+     */
+    public function zones(): HasMany
     {
         return $this->hasMany(Zone::class);
     }

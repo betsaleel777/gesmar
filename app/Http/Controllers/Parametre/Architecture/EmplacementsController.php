@@ -6,42 +6,71 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
+use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class EmplacementsController extends Controller implements StandardControllerInterface
 {
-    private static function codeGenerate(int $id)
+    /**
+     * Undocumented function
+     *
+     * @param  int  $id
+     * @return array<string, string>
+     */
+    private static function codeGenerate(int $id): array
     {
-        $zone = Zone::with('niveau.pavillon', 'emplacements')->find($id);
-        $rang = (int) $zone->emplacements->count() + 1;
+        $zone = Zone::with('niveau.pavillon', 'emplacements')->findOrFail($id);
+        $rang = (string) ($zone->emplacements->count() + 1);
         $place = str_pad($rang, 3, '0', STR_PAD_LEFT);
         $code = $zone->niveau->pavillon->code . $zone->niveau->code . $zone->code . $place;
+
         return ['code' => $code, 'rang' => $rang];
     }
 
-    public function all()
+    /**
+     * Undocumented function
+     *
+     * @param integer $id
+     * @return Builder
+     */
+    private static function queryByMarche(int $id): Builder
+    {
+        $query = DB::table('emplacements')->select('emplacements.*')->join('zones', 'zones.id', '=', 'emplacements.zone_id')
+            ->join('niveaux', 'zones.niveau_id', '=', 'niveaux.id')->join('pavillons', 'niveaux.pavillon_id', '=', 'pavillons.id')
+            ->where('pavillons.site_id', $id, true);
+
+        return $query;
+    }
+
+    public function all(): JsonResponse
     {
         $emplacements = Emplacement::with('type', 'zone.niveau.pavillon.site')->get();
+
         return response()->json(['emplacements' => $emplacements]);
     }
 
-    public function equipables()
+    public function equipables(): JsonResponse
     {
-        $emplacements = DB::table('emplacements')->select('emplacements.*', 'pavillons.site_id')->join('zones', 'zones.id', '=', 'emplacements.zone_id')
+        $emplacements = DB::table('emplacements')->select('emplacements.*', 'pavillons.site_id')
+            ->join('zones', 'zones.id', '=', 'emplacements.zone_id')
             ->join('niveaux', 'zones.niveau_id', '=', 'niveaux.id')->join('pavillons', 'niveaux.pavillon_id', '=', 'pavillons.id')
             ->join('type_emplacements', 'type_emplacements.id', '=', 'emplacements.type_emplacement_id')
             ->where('type_emplacements.equipable', true)->get();
+
         return response()->json(['emplacements' => $emplacements]);
     }
 
-    public function show(int $id)
+    public function show(int $id): JsonResponse
     {
-        $emplacement = Emplacement::with('type', 'zone.niveau.pavillon.site')->find($id);
+        $emplacement = Emplacement::with('type', 'zone.niveau.pavillon.site')->findOrFail($id);
+
         return response()->json(['emplacement' => $emplacement]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $request->validate(Emplacement::RULES);
         $emplacement = new Emplacement($request->all());
@@ -49,13 +78,14 @@ class EmplacementsController extends Controller implements StandardControllerInt
         $emplacement->code = $code;
         $emplacement->save();
         $message = "L'emplacement $request->nom a été crée avec succès.";
+
         return response()->json(['message' => $message]);
     }
 
-    public function update(int $id, Request $request)
+    public function update(int $id, Request $request): JsonResponse
     {
         $request->validate(Emplacement::RULES);
-        $emplacement = Emplacement::find($id);
+        $emplacement = Emplacement::findOrFail($id);
         $emplacement->nom = $request->nom;
         $emplacement->superficie = $request->superficie;
         $emplacement->loyer = $request->loyer;
@@ -64,38 +94,41 @@ class EmplacementsController extends Controller implements StandardControllerInt
         $emplacement->type_emplacement_id = $request->type_emplacement_id;
         $emplacement->save();
         $message = "L'emplacement $request->nom a été modifié avec succès.";
+
         return response()->json(['message' => $message]);
     }
 
-    public function restore(int $id)
+    public function restore(int $id): JsonResponse
     {
         $emplacement = Emplacement::withTrashed()->find($id);
         $emplacement->restore();
         $message = "L'emplacement $emplacement->nom a été restauré avec succès.";
+
         return response()->json(['message' => $message]);
     }
 
-    public function trashed()
+    public function trashed(): JsonResponse
     {
         $emplacements = Emplacement::with('zone', 'type')->onlyTrashed()->get();
+
         return response()->json(['emplacements' => $emplacements]);
     }
 
-    public function trash(int $id)
+    public function trash(int $id): JsonResponse
     {
-        $emplacement = Emplacement::find($id);
+        $emplacement = Emplacement::findOrFail($id);
         $emplacement->delete();
         $message = "L'emplacement $emplacement->nom a été supprimé avec succès.";
+
         return response()->json(['message' => $message]);
     }
 
-    public function push(Request $request)
+    public function push(Request $request): JsonResponse
     {
         $request->validate(Emplacement::PUSH_RULES);
         $compteur = $request->nombre;
         while ($compteur > 0) {
             $emplacement = new Emplacement($request->all());
-            $emplacement->code = self::codeGenerate($request->zone_id);
             ['code' => $code, 'rang' => $rang] = self::codeGenerate($request->zone_id);
             $emplacement->code = $code;
             $emplacement->nom = 'EMPLACEMENT ' . $rang;
@@ -103,14 +136,42 @@ class EmplacementsController extends Controller implements StandardControllerInt
             $compteur--;
         }
         $message = "$request->nombre emplacements ont été crées avec succès.";
+
         return response()->json(['message' => $message]);
     }
 
-    public function getByMarche(int $id)
+    public function getByMarche(int $id): JsonResponse
     {
-        $emplacements = DB::table('emplacements')->select('emplacements.*')->join('zones', 'zones.id', '=', 'emplacements.zone_id')
-            ->join('niveaux', 'zones.niveau_id', '=', 'niveaux.id')->join('pavillons', 'niveaux.pavillon_id', '=', 'pavillons.id')
-            ->where('pavillons.site_id', $id)->get();
+        $emplacements = self::queryByMarche($id)->get();
+
+        return response()->json(['emplacements' => $emplacements]);
+    }
+
+    public function getFreeByMarche(int $id): JsonResponse
+    {
+        $emplacements = self::queryByMarche($id)->whereNull('date_occupe')->get();
+
+        return response()->json(['emplacements' => $emplacements]);
+    }
+
+    public function getBusyByMarche(int $id): JsonResponse
+    {
+        $emplacements = self::queryByMarche($id)->whereNotNull('date_occupe')->get();
+
+        return response()->json(['emplacements' => $emplacements]);
+    }
+
+    public function getRentalbyMonth(string $date): JsonResponse
+    {
+        $emplacements = DB::table('emplacements')
+            ->select('emplacements.*', DB::raw("concat(personnes.nom,' ',personnes.prenom) as nomComplet"))
+            ->join('contrats', 'emplacements.id', '=', 'contrats.emplacement_id')
+            ->join('personnes', 'personnes.id', '=', 'contrats.personne_id')
+            ->leftJoin('factures', 'contrats.id', '=', 'factures.contrat_id')
+            ->where('factures.code', 'LIKE', 'FAL%')->whereMonth('factures.periode', '!=', Carbon::parse($date)->format('m'))
+            ->whereYear('factures.periode', '!=', Carbon::parse($date)->format('Y'))->orWhereNull('factures.periode')
+            ->where('personnes.prospect', false)->distinct()->get();
+
         return response()->json(['emplacements' => $emplacements]);
     }
 }
