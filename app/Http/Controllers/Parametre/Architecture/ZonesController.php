@@ -45,7 +45,7 @@ class ZonesController extends Controller implements StandardControllerInterface
                 $start++;
                 $zone = new Zone();
                 $zone->niveau_id = $niveau;
-                $zone->nom = 'zone ' . $start;
+                $zone->nom = 'zone '.$start;
                 $zone->code = (string) $start;
                 $zone->save();
             }

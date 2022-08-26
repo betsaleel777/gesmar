@@ -18,14 +18,14 @@ class FactureEquipementController extends Controller
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'equipement')->validees()->isEquipement()->get();
+        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'equipement')->isPaid()->isEquipement()->get();
 
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'equipement')->nonValidees()->isEquipement()->get();
+        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'equipement')->isUnpaid()->isEquipement()->get();
 
         return response()->json(['factures' => $factures]);
     }
@@ -41,7 +41,8 @@ class FactureEquipementController extends Controller
     {
         $request->validate(Facture::gearRules());
         $facture = new Facture($request->all());
-        $facture->codeGenerate(EQUIPEMENT_PREFIXE);
+        $facture->facturable();
+        $facture->codeGenerate(EQUIPEMENT_FACTURE_PREFIXE);
         $facture->save();
         $message = "La facture d'équipement $facture->code a été crée avec succès.";
 

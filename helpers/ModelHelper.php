@@ -70,7 +70,6 @@ namespace App\Models\Architecture{
      * @property-read \App\Models\Exploitation\Contrat|null $contrat
      * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Architecture\Equipement[] $equipements
      * @property-read int|null $equipements_count
-     * @property-read mixed $status
      * @property-read \App\Models\Architecture\TypeEmplacement $type
      * @property-read \App\Models\Architecture\Zone $zone
      *
@@ -443,7 +442,6 @@ namespace App\Models\Exploitation{
      * @property-read int|null $equipements_count
      * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Finance\Facture[] $factures
      * @property-read int|null $factures_count
-     * @property-read string $type
      * @property-read \App\Models\Exploitation\Personne $personne
      * @property-read \App\Models\Architecture\Site $site
      *
@@ -514,6 +512,7 @@ namespace App\Models\Exploitation{
      * @property string|null $regime
      * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Exploitation\Contrat[] $contrats
      * @property-read int|null $contrats_count
+     * @property-read string $nom_complet
      * @property-read \App\Models\Architecture\Site $site
      * @property-read \App\Models\Exploitation\TypePersonne|null $type
      *
@@ -748,7 +747,6 @@ namespace App\Models\Template{
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property string $type
-     * @property-read mixed $status
      * @property-read \App\Models\Architecture\Site $site
      * @property-read \App\Models\User $user
      *
@@ -788,7 +786,6 @@ namespace App\Models\Template{
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property string $type
-     * @property-read mixed $status
      * @property-read \App\Models\Architecture\Site $site
      * @property-read \App\Models\User $user
      *
@@ -829,7 +826,6 @@ namespace App\Models\Template{
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property string $type
-     * @property-read mixed $status
      * @property-read \App\Models\Architecture\Site $site
      * @property-read \App\Models\User $user
      *

@@ -4,10 +4,10 @@ namespace App\Models\Architecture;
 
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Personne;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 
 /**
  * @mixin IdeHelperSite
@@ -15,16 +15,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Site extends Model
 {
     use SoftDeletes;
+    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
     protected $fillable = ['nom', 'pays', 'ville', 'commune', 'postale'];
 
-    const RULES = [
+    public const RULES = [
         'nom' => 'required|max:255|unique:sites,nom',
         'pays' => 'required',
         'commune' => 'required',
         'ville' => 'required',
     ];
 
+    /**
+     * Undocumented function
+     *
+     * @param  int  $id
+     * @return array<string, string>
+     */
     public static function edit_rules(int $id): array
     {
         return [
@@ -38,7 +45,7 @@ class Site extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int Collection<int,Pavillon>>
+     * @return HasMany<Pavillon>
      */
     public function pavillons(): HasMany
     {
@@ -46,9 +53,19 @@ class Site extends Model
     }
 
     /**
+     * afficher directement tout les emplacements d'un site (marché)
+     *
+     * @return HasManyDeep<Niveau>
+     */
+    public function emplacements(): HasManyDeep
+    {
+        return $this->hasManyDeep(Emplacement::class, [Pavillon::class, Niveau::class, Zone::class]);
+    }
+
+    /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int,Equipement>>
+     * @return HasMany<Equipement>
      */
     public function equipements(): HasMany
     {
@@ -58,7 +75,7 @@ class Site extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int, Personne>>
+     * @return HasMany<Personne>
      */
     public function personnes(): HasMany
     {
@@ -68,7 +85,7 @@ class Site extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int, Contrat>>
+     * @return HasMany<Contrat>
      */
     public function contrats(): HasMany
     {
@@ -78,7 +95,7 @@ class Site extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int, Abonnement>>
+     * @return HasMany<Abonnement>
      */
     public function abonnements(): HasMany
     {
@@ -88,7 +105,7 @@ class Site extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int, ServiceAnnexe>>
+     * @return HasMany<ServiceAnnexe>
      */
     public function servicesAnnexes(): HasMany
     {

@@ -2,8 +2,8 @@
 
 namespace App\Models\Architecture;
 
+use App\Enums\ModeServiceAnnexe;
 use App\Models\Exploitation\Contrat;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,38 +18,32 @@ class ServiceAnnexe extends Model
 
     protected $fillable = ['nom', 'site_id', 'prix', 'description', 'mode'];
 
-    const RULES = [
+    public const RULES = [
         'nom' => 'required|max:250',
         'prix' => 'required',
         'site_id' => 'required',
         'mode' => 'required',
     ];
 
-    const MENSUEL = 'par mois';
-
-    const QUOTIDIEN = 'par jour';
-
-    const FORFAIT = 'forfaitaire';
-
     public function forfaitaire(): void
     {
-        $this->attributes['mode'] = self::FORFAIT;
+        $this->attributes['mode'] = ModeServiceAnnexe::FORFAIT;
     }
 
     public function quotidien(): void
     {
-        $this->attributes['mode'] = self::QUOTIDIEN;
+        $this->attributes['mode'] = ModeServiceAnnexe::QUOTIDIEN;
     }
 
     public function mensuel(): void
     {
-        $this->attributes['mode'] = self::MENSUEL;
+        $this->attributes['mode'] = ModeServiceAnnexe::MENSUEL;
     }
 
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Site>
+     * @return BelongsTo<Site, ServiceAnnexe>
      */
     public function site(): BelongsTo
     {
@@ -59,7 +53,7 @@ class ServiceAnnexe extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int, Contrat>>
+     * @return HasMany<Contrat>
      */
     public function contrats(): HasMany
     {

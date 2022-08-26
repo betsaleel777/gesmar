@@ -27,7 +27,7 @@ class TypeEquipement extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int, Equipement>>
+     * @return HasMany<Equipement>
      */
     public function equipements(): HasMany
     {
@@ -37,7 +37,7 @@ class TypeEquipement extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Site>
+     * @return BelongsTo<Site, TypeEquipement>
      */
     public function site(): BelongsTo
     {

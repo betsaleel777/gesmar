@@ -33,12 +33,12 @@ class TermesContrat extends Model
     /**
      * Undocumented function
      *
-     * @return Attribute{get:(callable(): string|null)}
+     * @return Attribute<get:(callable():string|null)>
      */
     protected function status(): Attribute
     {
-        return new Attribute(
-            get:fn() => !empty($this->atrributes['date_using']) ? self::USING : null
+        return Attribute::make(
+            get:fn () => ! empty($this->atrributes['date_using']) ? self::USING : null
         );
     }
 
@@ -55,7 +55,7 @@ class TermesContrat extends Model
     public function generate(string $prefixe): void
     {
         $rang = $this->get()->count() + 1;
-        $this->attributes['code'] = $prefixe . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
+        $this->attributes['code'] = $prefixe.str_pad((string) $rang, 2, '0', STR_PAD_LEFT).Carbon::now()->format('my');
     }
 
     public function using(): void
@@ -66,7 +66,7 @@ class TermesContrat extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<User>
+     * @return BelongsTo<User, TermesContrat>
      */
     public function user(): BelongsTo
     {
@@ -76,7 +76,7 @@ class TermesContrat extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Site>
+     * @return BelongsTo<Site, TermesContrat>
      */
     public function site(): BelongsTo
     {

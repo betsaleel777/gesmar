@@ -19,7 +19,7 @@ class PavillonsController extends Controller implements StandardControllerInterf
             $start++;
             $pavillon = new Pavillon();
             $pavillon->site_id = $site;
-            $pavillon->nom = 'pavillon ' . $start;
+            $pavillon->nom = 'pavillon '.$start;
             $pavillon->code = (string) $start;
             $pavillon->save();
         }

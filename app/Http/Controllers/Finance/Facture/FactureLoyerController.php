@@ -18,14 +18,14 @@ class FactureLoyerController extends Controller
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->validees()->isLoyer()->get();
+        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isPaid()->isLoyer()->get();
 
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->nonValidees()->isLoyer()->get();
+        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isUnpaid()->isLoyer()->get();
 
         return response()->json(['factures' => $factures]);
     }
@@ -41,7 +41,8 @@ class FactureLoyerController extends Controller
     {
         $request->validate(Facture::loyerRules());
         $facture = new Facture($request->all());
-        $facture->codeGenerate(LOYER_PREFIXE);
+        $facture->codeGenerate(LOYER_FACTURE_PREFIXE);
+        $facture->facturable();
         $facture->save();
         $message = "La facture de loyer: $facture->code a été crée avec succès.";
 

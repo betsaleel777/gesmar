@@ -116,6 +116,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/trashed', [EmplacementsController::class, 'trashed']);
         Route::get('/rental/{date}', [EmplacementsController::class, 'getRentalbyMonth']);
         Route::get('/marche/{id}', [EmplacementsController::class, 'getByMarche']);
+        Route::get('/marche/gears/{id}', [EmplacementsController::class, 'getByMarcheWithGearsLinked']);
+        Route::get('/marche/unlinked/{id}', [EmplacementsController::class, 'getUnlinkedByMarche']);
         Route::get('/marche/free/{id}', [EmplacementsController::class, 'getFreeByMarche']);
         Route::get('/marche/busy/{id}', [EmplacementsController::class, 'getBusyByMarche']);
         Route::post('/store', [EmplacementsController::class, 'store']);
@@ -150,7 +152,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/', [EquipementsController::class, 'all']);
         Route::get('/trashed', [EquipementsController::class, 'trashed']);
         Route::post('/store', [EquipementsController::class, 'store']);
-        Route::post('/types', [EquipementsController::class, 'getFromTypesAndBail']);
+        Route::get('/unlinkedsubscribed', [EquipementsController::class, 'getUnlinkedsubscribed']);
         Route::get('{id}', [EquipementsController::class, 'show']);
         Route::delete('{id}', [EquipementsController::class, 'trash']);
         Route::put('{id}', [EquipementsController::class, 'update']);

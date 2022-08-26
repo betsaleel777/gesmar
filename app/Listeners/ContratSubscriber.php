@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Enums\StatusFacture;
 use App\Events\ContratRegistred;
 use App\Events\FactureStatusChange;
 use App\Models\Architecture\Emplacement;
@@ -14,7 +15,8 @@ class ContratSubscriber
     {
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
-        $facture->codeGenerate(ANNEXE_PREFIXE);
+        $facture->codeGenerate(ANNEXE_FACTURE_PREFIXE);
+        $facture->proforma();
         $facture->annexe_id = $event->contrat->annexe_id;
         $facture->save();
     }
@@ -24,13 +26,14 @@ class ContratSubscriber
         $emplacement = Emplacement::with('type')->findOrFail($event->contrat->emplacement_id);
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
-        $facture->codeGenerate(INITIALE_PREFIXE);
+        $facture->proforma();
+        $facture->codeGenerate(INITIALE_FACTURE_PREFIXE);
         $facture->caution = $emplacement->caution;
         $facture->avance = $event->avance;
         $facture->pas_porte = (int) $emplacement->pas_porte;
         if ((bool) $emplacement->type->auto_valid === true) {
-            $facture->planifier();
-            $event->contrat->valider();
+            $facture->facturable();
+            $event->contrat->validated();
             $event->contrat->save();
             $personne = Personne::findOrFail($event->contrat->personne_id);
             $personne->client();
@@ -43,8 +46,8 @@ class ContratSubscriber
 
     public function updateFactureStatus(FactureStatusChange $event): void
     {
-        if ($event->status === Facture::SHEDULABLE) {
-            $event->facture->planifier();
+        if ($event->status === StatusFacture::FACTURE) {
+            $event->facture->facturable();
             $event->facture->save();
         }
     }
@@ -60,7 +63,7 @@ class ContratSubscriber
      * @param  \Illuminate\Events\Dispatcher  $events
      * @return void
      */
-    public function subscribe($events)
+    public function subscribe($events): void
     {
         $events->listen(
             ContratRegistred::class,

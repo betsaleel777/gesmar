@@ -41,19 +41,19 @@ class Pavillon extends Model
     /**
      * Undocumented function
      *
-     * @return Attribute{get:(callable(): string)}
+     * @return Attribute<get:(callable():string)>
      */
     protected function code(): Attribute
     {
-        return new Attribute(
-            get:fn() => str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
+        return Attribute::make(
+            get:fn () => str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
         );
     }
 
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Site>
+     * @return BelongsTo<Site, Pavillon>
      */
     public function site(): BelongsTo
     {
@@ -63,7 +63,7 @@ class Pavillon extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int, Niveau>>
+     * @return HasMany<Niveau>
      */
     public function niveaux(): HasMany
     {

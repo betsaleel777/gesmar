@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Parametre\Architecture;
 
+use App\Events\AbonnementRegistred;
+use App\Events\AbonnementResilied;
 use App\Http\Controllers\Controller;
 use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
@@ -30,12 +32,16 @@ class AbonnementsController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate(Abonnement::RULES);
-        $abonnement = new Abonnement($request->all());
-        $abonnement->code = self::codeGenerate($request->site_id);
-        $abonnement->save();
-        $equipement = Equipement::findOrFail($request->equipement_id);
-        $equipement->busy();
-        $equipement->save();
+        foreach ($request->equipements as $equipement) {
+            $abonnement = new Abonnement($request->all());
+            $abonnement->code = self::codeGenerate($request->site_id);
+            $abonnement->index_depart = $equipement['index_depart'];
+            $abonnement->index_autre = $equipement['index_autre'];
+            $abonnement->equipement_id = $equipement['id'];
+            $abonnement->save();
+            $abonnement->process();
+            AbonnementRegistred::dispatch($abonnement);
+        }
         $message = "L'abonnement $request->code a été crée avec succès.";
 
         return response()->json(['message' => $message]);
@@ -50,31 +56,6 @@ class AbonnementsController extends Controller
 
         return response()->json(['message' => $message]);
     }
-
-    // public function trash(int $id)
-    // {
-    //     $abonnement = Abonnement::find($id);
-    //     $equipement = Equipement::find($abonnement->equipement_id);
-    //     $equipement->free();
-    //     $equipement->save();
-    //     $abonnement->delete();
-    //     $message = "L'abonnement $abonnement->code a été supprimé avec succès.";
-    //     return response()->json(['message' => $message]);
-    // }
-
-    // public function restore(int $id)
-    // {
-    //     $abonnement = Abonnement::withTrashed()->find($id);
-    //     $abonnement->restore();
-    //     $message = "L'abonnement $abonnement->code a été restauré avec succès.";
-    //     return response()->json(['message' => $message]);
-    // }
-
-    // public function trashed()
-    // {
-    //     $abonnements = Abonnement::with('emplacement', 'equipement.type')->onlyTrashed()->get();
-    //     return response()->json(['abonnements' => $abonnements]);
-    // }
 
     public function show(int $id): JsonResponse
     {
@@ -99,11 +80,9 @@ class AbonnementsController extends Controller
         $request->validate(Abonnement::FINISH_RULES);
         $abonnement = Abonnement::findOrFail($id);
         $abonnement->index_fin = $request->index_fin;
-        $abonnement->stop();
-        $equipement = Equipement::findOrFail($abonnement->equipement_id);
-        $equipement->free();
-        $equipement->save();
         $abonnement->save();
+        $abonnement->stop();
+        AbonnementResilied::dispatch($abonnement);
         $message = "L'abonnement $request->code a été résilié avec succès.";
 
         return response()->json(['message' => $message]);

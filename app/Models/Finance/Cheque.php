@@ -28,7 +28,7 @@ class Cheque extends Model
     /**
      * Undocumented function
      *
-     * @param Builder<Cheque> $query
+     * @param  Builder<Cheque>  $query
      * @return Builder<Cheque>
      */
     public function isValid(Builder $query): Builder

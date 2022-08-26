@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      *
@@ -20,8 +19,6 @@ return new class extends Migration
             $table->unsignedTinyInteger('avance')->nullable();
             $table->unsignedTinyInteger('caution')->nullable();
             $table->unsignedInteger('pas_porte')->nullable();
-            $table->dateTime('date_facture')->nullable();
-            $table->dateTime('date_soldee')->nullable();
             $table->foreignId('annexe_id')->nullable()->constrained('service_annexes')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('equipement_id')->nullable()->constrained('equipements')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('contrat_id')->constrained('contrats')->onDelete('cascade')->onUpdate('cascade');

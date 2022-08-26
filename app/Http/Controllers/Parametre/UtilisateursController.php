@@ -41,7 +41,7 @@ class UtilisateursController extends Controller
         $user->password = Hash::make($request->password);
         $user->disconnect();
         $user->save();
-        $path = substr($request->file('avatar')->store('public/user-' . $user->id), 7);
+        $path = substr($request->file('avatar')->store('public/user-'.$user->id), 7);
         $user->avatar = $path;
         $user->save();
         $message = "L'utilisateur $request->name a été crée avec succès.";
@@ -59,9 +59,9 @@ class UtilisateursController extends Controller
             $user->name = $request->name;
             $user->adresse = $request->adresse;
             $user->description = $request->description;
-            if ($request->hasFile('image') and !empty($user->avatar)) {
-                unlink(public_path() . '/storage/' . $user->avatar);
-                $path = substr($request->file('image')->store('public/user-' . $request->id), 7);
+            if ($request->hasFile('image') and ! empty($user->avatar)) {
+                unlink(public_path().'/storage/'.$user->avatar);
+                $path = substr($request->file('image')->store('public/user-'.$request->id), 7);
                 $user->avatar = $path;
             }
             $user->save();
@@ -86,12 +86,12 @@ class UtilisateursController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         } else {
-            if (!Hash::check($request->oldPassword, $user->password)) {
+            if (! Hash::check($request->oldPassword, $user->password)) {
                 $message = 'Ancien mot de passe incorrecte.';
 
                 return response()->json(['message' => $message], 400);
             } else {
-                if (!empty($request->password)) {
+                if (! empty($request->password)) {
                     $user->password = Hash::make($request->password);
                 }
                 $user->save();
@@ -112,7 +112,7 @@ class UtilisateursController extends Controller
         if (count($rolePermissions) > 0) {
             $ids = array_column($rolePermissions, 'id');
             $directPermissions = array_filter($request->permissions, function ($permission) use ($ids) {
-                return !in_array($permission['id'], $ids);
+                return ! in_array($permission['id'], $ids);
             }, ARRAY_FILTER_USE_BOTH);
             if (count($directPermissions) > 0) {
                 $permissions = array_column($directPermissions, 'id');

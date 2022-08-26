@@ -45,7 +45,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
                 $start++;
                 $niveau = new Niveau();
                 $niveau->pavillon_id = $pavillon;
-                $niveau->nom = 'niveau ' . $start;
+                $niveau->nom = 'niveau '.$start;
                 $niveau->code = (string) $start;
                 $niveau->save();
             }
@@ -67,7 +67,8 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         } else {
             $request->validate(Niveau::RULES);
             $niveau = new Niveau($request->all());
-            $niveau->code = (string) (Pavillon::with('niveaux')->findOrFail($request->pavillon_id)->niveaux->count() + 1);
+            $pavillon = Pavillon::with('niveaux')->findOrFail($request->pavillon_id);
+            $niveau->code = (string) ($pavillon->niveaux->count() + 1);
             $niveau->save();
         }
         $message = "Le niveau $request->nom a été crée avec succès.";

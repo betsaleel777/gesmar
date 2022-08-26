@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Parametre\Architecture;
 
+use App\Enums\StatusAbonnement;
+use App\Enums\StatusEmplacement;
 use App\Http\Controllers\Controller;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Emplacement;
+use App\Models\Architecture\Site;
 use App\Models\Architecture\Zone;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
@@ -15,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 class EmplacementsController extends Controller implements StandardControllerInterface
 {
     /**
-     * Undocumented function
+     * Génerer le code de l'emplacement
      *
      * @param  int  $id
      * @return array<string, string>
@@ -33,13 +36,14 @@ class EmplacementsController extends Controller implements StandardControllerInt
     /**
      * Undocumented function
      *
-     * @param integer $id
+     * @param  int  $id
      * @return Builder
      */
     private static function queryByMarche(int $id): Builder
     {
         $query = DB::table('emplacements')->select('emplacements.*')->join('zones', 'zones.id', '=', 'emplacements.zone_id')
             ->join('niveaux', 'zones.niveau_id', '=', 'niveaux.id')->join('pavillons', 'niveaux.pavillon_id', '=', 'pavillons.id')
+            ->leftjoin('equipements', 'equipements.emplacement_id', '=', 'emplacements.id')
             ->where('pavillons.site_id', $id, true);
 
         return $query;
@@ -77,6 +81,8 @@ class EmplacementsController extends Controller implements StandardControllerInt
         ['code' => $code] = self::codeGenerate($request->zone_id);
         $emplacement->code = $code;
         $emplacement->save();
+        $emplacement->liberer();
+        $emplacement->delier();
         $message = "L'emplacement $request->nom a été crée avec succès.";
 
         return response()->json(['message' => $message]);
@@ -133,6 +139,8 @@ class EmplacementsController extends Controller implements StandardControllerInt
             $emplacement->code = $code;
             $emplacement->nom = 'EMPLACEMENT ' . $rang;
             $emplacement->save();
+            $emplacement->liberer();
+            $emplacement->delier();
             $compteur--;
         }
         $message = "$request->nombre emplacements ont été crées avec succès.";
@@ -147,10 +155,24 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['emplacements' => $emplacements]);
     }
 
+    public function getByMarcheWithGearsLinked(int $id): JsonResponse
+    {
+        $emplacements = Site::with('emplacements.equipements.type')->findOrFail($id)->emplacements;
+
+        return response()->json(['emplacements' => $emplacements]);
+    }
+
+    public function getUnlinkedByMarche(int $id): JsonResponse
+    {
+        $emplacements = Emplacement::isUnlinked()->get();
+
+        return response()->json(['emplacements' => $emplacements]);
+    }
+
     public function getFreeByMarche(int $id): JsonResponse
     {
-        $emplacements = self::queryByMarche($id)->whereNull('date_occupe')->get();
-
+        $emplacements = self::queryByMarche($id)->join('statuses', 'statuses.model_id', '=', 'emplacements.id')
+        ->where('statuses.name', StatusEmplacement::FREE)->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
@@ -164,7 +186,7 @@ class EmplacementsController extends Controller implements StandardControllerInt
     public function getRentalbyMonth(string $date): JsonResponse
     {
         $emplacements = DB::table('emplacements')
-            ->select('emplacements.*', DB::raw("concat(personnes.nom,' ',personnes.prenom) as nomComplet"))
+            ->select('emplacements.*', DB::raw("concat(personnes.nom,' ',personnes.prenom) as alias"))
             ->join('contrats', 'emplacements.id', '=', 'contrats.emplacement_id')
             ->join('personnes', 'personnes.id', '=', 'contrats.personne_id')
             ->leftJoin('factures', 'contrats.id', '=', 'factures.contrat_id')

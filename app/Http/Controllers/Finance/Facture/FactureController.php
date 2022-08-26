@@ -17,14 +17,14 @@ class FactureController extends Controller
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.personne', 'contrat.site')->validees()->get();
+        $factures = Facture::with('contrat.personne', 'contrat.site')->isPaid()->get();
 
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.personne', 'contrat.site')->nonValidees()->get();
+        $factures = Facture::with('contrat.personne', 'contrat.site')->isUnpaid()->get();
 
         return response()->json(['factures' => $factures]);
     }

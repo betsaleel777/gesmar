@@ -4,7 +4,6 @@ namespace App\Models\Architecture;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +19,11 @@ class TypeEmplacement extends Model
 
     protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'equipable'];
 
+    /**
+     * Undocumented variable
+     *
+     * @var array<int, string>
+     */
     protected $appends = ['code'];
 
     const RULES = [
@@ -31,12 +35,12 @@ class TypeEmplacement extends Model
     /**
      * Undocumented function
      *
-     * @return Attribute{get:(callable(): string)}
+     * @return Attribute<get:(callable():string)>
      */
     protected function code(): Attribute
     {
-        return new Attribute(
-            get:fn() => $this->attributes['prefix'] . str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
+        return Attribute::make(
+            get:fn () => $this->attributes['prefix'].str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
         );
     }
 
@@ -54,7 +58,7 @@ class TypeEmplacement extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int, Emplacement>>
+     * @return HasMany<Emplacement>
      */
     public function emplacements(): HasMany
     {
@@ -64,7 +68,7 @@ class TypeEmplacement extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Site>
+     * @return BelongsTo<Site, TypeEmplacement>
      */
     public function site(): BelongsTo
     {

@@ -15,16 +15,16 @@ class FactureAnnexeController extends FactureController
         return response()->json(['factures' => $factures]);
     }
 
-    public function facturesValidees(): JsonResponse
+    public function facturesSoldees(): JsonResponse
     {
-        $factures = Facture::with('contrat.personne', 'contrat.site', 'annexe')->validees()->isAnnexe()->get();
+        $factures = Facture::with('contrat.personne', 'contrat.site', 'annexe')->isPaid()->isAnnexe()->get();
 
         return response()->json(['factures' => $factures]);
     }
 
-    public function facturesNonValidees(): JsonResponse
+    public function facturesNonSoldees(): JsonResponse
     {
-        $factures = Facture::with('contrat.personne', 'contrat.site', 'annexe')->nonValidees()->isAnnexe()->get();
+        $factures = Facture::with('contrat.personne', 'contrat.site', 'annexe')->isUnpaid()->isAnnexe()->get();
 
         return response()->json(['factures' => $factures]);
     }
@@ -40,7 +40,8 @@ class FactureAnnexeController extends FactureController
     {
         $request->validate(Facture::RULES);
         $facture = new Facture($request->all());
-        $facture->codeGenerate(ANNEXE_PREFIXE);
+        $facture->proforma();
+        $facture->codeGenerate(ANNEXE_FACTURE_PREFIXE);
         $facture->save();
         $message = "La facture annexe: $facture->code a été crée avec succès.";
 

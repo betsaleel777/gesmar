@@ -2,7 +2,6 @@
 
 namespace App\Models\Architecture;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,7 +33,7 @@ class Niveau extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Pavillon>
+     * @return BelongsTo<Pavillon, Niveau>
      */
     public function pavillon(): BelongsTo
     {
@@ -44,7 +43,7 @@ class Niveau extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int,Collection<int, Zone>>
+     * @return HasMany<Zone>
      */
     public function zones(): HasMany
     {

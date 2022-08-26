@@ -30,7 +30,7 @@ class Versement extends Model
     /**
      * Undocumented function
      *
-     * @param Builder<Versement> $query
+     * @param  Builder<Versement>  $query
      * @return Builder<Versement>
      */
     public function scopeIsAnnexe(Builder $query): Builder
@@ -43,7 +43,7 @@ class Versement extends Model
     /**
      * Undocumented function
      *
-     * @param Builder<Versement> $query
+     * @param  Builder<Versement>  $query
      * @return Builder<Versement>
      */
     public function scopeIsInitiale(Builder $query)
@@ -57,7 +57,7 @@ class Versement extends Model
     /**
      * Undocumented function
      *
-     * @param Builder<Versement> $query
+     * @param  Builder<Versement>  $query
      * @return Builder<Versement>
      */
     public function scopeIsEquipement(Builder $query): Builder
@@ -70,7 +70,7 @@ class Versement extends Model
     /**
      * Undocumented function
      *
-     * @param Builder<Versement> $query
+     * @param  Builder<Versement>  $query
      * @return Builder<Versement>
      */
     public function scopeIsLoyer(Builder $query): Builder
@@ -85,7 +85,7 @@ class Versement extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Facture>
+     * @return BelongsTo<Facture, Versement>
      */
     public function facture(): BelongsTo
     {

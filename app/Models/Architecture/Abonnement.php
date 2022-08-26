@@ -2,92 +2,77 @@
 
 namespace App\Models\Architecture;
 
-use Carbon\Carbon;
+use App\Enums\StatusAbonnement;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperAbonnement
  */
 class Abonnement extends Pivot
 {
-    protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'date_resiliation', 'site_id'];
+    use HasStatuses;
+
+    protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'site_id'];
 
     protected $table = 'abonnements';
 
-    /**
-     * variables dynamiques
-     *
-     * @var array<int, string>
-     */
     protected $appends = ['status'];
+    protected $with = ['statuses'];
 
-    const PROGRESSING = 'en cours';
-
-    const STOPPED = 'résilié';
-
-    const RULES = [
-        'equipement_id' => 'required',
+    public const RULES = [
         'emplacement_id' => 'required',
-        'index_depart' => 'required|numeric',
         'site_id' => 'required',
     ];
 
-    const FINISH_RULES = [
+    public const FINISH_RULES = [
         'index_fin' => 'required|numeric',
     ];
 
-    /**
-     * Undocumented function
-     *
-     * @return Attribute{get:(callable(): string)}
-     */
-    protected function status(): Attribute
-    {
-        return new Attribute(
-            get:fn() => empty($this->attributes['date_resiliation']) ? self::PROGRESSING : self::STOPPED
-        );
-    }
-
     public function stop(): void
     {
-        $this->attributes['date_resiliation'] = Carbon::now();
+        $this->setStatus(StatusAbonnement::STOPPED->value);
     }
 
     public function process(): void
     {
-        $this->attributes['date_resiliation'] = null;
+        $this->setStatus(StatusAbonnement::PROGRESSING->value);
     }
 
     // scopes
+
     /**
-     * Undocumented function
+     * Obtenir les abonnements résiliés
      *
      * @param  Builder<Abonnement>  $query
      * @return Builder<Abonnement>
      */
-    public function scopeResilies(Builder $query): Builder
+    public function scopeStopped(Builder $query): Builder
     {
-        return $query->whereNotNull('date_resiliation');
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusAbonnement::STOPPED->value, true) ;
+        });
     }
 
     /**
-     * Undocumented function
+     * Obtenir les abonnements en cours
      *
      * @param  Builder<Abonnement>  $query
      * @return Builder<Abonnement>
      */
-    public function scopeEnCours(Builder $query): Builder
+    public function scopeProgressing(Builder $query): Builder
     {
-        return $query->whereNull('date_resiliation');
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusAbonnement::PROGRESSING->value, true) ;
+        });
     }
 
     /**
-     * Undocumented function
+     * Obtenir l'unique équipement qui est lié à cet abonnement
      *
-     * @return BelongsTo<Equipement>
+     * @return BelongsTo<Equipement, Abonnement>
      */
     public function equipement(): BelongsTo
     {
@@ -95,9 +80,9 @@ class Abonnement extends Pivot
     }
 
     /**
-     * Undocumented function
+     * Obtenir l'unique emplacement qui est lié à cet abonnement
      *
-     * @return BelongsTo<Emplacement>
+     * @return BelongsTo<Emplacement, Abonnement>
      */
     public function emplacement(): BelongsTo
     {
@@ -105,9 +90,9 @@ class Abonnement extends Pivot
     }
 
     /**
-     * Undocumented function
+     * Obtenir l'unique site (marché) qui est lié à cet abonnement
      *
-     * @return BelongsTo<Site>
+     * @return BelongsTo<Site, Abonnement>
      */
     public function site(): BelongsTo
     {

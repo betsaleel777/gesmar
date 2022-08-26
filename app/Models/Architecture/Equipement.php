@@ -2,20 +2,23 @@
 
 namespace App\Models\Architecture;
 
+use App\Enums\StatusEquipement;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Carbon;
+use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperEquipement
  */
 class Equipement extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
+    use HasStatuses;
 
     protected $fillable = [
         'nom',
@@ -26,9 +29,7 @@ class Equipement extends Model
         'index',
         'type_equipement_id',
         'site_id',
-        'date_occupe',
-        'date_abime',
-        'date_libre',
+        'emplacement_id',
     ];
 
     /**
@@ -36,15 +37,16 @@ class Equipement extends Model
      *
      * @var array<int, string>
      */
-    protected $appends = ['status'];
+    protected $appends = ['alias','statuts'];
 
-    const FREE = 'libre';
+    /**
+     * Undocumented variable
+     *
+     * @var array<int, string>
+     */
+    protected $with = ['type','statuses'];
 
-    const BUSY = 'occupé';
-
-    const DAMAGING = 'abimé';
-
-    const RULES = [
+    public const RULES = [
         'prix_unitaire' => 'required|numeric',
         'prix_fixe' => 'required|numeric',
         'frais_facture' => 'required',
@@ -52,84 +54,123 @@ class Equipement extends Model
         'index' => 'required',
         'site_id' => 'required',
     ];
+    /**
+     * Undocumented function
+     *
+     * @return Attribute<mixed>
+     */
+    protected function alias(): Attribute
+    {
+        return Attribute::make(
+            get:fn () => $this->attributes['code'] . ' ' . $this->type->nom,
+        );
+    }
 
     /**
      * Undocumented function
      *
-     * @return Attribute{get:(callable(): string)}
+     * @return Attribute<get:(callable():string)>
      */
-    protected function status(): Attribute
+    protected function statuts(): Attribute
     {
-        return new Attribute(
+        return Attribute::make(
             get:function () {
-                if (empty($this->attributes['date_occupe']) and empty($this->attributes['date_abime'])) {
-                    return self::FREE;
-                }
-                if (!empty($this->attributes['date_occupe'])) {
-                    return self::BUSY;
-                }
+                $status[] = $this->latestStatus(StatusEquipement::SUBSCRIBED->value, StatusEquipement::UNSUBSCRIBED->value);
+                $status[] = $this->latestStatus(StatusEquipement::LINKED->value, StatusEquipement::UNLINKED->value);
+                return $status;
             }
         );
     }
 
-    public function busy(): void
+    public function abonner(): void
     {
-        $this->attributes['date_occupe'] = Carbon::now();
-        $this->attributes['date_abime'] = null;
-        $this->attributes['date_libre'] = null;
+        $this->setStatus(StatusEquipement::SUBSCRIBED->value);
     }
 
-    public function damaging(): void
+    public function desabonner(): void
     {
-        $this->attributes['date_abime'] = Carbon::now();
-        $this->attributes['date_occupe'] = null;
-        $this->attributes['date_libre'] = null;
+        $this->setStatus(StatusEquipement::UNSUBSCRIBED->value);
     }
 
-    public function free(): void
+    public function lier(): void
     {
-        $this->attributes['date_libre'] = Carbon::now();
-        $this->attributes['date_abime'] = null;
-        $this->attributes['date_occupe'] = null;
+        $this->setStatus(StatusEquipement::LINKED->value);
     }
+
+    public function delier(): void
+    {
+        $this->setStatus(StatusEquipement::UNLINKED->value);
+    }
+
+    public function endommager(): void
+    {
+        $this->setStatus(StatusEquipement::DAMAGED->value);
+    }
+
+    public function reparer(): void
+    {
+        $this->setStatus(StatusEquipement::FIXED->value);
+    }
+
+    // scopes
 
     /**
-     * Undocumented function
+     * obtenir les equipements qui ont un abonnement en cours
      *
-     * @param  Builder<Equipement>  $query
+     * @param Builder<Equipement> $query
      * @return Builder<Equipement>
      */
-    public function socpeIsFree(Builder $query): Builder
+    public function scopeIsSubscribed(Builder $query): Builder
     {
-        return $query->whereNotNull('date_libre');
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusEquipement::SUBSCRIBED->value) ;
+        });
     }
 
     /**
-     * Undocumented function
+     * obtenir les equipements qui n'ont pas d'abonnement en cours
      *
-     * @param  Builder<Equipement>  $query
+     * @param Builder<Equipement> $query
      * @return Builder<Equipement>
      */
-    public function socpeIsDamaged(Builder $query): Builder
+    public function scopeIsUnsubscribed(Builder $query): Builder
     {
-        return $query->whereNotNull('date_abime');
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusEquipement::UNSUBSCRIBED->value) ;
+        });
     }
 
     /**
-     * Undocumented function
+     * obtenir les equipements qui sont liés à un emplacement
      *
-     * @param  Builder<Equipement>  $query
+     * @param Builder<Equipement> $query
      * @return Builder<Equipement>
      */
-    public function socpeIsBusy(Builder $query): Builder
+    public function scopeIsLinked(Builder $query): Builder
     {
-        return $query->whereNotNull('date_occupe');
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusEquipement::LINKED->value) ;
+        });
     }
+
+    /**
+     * obtenir les equipements qui ne sont pas liés à un emplacement
+     *
+     * @param Builder<Equipement> $query
+     * @return Builder<Equipement>
+     */
+    public function scopeIsUnlinked(Builder $query): Builder
+    {
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusEquipement::UNLINKED->value) ;
+        });
+    }
+
 
     /**
      * Undocumented function
      *
-     * @return BelongsTo<TypeEquipement>
+     * @return BelongsTo<TypeEquipement, Equipement>
      */
     public function type(): BelongsTo
     {
@@ -139,10 +180,20 @@ class Equipement extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Site>
+     * @return BelongsTo<Site, Equipement>
      */
     public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class);
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return BelongsTo<Emplacement, Equipement>
+     */
+    public function emplacement(): BelongsTo
+    {
+        return $this->belongsTo(Emplacement::class);
     }
 }

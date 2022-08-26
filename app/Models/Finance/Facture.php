@@ -2,17 +2,16 @@
 
 namespace App\Models\Finance;
 
+use App\Enums\StatusFacture;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Exploitation\Contrat;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperFacture
@@ -20,43 +19,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Facture extends Model
 {
     use HasFactory;
+    use HasStatuses;
 
     protected $fillable = [
-        'code', 'contrat_id', 'date_soldee', 'annexe_id', 'date_facture', 'index_debut', 'index_fin',
-        'equipement_id', 'avance', 'caution', 'pas_porte', 'date_plan', 'periode',
+        'code', 'contrat_id', 'annexe_id', 'index_debut', 'index_fin', 'equipement_id', 'avance', 'caution', 'pas_porte', 'periode',
     ];
 
-    protected $appends = ['status'];
-
-    private const PAID = 'payée';
-
-    private const UNPAID = 'impayée';
-
-    const SHEDULABLE = 'planifiable';
-
-    const RULES = [
+    public const RULES = [
         'contrat_id' => 'required',
     ];
-
-    /**
-     * Undocumented function
-     *
-     * @return Attribute{get:(callable(): string)}
-     */
-    protected function status(): Attribute
-    {
-        return new Attribute(
-            get:function () {
-                if ($this->attributes['date_plan']) {
-                    return self::SHEDULABLE;
-                } elseif ($this->attributes['date_soldee']) {
-                    return self::PAID;
-                } else {
-                    return self::UNPAID;
-                }
-            },
-        );
-    }
 
     public function codeGenerate(string $prefix): void
     {
@@ -64,6 +35,11 @@ class Facture extends Model
         $this->attributes['code'] = $prefix . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
+    /**
+     * règles du formulaire de création d'une facture initiale
+     *
+     * @return array<string, string>
+     */
     public static function initialeRules(): array
     {
         return array_merge(self::RULES, [
@@ -73,6 +49,11 @@ class Facture extends Model
         ]);
     }
 
+    /**
+     * règles du formulaire de création d'une facture d'équipement
+     *
+     * @return array<string, string>
+     */
     public static function gearRules(): array
     {
         return array_merge(self::RULES, [
@@ -82,6 +63,11 @@ class Facture extends Model
         ]);
     }
 
+    /**
+     * règles du formulaire de création d'une facture de loyer (bail)
+     *
+     * @return array<string, string>
+     */
     public static function loyerRules(): array
     {
         return array_merge(self::RULES, ['periode' => 'required']);
@@ -89,53 +75,29 @@ class Facture extends Model
 
     public function payer(): void
     {
-        $this->attributes['date_soldee'] = Carbon::now();
+        $this->setStatus(StatusFacture::PAID->value);
     }
 
-    public function planifier(): void
+    public function impayer(): void
     {
-        $this->attributes['date_plan'] = Carbon::now();
+        $this->setStatus(StatusFacture::UNPAID->value);
+    }
+
+    public function facturable(): void
+    {
+        $this->setStatus(StatusFacture::FACTURE->value);
+    }
+
+    public function proforma(): void
+    {
+        $this->setStatus(StatusFacture::PROFORMA->value);
     }
 
     // scopes
-
     /**
      * Undocumented function
      *
-     * @param Builder<Facture> $query
-     * @return Builder<Facture>
-     */
-    public function scopeSoldees(Builder $query): Builder
-    {
-        return $query->whereNotNull('date_soldee');
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param Builder<Facture> $query
-     * @return Builder<Facture>
-     */
-    public function scopeValidees(Builder $query): Builder
-    {
-        return $query->whereNotNull('date_facture');
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param Builder<Facture> $query
-     * @return Builder<Facture>
-     */
-    public function scopeNonValidees(Builder $query): Builder
-    {
-        return $query->whereNull('date_facture');
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param Builder<Facture> $query
+     * @param  Builder<Facture>  $query
      * @return Builder<Facture>
      */
     public function scopeIsAnnexe(Builder $query): Builder
@@ -146,7 +108,7 @@ class Facture extends Model
     /**
      * Undocumented function
      *
-     * @param Builder<Facture> $query
+     * @param  Builder<Facture>  $query
      * @return Builder<Facture>
      */
     public function scopeIsEquipement(Builder $query): Builder
@@ -157,7 +119,7 @@ class Facture extends Model
     /**
      * Undocumented function
      *
-     * @param Builder<Facture> $query
+     * @param  Builder<Facture>  $query
      * @return Builder<Facture>
      */
     public function scopeIsInitiale(Builder $query): Builder
@@ -168,7 +130,7 @@ class Facture extends Model
     /**
      * Undocumented function
      *
-     * @param Builder<Facture> $query
+     * @param  Builder<Facture>  $query
      * @return Builder<Facture>
      */
     public function scopeIsLoyer(Builder $query): Builder
@@ -176,11 +138,56 @@ class Facture extends Model
         return $query->whereNotNull('periode')->whereNull('equipement_id');
     }
 
+    /**
+    * obtenir les prospects
+    *
+    * @param Builder<Facture> $query
+    * @return Builder<Facture>
+    */
+    public function scopeIsPaid(Builder $query): Builder
+    {
+        return $query->currentStatus(StatusFacture::PAID->value);
+    }
+
+    /**
+    * obtenir les factures payées partielements ou impayées
+    *
+    * @param Builder<Facture> $query
+    * @return Builder<Facture>
+    */
+    public function scopeIsUnpaid(Builder $query): Builder
+    {
+        return $query->currentStatus(StatusFacture::UNPAID->value);
+    }
+
+    /**
+    * obtenir les proformas
+    *
+    * @param Builder<Facture> $query
+    * @return Builder<Facture>
+    */
+    public function scopeIsProforma(Builder $query): Builder
+    {
+        return $query->currentStatus(StatusFacture::PROFORMA->value);
+    }
+
+    /**
+    * obtenir les factures
+    *
+    * @param Builder<Facture> $query
+    * @return Builder<Facture>
+    */
+    public function scopeIsFacture(Builder $query): Builder
+    {
+        return $query->currentStatus(StatusFacture::FACTURE->value);
+    }
+
     // relations
+
     /**
      * Undocumented function
      *
-     * @return BelongsTo<ServiceAnnexe>
+     * @return BelongsTo<ServiceAnnexe, Facture>
      */
     public function annexe(): BelongsTo
     {
@@ -190,7 +197,7 @@ class Facture extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Equipement>
+     * @return BelongsTo<Equipement, Facture>
      */
     public function equipement(): BelongsTo
     {
@@ -200,7 +207,7 @@ class Facture extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Contrat>
+     * @return BelongsTo<Contrat, Facture>
      */
     public function contrat(): BelongsTo
     {
@@ -210,7 +217,7 @@ class Facture extends Model
     /**
      * Undocumented function
      *
-     * @return HasMany<int, Collection<int, Versement>>
+     * @return HasMany<Versement>
      */
     public function versements(): HasMany
     {

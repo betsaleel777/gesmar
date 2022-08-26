@@ -20,7 +20,7 @@ class PaiementLigne extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Versement>
+     * @return BelongsTo<Versement, PaiementLigne>
      */
     public function versement(): BelongsTo
     {

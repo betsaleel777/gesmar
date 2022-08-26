@@ -2,14 +2,17 @@
 
 namespace App\Models\Architecture;
 
+use App\Enums\StatusAbonnement;
+use App\Enums\StatusEmplacement;
 use App\Models\Exploitation\Contrat;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperEmplacement
@@ -17,12 +20,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Emplacement extends Model
 {
     use SoftDeletes;
+    use HasStatuses;
 
-    protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'date_occupe', 'loyer', 'pas_porte', 'caution'];
+    protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'loyer', 'pas_porte', 'caution'];
 
-    protected $appends = ['status'];
+    protected $appends = ['statuts'];
+    protected $with = ['statuses'];
 
-    const RULES = [
+    public const RULES = [
         'nom' => 'required|max:255',
         'superficie' => 'required',
         'loyer' => 'required',
@@ -30,7 +35,7 @@ class Emplacement extends Model
         'type_emplacement_id' => 'required',
     ];
 
-    const PUSH_RULES = [
+    public const PUSH_RULES = [
         'superficie' => 'required',
         'loyer' => 'required',
         'zone_id' => 'required',
@@ -38,18 +43,14 @@ class Emplacement extends Model
         'nombre' => 'required|numeric',
     ];
 
-    private const OCCUPE = 'occupé';
-
-    private const LIBRE = 'libre';
-
     /**
      * Undocumented function
      *
-     * @return Attribute{get:(callable(): string)}
+     * @return Attribute<get:(callable():string)>
      */
     protected function code(): Attribute
     {
-        return new Attribute(
+        return Attribute::make(
             get:fn () => str_pad((string) $this->attributes['code'], 3, '0', STR_PAD_LEFT),
         );
     }
@@ -57,64 +58,100 @@ class Emplacement extends Model
     /**
      * Undocumented function
      *
-     * @return Attribute{get:(callable(): string)}
+     * @return Attribute<get:(callable():string)>
      */
-    protected function status(): Attribute
+    protected function statuts(): Attribute
     {
-        return new Attribute(
-            get:fn () => $this->attributes['date_occupe'] ? self::OCCUPE : self::LIBRE
+        return Attribute::make(
+            get:function () {
+                $status[] = $this->latestStatus(StatusEmplacement::BUSY->value, StatusEmplacement::FREE->value);
+                $status[] = $this->latestStatus(StatusEmplacement::LINKED->value, StatusEmplacement::UNLINKED->value);
+                return $status;
+            }
         );
     }
 
     public function occuper(): void
     {
-        $this->attributes['date_occupe'] = Carbon::now();
+        $this->setStatus(StatusEmplacement::BUSY->value);
     }
 
-    public function isBusy(): bool
+    public function lier(): void
     {
-        return ! empty($this->attributes['date_occupe']);
+        $this->setStatus(StatusEmplacement::LINKED->value);
+    }
+
+    public function delier(): void
+    {
+        $this->setStatus(StatusEmplacement::UNLINKED->value);
     }
 
     public function liberer(): void
     {
-        $this->attributes['date_occupe'] = null;
+        $this->setStatus(StatusEmplacement::FREE->value);
     }
 
-    public function isFree(): bool
-    {
-        return empty($this->attributes['date_occupe']);
-    }
 
     //scopes
 
     /**
-     * Undocumented function
+     * obtenir les emplacements occupés
      *
-     * @param  Builder<Emplacement>  $query
+     * @param Builder<Emplacement> $query
      * @return Builder<Emplacement>
      */
-    public function scopeLibres(Builder $query): Builder
+    public function scopeIsBusy(Builder $query): Builder
     {
-        return $query->whereNull('date_occupe');
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusEmplacement::BUSY->value) ;
+        });
     }
 
     /**
-     * Undocumented function
+     * obtenir les emplacements libres
      *
-     * @param  Builder<Emplacement>  $query
+     * @param Builder<Emplacement> $query
      * @return Builder<Emplacement>
      */
-    public function scopeOccupes(Builder $query): Builder
+    public function scopeIsFree(Builder $query): Builder
     {
-        return $query->whereNotNull('date_occupe');
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusEmplacement::FREE->value) ;
+        });
+    }
+
+    /**
+     * obtenir les emplacements liés à au moins un equipement
+     *
+     * @param Builder<Emplacement> $query
+     * @return Builder<Emplacement>
+     */
+    public function scopeIsLinked(Builder $query): Builder
+    {
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusEmplacement::LINKED->value) ;
+        });
+    }
+
+    /**
+     * obtenir les emplacements liés à aucun equipement
+     *
+     * @param Builder<Emplacement> $query
+     * @return Builder<Emplacement>
+     */
+    public function scopeIsUnlinked(Builder $query): Builder
+    {
+        return $query->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusEmplacement::UNLINKED->value) ;
+        });
     }
 
     //relations
+
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Zone>
+     * @return BelongsTo<Zone, Emplacement>
      */
     public function zone(): BelongsTo
     {
@@ -124,7 +161,7 @@ class Emplacement extends Model
     /**
      * Undocumented function
      *
-     * @return BelongsTo<TypeEmplacement>
+     * @return BelongsTo<TypeEmplacement, Emplacement>
      */
     public function type(): BelongsTo
     {
@@ -136,19 +173,30 @@ class Emplacement extends Model
      *
      * @return BelongsToMany<Equipement>
      */
-    public function equipements(): BelongsToMany
+    public function abonnements(): BelongsToMany
     {
-        return $this->belongsToMany(Equipement::class, 'abonnements')->wherePivotNull('date_resiliation')
-            ->using(Abonnement::class)->withTimestamps();
+        return $this->belongsToMany(Equipement::class, 'abonnements')->whereHas('statuses', function ($query) {
+            return $query->where('name', StatusAbonnement::PROGRESSING->value) ;
+        })->using(Abonnement::class)->withTimestamps();
     }
 
     /**
      * Undocumented function
      *
-     * @return BelongsTo<Contrat>
+     * @return BelongsTo<Contrat, Emplacement>
      */
     public function contrat(): BelongsTo
     {
         return $this->belongsTo(Contrat::class);
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return HasMany<Equipement, Emplacement>
+     */
+    public function equipements(): HasMany
+    {
+        return $this->hasMany(Equipement::class);
     }
 }

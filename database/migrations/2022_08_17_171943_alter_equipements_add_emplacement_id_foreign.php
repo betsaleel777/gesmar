@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('emplacements', function (Blueprint $table) {
-            $table->dateTime('date_occupe')->nullable();
+        Schema::table('equipements', function (Blueprint $table) {
+            $table->foreignId('emplacement_id')->nullable()->constrained('emplacements')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -25,7 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('emplacements', function (Blueprint $table) {
+        Schema::table('equipements', function (Blueprint $table) {
+            //
         });
     }
 };

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      *
@@ -18,7 +17,6 @@ return new class extends Migration
             $table->string('code', 10)->unique();
             $table->unsignedInteger('index_depart');
             $table->unsignedInteger('index_fin')->nullable();
-            $table->dateTime('date_resiliation')->nullable();
             $table->foreignId('equipement_id')->constrained('equipements')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('emplacement_id')->constrained('emplacements')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();

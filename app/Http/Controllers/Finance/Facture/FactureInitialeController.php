@@ -18,14 +18,14 @@ class FactureInitialeController extends Controller
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->validees()->isInitiale()->get();
+        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isPaid()->isInitiale()->get();
 
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->nonValidees()->isInitiale()->get();
+        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isUnpaid()->isInitiale()->get();
 
         return response()->json(['factures' => $factures]);
     }
@@ -41,7 +41,8 @@ class FactureInitialeController extends Controller
     {
         $request->validate(Facture::initialeRules());
         $facture = new Facture($request->all());
-        $facture->codeGenerate(INITIALE_PREFIXE);
+        $facture->codeGenerate(INITIALE_FACTURE_PREFIXE);
+        $facture->proforma();
         $facture->save();
         $message = "La facture initiale: $facture->code a été crée avec succès.";
 
