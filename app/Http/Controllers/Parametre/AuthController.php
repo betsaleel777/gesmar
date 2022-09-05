@@ -18,7 +18,7 @@ class AuthController extends Controller
         ]);
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            $user = User::where('email', $request->email)->firstOrFail();
+            $user = User::firstWhere('email', $request->email);
             $user->connect();
             $user->save();
             $request->session()->regenerate();

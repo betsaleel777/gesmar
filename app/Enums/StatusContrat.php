@@ -8,4 +8,5 @@ enum StatusContrat: string
     case ONENDORSED = 'à signer';
     case ONVALIDATED = 'à valider';
     case ATTENTE = 'en attente';
+    case ABORTED = 'résilié';
 }

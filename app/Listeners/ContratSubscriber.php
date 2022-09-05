@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Enums\StatusFacture;
 use App\Events\ContratRegistred;
+use App\Events\ContratScheduled;
 use App\Events\FactureStatusChange;
 use App\Models\Architecture\Emplacement;
 use App\Models\Exploitation\Personne;
@@ -16,9 +17,9 @@ class ContratSubscriber
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
         $facture->codeGenerate(ANNEXE_FACTURE_PREFIXE);
-        $facture->proforma();
         $facture->annexe_id = $event->contrat->annexe_id;
         $facture->save();
+        $facture->proforma();
     }
 
     private function createFactureInitiale(ContratRegistred $event): void
@@ -26,29 +27,26 @@ class ContratSubscriber
         $emplacement = Emplacement::with('type')->findOrFail($event->contrat->emplacement_id);
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
-        $facture->proforma();
         $facture->codeGenerate(INITIALE_FACTURE_PREFIXE);
         $facture->caution = $emplacement->caution;
         $facture->avance = $event->avance;
         $facture->pas_porte = (int) $emplacement->pas_porte;
-        if ((bool) $emplacement->type->auto_valid === true) {
-            $facture->facturable();
-            $event->contrat->validated();
-            $event->contrat->save();
-            $personne = Personne::findOrFail($event->contrat->personne_id);
-            $personne->client();
-            $personne->save();
-            $emplacement->occuper();
-            $emplacement->save();
-        }
         $facture->save();
+        $facture->proforma();
+    }
+
+    public function validerSansSigner(ContratScheduled $event): void
+    {
+        $event->contrat->validated();
+        $personne = Personne::findOrFail($event->contrat->personne_id);
+        $personne->client();
+        $event->emplacement->occuper();
     }
 
     public function updateFactureStatus(FactureStatusChange $event): void
     {
         if ($event->status === StatusFacture::FACTURE) {
             $event->facture->facturable();
-            $event->facture->save();
         }
     }
 
@@ -61,17 +59,14 @@ class ContratSubscriber
      * Register the listeners for the subscriber.
      *
      * @param  \Illuminate\Events\Dispatcher  $events
-     * @return void
+     * @return array
      */
-    public function subscribe($events): void
+    public function subscribe($events): array
     {
-        $events->listen(
-            ContratRegistred::class,
-            [ContratSubscriber::class, 'createFacture']
-        );
-        $events->listen(
-            FactureStatusChange::class,
-            [ContratSubscriber::class, 'updateFactureStatus']
-        );
+        return [
+            ContratRegistred::class =>'createFacture',
+            FactureStatusChange::class =>'updateFactureStatus',
+            ContratScheduled::class => 'validerSansSigner'
+        ];
     }
 }

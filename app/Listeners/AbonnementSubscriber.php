@@ -2,21 +2,11 @@
 
 namespace App\Listeners;
 
-use App\Events\AbonnementRegistred;
 use App\Events\AbonnementResilied;
 use App\Models\Architecture\Equipement;
 
 class AbonnementSubscriber
 {
-    public function makeEquipementSubscribed(AbonnementRegistred $event): void
-    {
-        $equipement = Equipement::findOrFail($event->abonnement->equipement_id);
-        $equipement->emplacement_id = $event->abonnement->emplacement_id;
-        $equipement->save();
-        $equipement->abonner();
-        $equipement->lier();
-    }
-
     public function makeEquipementUnsubscribed(AbonnementResilied $event): void
     {
         $equipement = Equipement::findOrFail($event->abonnement->equipement_id);
@@ -27,17 +17,12 @@ class AbonnementSubscriber
      * Register the listeners for the subscriber.
      *
      * @param  \Illuminate\Events\Dispatcher  $events
-     * @return void
+     * @return array
      */
-    public function subscribe($events): void
+    public function subscribe($events): array
     {
-        $events->listen(
-            AbonnementRegistred::class,
-            [$this, 'makeEquipementSubscribed']
-        );
-        $events->listen(
-            AbonnementResilied::class,
-            [$this, 'makeEquipementUnsubscribed']
-        );
+        return [
+            AbonnementResilied::class => 'makeEquipementUnsubscribed'
+        ];
     }
 }

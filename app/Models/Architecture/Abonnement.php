@@ -3,15 +3,16 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusAbonnement;
+use App\Enums\StatusEquipement;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperAbonnement
  */
-class Abonnement extends Pivot
+class Abonnement extends Model
 {
     use HasStatuses;
 
@@ -31,6 +32,27 @@ class Abonnement extends Pivot
         'index_fin' => 'required|numeric',
     ];
 
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::deleted(function (Abonnement $abonnement) {
+            $equipement = Equipement::findOrFail($abonnement->equipement_id);
+            $equipement->desabonner();
+        });
+
+        static::saved(function (Abonnement $abonnement) {
+            $equipement = Equipement::findOrFail($abonnement->equipement_id);
+            $equipement->emplacement_id = $abonnement->emplacement_id;
+            $equipement->save();
+            $equipement->abonement === StatusEquipement::LINKED->value ?: $equipement->lier();
+            $equipement->abonner();
+        });
+    }
+
     public function stop(): void
     {
         $this->setStatus(StatusAbonnement::STOPPED->value);
@@ -41,8 +63,12 @@ class Abonnement extends Pivot
         $this->setStatus(StatusAbonnement::PROGRESSING->value);
     }
 
-    // scopes
+    public function error(): void
+    {
+        $this->setStatus(StatusAbonnement::ERROR->value);
+    }
 
+    // scopes
     /**
      * Obtenir les abonnements résiliés
      *
@@ -51,9 +77,7 @@ class Abonnement extends Pivot
      */
     public function scopeStopped(Builder $query): Builder
     {
-        return $query->whereHas('statuses', function ($query) {
-            return $query->where('name', StatusAbonnement::STOPPED->value, true) ;
-        });
+        return $query->currentStatus(StatusAbonnement::STOPPED->value);
     }
 
     /**
@@ -64,9 +88,29 @@ class Abonnement extends Pivot
      */
     public function scopeProgressing(Builder $query): Builder
     {
-        return $query->whereHas('statuses', function ($query) {
-            return $query->where('name', StatusAbonnement::PROGRESSING->value, true) ;
-        });
+        return $query->currentStatus(StatusAbonnement::PROGRESSING->value);
+    }
+
+    /**
+     * Obtenir les abonnements en erreur d'index
+     *
+     * @param  Builder<Abonnement>  $query
+     * @return Builder<Abonnement>
+     */
+    public function scopeIndexError(Builder $query): Builder
+    {
+        return $query->currentStatus(StatusAbonnement::ERROR->value);
+    }
+
+    /**
+     * Obtenir les abonnements sans erreur d'index
+     *
+     * @param  Builder<Abonnement>  $query
+     * @return Builder<Abonnement>
+     */
+    public function scopeWithoutError(Builder $query): Builder
+    {
+        return $query->otherCurrentStatus(StatusAbonnement::ERROR->value);
     }
 
     /**

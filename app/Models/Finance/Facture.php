@@ -25,13 +25,22 @@ class Facture extends Model
         'code', 'contrat_id', 'annexe_id', 'index_debut', 'index_fin', 'equipement_id', 'avance', 'caution', 'pas_porte', 'periode',
     ];
 
+    protected $appends = ['status'];
+
     public const RULES = [
         'contrat_id' => 'required',
     ];
 
+    protected static function booted()
+    {
+        static::deleted(function (Facture $facture) {
+            Contrat::findOrFail($facture->contrat_id)->delete();
+        });
+    }
+
     public function codeGenerate(string $prefix): void
     {
-        $rang = $this->get()->count() + 1;
+        $rang = $this->count() + 1;
         $this->attributes['code'] = $prefix . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
@@ -42,11 +51,11 @@ class Facture extends Model
      */
     public static function initialeRules(): array
     {
-        return array_merge(self::RULES, [
+        return [...self::RULES, ...[
             'avance' => 'required|numeric',
             'caution' => 'required|numeric',
             'pas_porte' => 'required|numeric',
-        ]);
+        ]];
     }
 
     /**
@@ -56,11 +65,11 @@ class Facture extends Model
      */
     public static function gearRules(): array
     {
-        return array_merge(self::RULES, [
+        return [...self::RULES, ...[
             'equipement_id' => 'required|numeric',
             'index_debut' => 'required|numeric',
             'index_fin' => 'required|numeric',
-        ]);
+        ]];
     }
 
     /**
@@ -70,7 +79,7 @@ class Facture extends Model
      */
     public static function loyerRules(): array
     {
-        return array_merge(self::RULES, ['periode' => 'required']);
+        return [...self::RULES, ...['periode' => 'required']];
     }
 
     public function payer(): void
@@ -94,8 +103,9 @@ class Facture extends Model
     }
 
     // scopes
+
     /**
-     * Undocumented function
+     * Obtenir les facture de service annexes
      *
      * @param  Builder<Facture>  $query
      * @return Builder<Facture>
@@ -106,7 +116,7 @@ class Facture extends Model
     }
 
     /**
-     * Undocumented function
+     * Obtenir les factures d'équipement
      *
      * @param  Builder<Facture>  $query
      * @return Builder<Facture>
@@ -117,7 +127,7 @@ class Facture extends Model
     }
 
     /**
-     * Undocumented function
+     * Obtenir les factures initiales
      *
      * @param  Builder<Facture>  $query
      * @return Builder<Facture>
@@ -128,7 +138,7 @@ class Facture extends Model
     }
 
     /**
-     * Undocumented function
+     * Obtenir les factures de loyer
      *
      * @param  Builder<Facture>  $query
      * @return Builder<Facture>
@@ -139,44 +149,44 @@ class Facture extends Model
     }
 
     /**
-    * obtenir les prospects
-    *
-    * @param Builder<Facture> $query
-    * @return Builder<Facture>
-    */
+     * Obtenir les prospects
+     *
+     * @param Builder<Facture> $query
+     * @return Builder<Facture>
+     */
     public function scopeIsPaid(Builder $query): Builder
     {
         return $query->currentStatus(StatusFacture::PAID->value);
     }
 
     /**
-    * obtenir les factures payées partielements ou impayées
-    *
-    * @param Builder<Facture> $query
-    * @return Builder<Facture>
-    */
+     * Obtenir les factures payées partielements ou impayées
+     *
+     * @param Builder<Facture> $query
+     * @return Builder<Facture>
+     */
     public function scopeIsUnpaid(Builder $query): Builder
     {
         return $query->currentStatus(StatusFacture::UNPAID->value);
     }
 
     /**
-    * obtenir les proformas
-    *
-    * @param Builder<Facture> $query
-    * @return Builder<Facture>
-    */
+     * Obtenir les proformas
+     *
+     * @param Builder<Facture> $query
+     * @return Builder<Facture>
+     */
     public function scopeIsProforma(Builder $query): Builder
     {
         return $query->currentStatus(StatusFacture::PROFORMA->value);
     }
 
     /**
-    * obtenir les factures
-    *
-    * @param Builder<Facture> $query
-    * @return Builder<Facture>
-    */
+     * Obtenir les factures
+     *
+     * @param Builder<Facture> $query
+     * @return Builder<Facture>
+     */
     public function scopeIsFacture(Builder $query): Builder
     {
         return $query->currentStatus(StatusFacture::FACTURE->value);

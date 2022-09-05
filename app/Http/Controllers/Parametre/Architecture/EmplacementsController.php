@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers\Parametre\Architecture;
 
-use App\Enums\StatusAbonnement;
-use App\Enums\StatusEmplacement;
 use App\Http\Controllers\Controller;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Emplacement;
-use App\Models\Architecture\Site;
 use App\Models\Architecture\Zone;
 use Carbon\Carbon;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -31,22 +27,6 @@ class EmplacementsController extends Controller implements StandardControllerInt
         $code = $zone->niveau->pavillon->code . $zone->niveau->code . $zone->code . $place;
 
         return ['code' => $code, 'rang' => $rang];
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param  int  $id
-     * @return Builder
-     */
-    private static function queryByMarche(int $id): Builder
-    {
-        $query = DB::table('emplacements')->select('emplacements.*')->join('zones', 'zones.id', '=', 'emplacements.zone_id')
-            ->join('niveaux', 'zones.niveau_id', '=', 'niveaux.id')->join('pavillons', 'niveaux.pavillon_id', '=', 'pavillons.id')
-            ->leftjoin('equipements', 'equipements.emplacement_id', '=', 'emplacements.id')
-            ->where('pavillons.site_id', $id, true);
-
-        return $query;
     }
 
     public function all(): JsonResponse
@@ -113,6 +93,11 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['message' => $message]);
     }
 
+    /**
+     * Liste des emplacements archivés
+     *
+     * @return JsonResponse
+     */
     public function trashed(): JsonResponse
     {
         $emplacements = Emplacement::with('zone', 'type')->onlyTrashed()->get();
@@ -120,6 +105,12 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['emplacements' => $emplacements]);
     }
 
+    /**
+     * Archivage d'emplacement
+     *
+     * @param integer $id
+     * @return JsonResponse
+     */
     public function trash(int $id): JsonResponse
     {
         $emplacement = Emplacement::findOrFail($id);
@@ -129,6 +120,12 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['message' => $message]);
     }
 
+    /**
+     * Insertion massive d'emplacement de même attributs
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function push(Request $request): JsonResponse
     {
         $request->validate(Emplacement::PUSH_RULES);
@@ -139,8 +136,6 @@ class EmplacementsController extends Controller implements StandardControllerInt
             $emplacement->code = $code;
             $emplacement->nom = 'EMPLACEMENT ' . $rang;
             $emplacement->save();
-            $emplacement->liberer();
-            $emplacement->delier();
             $compteur--;
         }
         $message = "$request->nombre emplacements ont été crées avec succès.";
@@ -148,38 +143,65 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['message' => $message]);
     }
 
+    /**
+     * Récupère tout les emplacements dans un marché ou site spécifié
+     *
+     * @param integer $id
+     * @return JsonResponse
+     */
     public function getByMarche(int $id): JsonResponse
     {
-        $emplacements = self::queryByMarche($id)->get();
+        $emplacements = Emplacement::whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
 
         return response()->json(['emplacements' => $emplacements]);
     }
 
-    public function getByMarcheWithGearsLinked(int $id): JsonResponse
+    /**
+     * Récupère les emplacements selon l'id d'un marché et l'existence d'un contrat non résilié en chargeant les équipements liés et leurs types
+     *
+     * @param integer $id
+     * @return JsonResponse
+     */
+    public function getByMarcheWithGearsAndContracts(int $id): JsonResponse
     {
-        $emplacements = Site::with('emplacements.equipements.type')->findOrFail($id)->emplacements;
-
+        $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn ($query) => $query->notAborted())
+        ->whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
+    /**
+     * Récupère les emplacements lié à aucun équipement selon le site (marché)
+     *
+     * @param integer $id
+     * @return JsonResponse
+     */
     public function getUnlinkedByMarche(int $id): JsonResponse
     {
-        $emplacements = Emplacement::isUnlinked()->get();
-
+        $emplacements = Emplacement::isUnlinked()->whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
+    /**
+     * Récupère les emplacements libre selon le site
+     *
+     * @param integer $id
+     * @return JsonResponse
+     */
     public function getFreeByMarche(int $id): JsonResponse
     {
-        $emplacements = self::queryByMarche($id)->join('statuses', 'statuses.model_id', '=', 'emplacements.id')
-        ->where('statuses.name', StatusEmplacement::FREE)->get();
+        $emplacements = Emplacement::isFree()->whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
+    /**
+     * Récupère les emplacements occupés selon le site
+     *
+     * @param integer $id
+     * @return JsonResponse
+     */
     public function getBusyByMarche(int $id): JsonResponse
     {
-        $emplacements = self::queryByMarche($id)->whereNotNull('date_occupe')->get();
-
+        $emplacements = Emplacement::isBusy()->whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 

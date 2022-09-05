@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('contrats_type_equipements', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('contrat_id')->constrained('contrats')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('type_equipement_id')->constrained('type_equipements')->onDelete('cascade')->onUpdate('cascade');
             $table->unique(['contrat_id', 'type_equipement_id'], 'contrat_type_equipement_unique');

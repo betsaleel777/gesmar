@@ -3,13 +3,16 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusEquipement;
+use App\Models\Finance\Facture;
+use App\States\Equipement\StatusAbonnementState;
+use App\States\Equipement\StatusLiaisonsState;
+use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperEquipement
@@ -18,7 +21,12 @@ class Equipement extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    use HasStatuses;
+    use HasStateMachines;
+
+    public $stateMachines = [
+        'abonnement' => StatusAbonnementState::class,
+        'liaison' => StatusLiaisonsState::class
+    ];
 
     protected $fillable = [
         'nom',
@@ -33,18 +41,16 @@ class Equipement extends Model
     ];
 
     /**
-     * Undocumented variable
      *
      * @var array<int, string>
      */
-    protected $appends = ['alias','statuts'];
+    protected $appends = ['alias'];
 
     /**
-     * Undocumented variable
      *
      * @var array<int, string>
      */
-    protected $with = ['type','statuses'];
+    protected $with = ['type'];
 
     public const RULES = [
         'prix_unitaire' => 'required|numeric',
@@ -54,116 +60,99 @@ class Equipement extends Model
         'index' => 'required',
         'site_id' => 'required',
     ];
+
+    protected static function booted()
+    {
+        static::deleted(function (Equipement $equipement): void {
+            Emplacement::findOrFail($equipement->emplacement_id)->delier();
+            Facture::whereHas('equipement', fn ($query) => $query->where('equipement_id', $equipement->id))->all()->map->delete();
+        });
+    }
     /**
-     * Undocumented function
      *
      * @return Attribute<mixed>
      */
     protected function alias(): Attribute
     {
         return Attribute::make(
-            get:fn () => $this->attributes['code'] . ' ' . $this->type->nom,
-        );
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return Attribute<get:(callable():string)>
-     */
-    protected function statuts(): Attribute
-    {
-        return Attribute::make(
-            get:function () {
-                $status[] = $this->latestStatus(StatusEquipement::SUBSCRIBED->value, StatusEquipement::UNSUBSCRIBED->value);
-                $status[] = $this->latestStatus(StatusEquipement::LINKED->value, StatusEquipement::UNLINKED->value);
-                return $status;
-            }
+            get: fn () => $this->attributes['code'] . ' ' . $this->type->nom,
         );
     }
 
     public function abonner(): void
     {
-        $this->setStatus(StatusEquipement::SUBSCRIBED->value);
+        $this->abonnement()->transitionTo(StatusEquipement::SUBSCRIBED->value);
     }
 
     public function desabonner(): void
     {
-        $this->setStatus(StatusEquipement::UNSUBSCRIBED->value);
+        $this->abonnement()->transitionTo(StatusEquipement::UNSUBSCRIBED->value);
     }
 
     public function lier(): void
     {
-        $this->setStatus(StatusEquipement::LINKED->value);
+        $this->liaison()->transitionTo(StatusEquipement::LINKED->value);
     }
 
     public function delier(): void
     {
-        $this->setStatus(StatusEquipement::UNLINKED->value);
+        $this->liaison()->transitionTo(StatusEquipement::UNLINKED->value);
     }
 
-    public function endommager(): void
-    {
-        $this->setStatus(StatusEquipement::DAMAGED->value);
-    }
+    // public function endommager(): void
+    // {
+    //     $this->abonnement()->transitionTo(StatusEquipement::DAMAGED->value);
+    // }
 
-    public function reparer(): void
-    {
-        $this->setStatus(StatusEquipement::FIXED->value);
-    }
+    // public function reparer(): void
+    // {
+    //     $this->abonnement()->transitionTo(StatusEquipement::FIXED->value);
+    // }
 
     // scopes
 
     /**
-     * obtenir les equipements qui ont un abonnement en cours
+     * Obtenir les equipements qui ont un abonnement en cours
      *
      * @param Builder<Equipement> $query
      * @return Builder<Equipement>
      */
-    public function scopeIsSubscribed(Builder $query): Builder
+    public function scopeSubscribed(Builder $query): Builder
     {
-        return $query->whereHas('statuses', function ($query) {
-            return $query->where('name', StatusEquipement::SUBSCRIBED->value) ;
-        });
+        return $query->where('abonnement', StatusEquipement::SUBSCRIBED->value);
     }
 
     /**
-     * obtenir les equipements qui n'ont pas d'abonnement en cours
+     * Obtenir les equipements qui n'ont pas d'abonnement en cours
      *
      * @param Builder<Equipement> $query
      * @return Builder<Equipement>
      */
-    public function scopeIsUnsubscribed(Builder $query): Builder
+    public function scopeUnsubscribed(Builder $query): Builder
     {
-        return $query->whereHas('statuses', function ($query) {
-            return $query->where('name', StatusEquipement::UNSUBSCRIBED->value) ;
-        });
+        return $query->where('abonnement', StatusEquipement::UNSUBSCRIBED->value);
     }
 
     /**
-     * obtenir les equipements qui sont liés à un emplacement
+     * Obtenir les equipements qui sont liés à un emplacement
      *
      * @param Builder<Equipement> $query
      * @return Builder<Equipement>
      */
-    public function scopeIsLinked(Builder $query): Builder
+    public function scopeLinked(Builder $query): Builder
     {
-        return $query->whereHas('statuses', function ($query) {
-            return $query->where('name', StatusEquipement::LINKED->value) ;
-        });
+        return $query->where('liaison', StatusEquipement::LINKED->value);
     }
 
     /**
-     * obtenir les equipements qui ne sont pas liés à un emplacement
+     * Obtenir les equipements qui ne sont pas liés à un emplacement
      *
      * @param Builder<Equipement> $query
      * @return Builder<Equipement>
      */
-    public function scopeIsUnlinked(Builder $query): Builder
+    public function scopeUnlinked(Builder $query): Builder
     {
-        return $query->whereHas('statuses', function ($query) {
-            return $query->where('name', StatusEquipement::UNLINKED->value) ;
-        });
+        return $query->where('liaison', StatusEquipement::UNLINKED->value);
     }
 
 

@@ -38,7 +38,7 @@ class TermesContrat extends Model
     protected function status(): Attribute
     {
         return Attribute::make(
-            get:fn () => ! empty($this->atrributes['date_using']) ? self::USING : null
+            get: fn () => !empty($this->atrributes['date_using']) ? self::USING : null
         );
     }
 
@@ -54,8 +54,8 @@ class TermesContrat extends Model
 
     public function generate(string $prefixe): void
     {
-        $rang = $this->get()->count() + 1;
-        $this->attributes['code'] = $prefixe.str_pad((string) $rang, 2, '0', STR_PAD_LEFT).Carbon::now()->format('my');
+        $rang = $this->count() + 1;
+        $this->attributes['code'] = $prefixe . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
     }
 
     public function using(): void

@@ -15,18 +15,25 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class TypeEmplacement extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'equipable'];
 
     /**
-     * Undocumented variable
+    * les propriétés qui doivent être caster.
+    *
+    * @var array<string, string>
+    */
+    protected $casts = ['equipable' => 'boolean','auto_valid' => 'boolean'];
+
+    /**
      *
      * @var array<int, string>
      */
     protected $appends = ['code'];
 
-    const RULES = [
+    public const RULES = [
         'nom' => 'required|max:150',
         'site_id' => 'required',
         'prefix' => 'required|max:5|min:2|alpha',

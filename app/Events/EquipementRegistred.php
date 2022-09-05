@@ -19,7 +19,7 @@ class EquipementRegistred
      *
      * @return void
      */
-    public function __construct(public Equipement $equipement, public int $ancienEmplacement)
+    public function __construct(public Equipement $equipement, public int $ancienEmplacement=0)
     {
         $this->equipement = $equipement;
         $this->ancienEmplacement = $ancienEmplacement;

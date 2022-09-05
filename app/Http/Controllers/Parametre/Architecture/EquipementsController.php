@@ -38,8 +38,7 @@ class EquipementsController extends Controller implements StandardControllerInte
         $equipement->code = $code;
         $equipement->nom = 'EQUIPEMENT ' . $rang;
         $equipement->save();
-        is_null($equipement->emplacement_id) ? $equipement->delier() : $equipement->lier();
-        $equipement->desabonner();
+        is_null($equipement->emplacement_id) ?: $equipement->lier();
         EquipementRegistred::dispatchIf(!is_null($equipement->emplacement_id), $equipement);
         $message = "L'équipement $equipement->nom a été enregistré avec succès.";
         return response()->json(['message' => $message]);
@@ -89,6 +88,23 @@ class EquipementsController extends Controller implements StandardControllerInte
     public function getUnlinkedsubscribed(): JsonResponse
     {
         $equipements = Equipement::isUnlinked()->isUnsubscribed()->get();
+        return response()->json(['equipements' => $equipements]);
+    }
+
+    /**
+     * Récupère les équipements non abonnés et non liés selon le marché et conserve l'équipement déjà lié de l'emplacement
+     *
+     * @param integer $id
+     * @param integer $emplacement
+     * @return JsonResponse
+     */
+    public function getGearsForContratView(int $id, int $emplacement, int $site): JsonResponse
+    {
+
+        $equipementLinked = Equipement::where('type_equipement_id', $id)->where('emplacement_id', $emplacement)->first();
+        $equipements = Equipement::where('site_id', $site)->where('type_equipement_id', $id)
+            ->unlinked()->unsubscribed()->get();
+        empty($equipementLinked) ?: $equipements->push($equipementLinked);
         return response()->json(['equipements' => $equipements]);
     }
 }

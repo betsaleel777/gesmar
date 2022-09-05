@@ -53,7 +53,7 @@ class Site extends Model
     }
 
     /**
-     * afficher directement tout les emplacements d'un site (marché)
+     * Afficher directement tout les emplacements d'un site (marché)
      *
      * @return HasManyDeep<Niveau>
      */
