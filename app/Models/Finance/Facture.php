@@ -24,7 +24,15 @@ class Facture extends Model
     protected $fillable = [
         'code', 'contrat_id', 'annexe_id', 'index_debut', 'index_fin', 'equipement_id', 'avance', 'caution', 'pas_porte', 'periode',
     ];
-
+    /**
+     *
+     * @var array<int, string>
+     */
+    protected $with = ['contrat'];
+    /**
+     *
+     * @var array<int, string>
+     */
     protected $appends = ['status'];
 
     public const RULES = [
@@ -190,6 +198,17 @@ class Facture extends Model
     public function scopeIsFacture(Builder $query): Builder
     {
         return $query->currentStatus(StatusFacture::FACTURE->value);
+    }
+
+    /**
+     * Obtenir les factures pour les emplacement avec paiement de loyer mensuel à l'ordonnancement
+     *
+     * @param Builder<Facture> $query
+     * @return Builder<Facture>
+     */
+    public function scopeIsSuperMarket(Builder $query): Builder
+    {
+        return $query->whereHas('contrat', fn (Builder $query) => $query->where('auto_valid', false));
     }
 
     // relations

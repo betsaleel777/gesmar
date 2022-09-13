@@ -4,11 +4,13 @@ use App\Http\Controllers\Exploitation\Reception\ClientsController;
 use App\Http\Controllers\Exploitation\Reception\ContratController;
 use App\Http\Controllers\Exploitation\Reception\ContratsAnnexesController;
 use App\Http\Controllers\Exploitation\Reception\ContratsEmplacementsController;
+use App\Http\Controllers\Exploitation\Reception\OrdonnancementController;
 use App\Http\Controllers\Exploitation\Reception\PersonnesController;
 use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
 use App\Http\Controllers\Finance\ChequeController;
 use App\Http\Controllers\Finance\Facture\FactureAnnexeController;
+use App\Http\Controllers\Finance\Facture\FactureController;
 use App\Http\Controllers\Finance\Facture\FactureEquipementController;
 use App\Http\Controllers\Finance\Facture\FactureInitialeController;
 use App\Http\Controllers\Finance\Facture\FactureLoyerController;
@@ -22,6 +24,7 @@ use App\Http\Controllers\Parametre\Architecture\ServiceAnnexesController;
 use App\Http\Controllers\Parametre\Architecture\SitesController;
 use App\Http\Controllers\Parametre\Architecture\TypeEmplacementsController;
 use App\Http\Controllers\Parametre\Architecture\TypeEquipementsController;
+use App\Http\Controllers\Parametre\Architecture\ValidationAbonnementController;
 use App\Http\Controllers\Parametre\Architecture\ZonesController;
 use App\Http\Controllers\Parametre\AuthController;
 use App\Http\Controllers\Parametre\PermissionsController;
@@ -29,6 +32,7 @@ use App\Http\Controllers\Parametre\RolesController;
 use App\Http\Controllers\Parametre\Template\TermesContratsAnnexesController;
 use App\Http\Controllers\Parametre\Template\TermesContratsEmplacementsController;
 use App\Http\Controllers\Parametre\UtilisateursController;
+use App\Models\Architecture\ValidationAbonnement;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -200,6 +204,12 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
             Route::patch('/restore/{id}', 'restore');
         });
     });
+    Route::controller(ValidationAbonnementController::class)->prefix('validations/abonnement')->group(function () {
+        Route::get('/', 'all');
+        Route::post('/store', 'store');
+        Route::get('{id}', 'show');
+        Route::put('{id}', 'update');
+    });
 });
 
 Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
@@ -231,8 +241,16 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::put('{id}', 'update');
             Route::delete('{id}', 'trash');
         });
+        Route::controller(OrdonnancementController::class)->prefix('ordonnancements')->group(function () {
+            Route::get('/', 'all');
+            Route::post('/store', 'store');
+            Route::get('{id}', 'show');
+            Route::put('{id}', 'update');
+            Route::delete('{id}', 'trash');
+        });
         Route::prefix('contrats')->group(function () {
             Route::get('/', [ContratController::class, 'all']);
+            Route::get('/scheduling', [ContratController::class, 'schedulableContrats']);
             Route::controller(ContratsAnnexesController::class)->prefix('annexes')->group(function () {
                 Route::get('/', 'all');
                 Route::get('/trashed', 'trashed');
@@ -269,6 +287,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
 });
 Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
     Route::prefix('factures')->group(function () {
+        Route::get('/', [FactureController::class, 'all']);
+        Route::get('/contrat/{id}', [FactureController::class, 'getByContrat']);
         Route::controller(FactureAnnexeController::class)->prefix('annexes')->group(function () {
             Route::get('/', 'all');
             Route::post('/store', 'store');

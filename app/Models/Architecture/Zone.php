@@ -39,14 +39,13 @@ class Zone extends Model
     ];
 
     /**
-     * Undocumented function
      *
-     * @return Attribute<get:(callable():string)>
+     * @return Attribute<string, never>
      */
     protected function code(): Attribute
     {
         return Attribute::make(
-            get:fn () => str_pad((string) $this->attributes['code'], 4, '0', STR_PAD_LEFT),
+            get: fn () => str_pad((string) $this->attributes['code'], 4, '0', STR_PAD_LEFT),
         );
     }
 

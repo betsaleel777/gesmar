@@ -87,7 +87,7 @@ class EquipementsController extends Controller implements StandardControllerInte
 
     public function getUnlinkedsubscribed(): JsonResponse
     {
-        $equipements = Equipement::isUnlinked()->isUnsubscribed()->get();
+        $equipements = Equipement::unlinked()->unsubscribed()->get();
         return response()->json(['equipements' => $equipements]);
     }
 

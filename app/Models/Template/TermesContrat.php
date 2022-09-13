@@ -20,7 +20,6 @@ class TermesContrat extends Model
     protected $fillable = ['code', 'user_id', 'site_id', 'contenu', 'date_using', 'type'];
 
     /**
-     * Undocumented variable
      *
      * @var array<int, string>
      */
@@ -31,9 +30,8 @@ class TermesContrat extends Model
     private const USING = 'en utilisation';
 
     /**
-     * Undocumented function
      *
-     * @return Attribute<get:(callable():string|null)>
+     *@return Attribute<string, never>
      */
     protected function status(): Attribute
     {

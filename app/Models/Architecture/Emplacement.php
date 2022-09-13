@@ -2,7 +2,6 @@
 
 namespace App\Models\Architecture;
 
-use App\Enums\StatusAbonnement;
 use App\Enums\StatusEmplacement;
 use App\Models\Exploitation\Contrat;
 use App\States\Emplacement\StatusDisponibiliteState;
@@ -12,8 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 
@@ -33,6 +32,11 @@ class Emplacement extends Model
     ];
 
     protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'loyer', 'pas_porte', 'caution'];
+    /**
+     *
+     * @var array<int, string>
+     */
+    protected $with = ['type'];
 
     public const RULES = [
         'nom' => 'required|max:255',
@@ -51,12 +55,12 @@ class Emplacement extends Model
     ];
 
     /**
-     * @return Attribut
+     * @return Attribute<string, never>
      */
-    protected function code(): Attribute
+    protected function auto(): Attribute
     {
         return Attribute::make(
-            get: fn () => str_pad((string) $this->attributes['code'], 3, '0', STR_PAD_LEFT),
+            get: fn () =>  $this->type->auto_valid,
         );
     }
 
@@ -141,7 +145,7 @@ class Emplacement extends Model
     /**
      * Obtenir le marche de l'emplacement
      *
-     * @return HasManyDeep<Site, Emplacement>
+     * @return HasManyDeep<Site>
      */
     public function site(): HasManyDeep
     {
@@ -164,9 +168,9 @@ class Emplacement extends Model
     }
 
     /**
-     * Obtenir les abonnement en cours d'un emplacement
+     * Obtenir les abonnements d'un emplacement
      *
-     * @return HasMany<Abonnement, Emplacement>
+     * @return HasMany<Abonnement>
      */
     public function abonnements(): hasMany
     {
@@ -174,9 +178,19 @@ class Emplacement extends Model
     }
 
     /**
+     * Obtenir les abonnements en cours pour un emplacement
+     *
+     * @return HasMany<Abonnement>
+     */
+    public function abonnementActuels(): hasMany
+    {
+        return $this->hasMany(Abonnement::class)->progressing();
+    }
+
+    /**
      * Obtenir les contrats d'un emplacement
      *
-     * @return HasMany<Contrat, Emplacement>
+     * @return HasMany<Contrat>
      */
     public function contrats(): HasMany
     {
@@ -184,9 +198,19 @@ class Emplacement extends Model
     }
 
     /**
+     * Obtenir le contrat en cours sur un emplacement
+     *
+     * @return HasOne<Contrat>
+     */
+    public function contratActuel(): HasOne
+    {
+        return $this->hasOne(Contrat::class)->isValidated();
+    }
+
+    /**
      * Obtenir les équipements liés à un emplacement
      *
-     * @return HasMany<Equipement, Emplacement>
+     * @return HasMany<Equipement>
      */
     public function equipements(): HasMany
     {

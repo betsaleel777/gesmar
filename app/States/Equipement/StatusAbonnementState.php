@@ -12,6 +12,10 @@ class StatusAbonnementState extends StateMachine
         return true;
     }
 
+    /**
+     *
+     * @return array<string, string>
+     */
     public function transitions(): array
     {
         return [

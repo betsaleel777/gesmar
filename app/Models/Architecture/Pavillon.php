@@ -18,7 +18,6 @@ class Pavillon extends Model
     protected $fillable = ['nom', 'code', 'site_id'];
 
     /**
-     * Undocumented variable
      *
      * @var array<int, string>
      */
@@ -39,14 +38,13 @@ class Pavillon extends Model
     ];
 
     /**
-     * Undocumented function
      *
-     * @return Attribute<get:(callable():string)>
+     * @return Attribute<string, never>
      */
     protected function code(): Attribute
     {
         return Attribute::make(
-            get:fn () => str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
+            get: fn () => str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
         );
     }
 

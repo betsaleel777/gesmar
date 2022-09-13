@@ -20,7 +20,15 @@ class Abonnement extends Model
 
     protected $table = 'abonnements';
 
+    /**
+     *
+     * @var array<int, string>
+     */
     protected $appends = ['status'];
+    /**
+     *
+     * @var array<int, string>
+     */
     protected $with = ['statuses'];
 
     public const RULES = [

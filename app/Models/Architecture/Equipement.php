@@ -23,6 +23,10 @@ class Equipement extends Model
     use SoftDeletes;
     use HasStateMachines;
 
+    /**
+     *
+     * @var array<string, string>
+     */
     public $stateMachines = [
         'abonnement' => StatusAbonnementState::class,
         'liaison' => StatusLiaisonsState::class
@@ -61,16 +65,16 @@ class Equipement extends Model
         'site_id' => 'required',
     ];
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::deleted(function (Equipement $equipement): void {
             Emplacement::findOrFail($equipement->emplacement_id)->delier();
-            Facture::whereHas('equipement', fn ($query) => $query->where('equipement_id', $equipement->id))->all()->map->delete();
+            Facture::whereHas('equipement', fn ($query) => $query->where('equipement_id', $equipement->id))->get()->all()->map->delete();
         });
     }
     /**
      *
-     * @return Attribute<mixed>
+     * @return Attribute<string, never>
      */
     protected function alias(): Attribute
     {
@@ -98,16 +102,6 @@ class Equipement extends Model
     {
         $this->liaison()->transitionTo(StatusEquipement::UNLINKED->value);
     }
-
-    // public function endommager(): void
-    // {
-    //     $this->abonnement()->transitionTo(StatusEquipement::DAMAGED->value);
-    // }
-
-    // public function reparer(): void
-    // {
-    //     $this->abonnement()->transitionTo(StatusEquipement::FIXED->value);
-    // }
 
     // scopes
 
