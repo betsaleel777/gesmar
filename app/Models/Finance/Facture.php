@@ -6,6 +6,7 @@ use App\Enums\StatusFacture;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Exploitation\Contrat;
+use App\Models\Exploitation\Paiement;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -251,5 +252,14 @@ class Facture extends Model
     public function versements(): HasMany
     {
         return $this->hasMany(Versement::class);
+    }
+    /**
+     * Obtenir les paiements d'une facture
+     *
+     * @return HasMany<Versement>
+     */
+    public function paiements(): HasMany
+    {
+        return $this->hasMany(Paiement::class);
     }
 }
