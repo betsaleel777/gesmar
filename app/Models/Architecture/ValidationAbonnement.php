@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\ModelStatus\HasStatuses;
 
+/**
+ * @mixin IdeHelperValidationAbonnement
+ */
 class ValidationAbonnement extends Model
 {
     use HasFactory;

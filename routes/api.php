@@ -8,7 +8,9 @@ use App\Http\Controllers\Exploitation\Reception\OrdonnancementController;
 use App\Http\Controllers\Exploitation\Reception\PersonnesController;
 use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
+use App\Http\Controllers\Finance\BordereauController;
 use App\Http\Controllers\Finance\ChequeController;
+use App\Http\Controllers\Finance\CommercialController;
 use App\Http\Controllers\Finance\Facture\FactureAnnexeController;
 use App\Http\Controllers\Finance\Facture\FactureController;
 use App\Http\Controllers\Finance\Facture\FactureEquipementController;
@@ -342,6 +344,26 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::get('/', 'all');
         Route::post('/store', 'store');
         Route::get('/marche/{id}', 'getByMarche');
+        Route::get('{id}', 'show');
+        Route::put('{id}', 'update');
+        Route::delete('{id}', 'trash');
+        Route::patch('/restore/{id}', 'restore');
+    });
+    Route::controller(CommercialController::class)->prefix('commerciaux')->group(function () {
+        Route::get('/', 'all');
+        Route::get('/trashed', 'trashed');
+        Route::get('/marche/{id}', 'getByMarche');
+        Route::post('/store', 'store');
+        Route::get('{id}', 'show');
+        Route::put('{id}', 'update');
+        Route::delete('{id}', 'trash');
+        Route::patch('/restore/{id}', 'restore');
+    });
+    Route::controller(BordereauController::class)->prefix('bordereaux')->group(function () {
+        Route::get('/', 'all');
+        Route::get('/trashed', 'trashed');
+        Route::get('/marche/{id}', 'getByMarche');
+        Route::post('/store', 'store');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');

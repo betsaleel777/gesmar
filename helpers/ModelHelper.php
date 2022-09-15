@@ -31,6 +31,7 @@ namespace App\Models\Architecture{
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\ModelStatus\Status[] $statuses
  * @property-read int|null $statuses_count
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement currentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|Abonnement indexError()
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement otherCurrentStatus(...$names)
@@ -47,6 +48,7 @@ namespace App\Models\Architecture{
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereIndexFin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereSiteId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Abonnement withoutError()
  */
 	class IdeHelperAbonnement {}
 }
@@ -69,9 +71,13 @@ namespace App\Models\Architecture{
  * @property int $caution
  * @property string $liaison
  * @property string $disponibilite
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Architecture\Equipement[] $abonnements
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Architecture\Abonnement[] $abonnementActuels
+ * @property-read int|null $abonnement_actuels_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Architecture\Abonnement[] $abonnements
  * @property-read int|null $abonnements_count
- * @property-read \App\Models\Exploitation\Contrat|null $contrat
+ * @property-read \App\Models\Exploitation\Contrat|null $contratActuel
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Exploitation\Contrat[] $contrats
+ * @property-read int|null $contrats_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Architecture\Equipement[] $equipements
  * @property-read int|null $equipements_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Asantibanez\LaravelEloquentStateMachines\Models\PendingTransition[] $pendingTransitions
@@ -134,14 +140,14 @@ namespace App\Models\Architecture{
  * @property-read \Illuminate\Database\Eloquent\Collection|\Asantibanez\LaravelEloquentStateMachines\Models\StateHistory[] $stateHistory
  * @property-read int|null $state_history_count
  * @property-read \App\Models\Architecture\TypeEquipement $type
- * @method static \Illuminate\Database\Eloquent\Builder|Equipement isLinked()
- * @method static \Illuminate\Database\Eloquent\Builder|Equipement isSubscribed()
- * @method static \Illuminate\Database\Eloquent\Builder|Equipement isUnlinked()
- * @method static \Illuminate\Database\Eloquent\Builder|Equipement isUnsubscribed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Equipement linked()
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement newQuery()
  * @method static \Illuminate\Database\Query\Builder|Equipement onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Equipement subscribed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Equipement unlinked()
+ * @method static \Illuminate\Database\Eloquent\Builder|Equipement unsubscribed()
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement whereAbonnement($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement whereCreatedAt($value)
@@ -357,6 +363,8 @@ namespace App\Models\Architecture{
  * @property int|null $caution_abonnement
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Architecture\Equipement[] $equipements
  * @property-read int|null $equipements_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Exploitation\Contrat[] $propositions
+ * @property-read int|null $propositions_count
  * @property-read \App\Models\Architecture\Site $site
  * @method static \Illuminate\Database\Eloquent\Builder|TypeEquipement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TypeEquipement newQuery()
@@ -375,6 +383,36 @@ namespace App\Models\Architecture{
  * @method static \Illuminate\Database\Query\Builder|TypeEquipement withoutTrashed()
  */
 	class IdeHelperTypeEquipement {}
+}
+
+namespace App\Models\Architecture{
+/**
+ * App\Models\Architecture\ValidationAbonnement
+ *
+ * @property int $id
+ * @property string $raison
+ * @property int $abonnement_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Architecture\Abonnement $abonnement
+ * @property-read string $status
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\ModelStatus\Status[] $statuses
+ * @property-read int|null $statuses_count
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement confirmed()
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement currentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement otherCurrentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement rejected()
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement whereAbonnementId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement whereRaison($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	class IdeHelperValidationAbonnement {}
 }
 
 namespace App\Models\Architecture{
@@ -426,10 +464,17 @@ namespace App\Models\Exploitation{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $avance
  * @property bool $equipable
+ * @property int $auto_valid
  * @property-read \App\Models\Architecture\ServiceAnnexe|null $annexe
  * @property-read \App\Models\Architecture\Emplacement|null $emplacement
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Architecture\TypeEquipement[] $equipements
  * @property-read int|null $equipements_count
+ * @property-read \App\Models\Finance\Facture|null $factureAnnexe
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Finance\Facture[] $factureEquipement
+ * @property-read int|null $facture_equipement_count
+ * @property-read \App\Models\Finance\Facture|null $factureInitiale
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Finance\Facture[] $factureLoyer
+ * @property-read int|null $facture_loyer_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Finance\Facture[] $factures
  * @property-read int|null $factures_count
  * @property-read string $status
@@ -437,6 +482,7 @@ namespace App\Models\Exploitation{
  * @property-read \App\Models\Architecture\Site $site
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\ModelStatus\Status[] $statuses
  * @property-read int|null $statuses_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Contrat aborted()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat currentStatus(...$names)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat enAttente()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat isAnnexe()
@@ -444,6 +490,7 @@ namespace App\Models\Exploitation{
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat isValidated()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Contrat notAborted()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat onEndorsed()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat onValidated()
  * @method static \Illuminate\Database\Query\Builder|Contrat onlyTrashed()
@@ -451,6 +498,7 @@ namespace App\Models\Exploitation{
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat query()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat whereAnnexeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat whereAttachment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Contrat whereAutoValid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat whereAvance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat whereCreatedAt($value)
@@ -467,6 +515,63 @@ namespace App\Models\Exploitation{
  * @method static \Illuminate\Database\Query\Builder|Contrat withoutTrashed()
  */
 	class IdeHelperContrat {}
+}
+
+namespace App\Models\Exploitation{
+/**
+ * App\Models\Exploitation\Ordonnancement
+ *
+ * @property int $id
+ * @property int $total
+ * @property string $code
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read string $status
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Exploitation\Paiement[] $paiements
+ * @property-read int|null $paiements_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\ModelStatus\Status[] $statuses
+ * @property-read int|null $statuses_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement currentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement otherCurrentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement paid()
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement unpaid()
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement whereTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	class IdeHelperOrdonnancement {}
+}
+
+namespace App\Models\Exploitation{
+/**
+ * App\Models\Exploitation\Paiement
+ *
+ * @property int $id
+ * @property int $facture_id
+ * @property int $ordonnancement_id
+ * @property int $montant
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Finance\Facture $facture
+ * @property-read \App\Models\Exploitation\Ordonnancement $ordonnancement
+ * @method static \Illuminate\Database\Eloquent\Builder|Paiement newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Paiement newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Paiement query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Paiement whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Paiement whereFactureId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Paiement whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Paiement whereMontant($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Paiement whereOrdonnancementId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Paiement whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	class IdeHelperPaiement {}
 }
 
 namespace App\Models\Exploitation{
@@ -617,6 +722,8 @@ namespace App\Models\Finance{
  * @property-read \App\Models\Exploitation\Contrat $contrat
  * @property-read \App\Models\Architecture\Equipement|null $equipement
  * @property-read string $status
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Exploitation\Paiement[] $paiements
+ * @property-read int|null $paiements_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\ModelStatus\Status[] $statuses
  * @property-read int|null $statuses_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Finance\Versement[] $versements
@@ -629,6 +736,7 @@ namespace App\Models\Finance{
  * @method static \Illuminate\Database\Eloquent\Builder|Facture isLoyer()
  * @method static \Illuminate\Database\Eloquent\Builder|Facture isPaid()
  * @method static \Illuminate\Database\Eloquent\Builder|Facture isProforma()
+ * @method static \Illuminate\Database\Eloquent\Builder|Facture isSuperMarket()
  * @method static \Illuminate\Database\Eloquent\Builder|Facture isUnpaid()
  * @method static \Illuminate\Database\Eloquent\Builder|Facture newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Facture newQuery()
@@ -647,7 +755,6 @@ namespace App\Models\Finance{
  * @method static \Illuminate\Database\Eloquent\Builder|Facture wherePasPorte($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Facture wherePeriode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Facture whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Facture isAnnexe($value)
  */
 	class IdeHelperFacture {}
 }
