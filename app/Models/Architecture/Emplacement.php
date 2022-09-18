@@ -37,6 +37,11 @@ class Emplacement extends Model
      * @var array<int, string>
      */
     protected $with = ['type'];
+    /**
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['auto'];
 
     public const RULES = [
         'nom' => 'required|max:255',

@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Finance\Commercial;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 
-class CommercialController extends Controller implements StandardControllerInterface
+class CommercialController extends Controller
 {
     public function all(): JsonResponse
     {
@@ -23,15 +25,6 @@ class CommercialController extends Controller implements StandardControllerInter
         $commercial->codeGenerate();
         $commercial->save();
         $message = "Le commercial: $commercial->code a été enregistré avec succès.";
-        return response()->json(['message' => $message]);
-    }
-
-    public function update(int $id, Request $request): JsonResponse
-    {
-        $request->validate(Commercial::RULES);
-        $commercial = Commercial::find($id);
-        $commercial->update($request->all());
-        $message = "Le commercial: $commercial->code a été modifié avec succès.";
         return response()->json(['message' => $message]);
     }
 
@@ -62,5 +55,12 @@ class CommercialController extends Controller implements StandardControllerInter
     {
         $commerciaux = Commercial::withTrashed()->get();
         return response()->json(['commerciaux' => $commerciaux]);
+    }
+
+    public function attribuate(Request $request): JsonResponse
+    {
+        $request->validate(Commercial::ATTRIBUTION_RULES);
+        $message = "Emplacement(s) attribué(s) avec succès.";
+        return response()->json(['message' => $message]);
     }
 }

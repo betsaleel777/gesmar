@@ -2,6 +2,7 @@
 
 namespace App\Models\Finance;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,11 @@ class Commercial extends Model
     protected $with = ['user'];
     const RULES = [
         'user_id' => 'required|numeric',
+    ];
+
+    const ATTRIBUTION_RULES = [
+        'jour' => 'required',
+        'zones' => 'required',
     ];
 
     public function codeGenerate(): void

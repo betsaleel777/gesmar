@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Finance\Commercial;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -53,7 +55,7 @@ class User extends Authenticatable
     public static function infosRules(int $id): array
     {
         return [
-            'name' => 'required|max:150|unique:users,name,'.$id,
+            'name' => 'required|max:150|unique:users,name,' . $id,
             'adresse' => 'required',
         ];
     }
@@ -91,4 +93,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function commercial()
+    {
+        return $this->hasOne(Commercial::class);
+    }
 }

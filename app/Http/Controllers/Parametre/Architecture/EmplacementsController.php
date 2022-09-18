@@ -22,10 +22,10 @@ class EmplacementsController extends Controller implements StandardControllerInt
      */
     private static function codeGenerate(int $id): array
     {
-        $zone = Zone::with('niveau.pavillon', 'emplacements')->findOrFail($id);
+        $zone = Zone::with('emplacements')->findOrFail($id);
         $rang = (string) ($zone->emplacements->count() + 1);
         $place = str_pad($rang, 3, '0', STR_PAD_LEFT);
-        $code = $zone->niveau->pavillon->code . $zone->niveau->code . $zone->code . $place;
+        $code = $zone->code . $place;
         return ['code' => $code, 'rang' => $rang];
     }
 
@@ -201,5 +201,10 @@ class EmplacementsController extends Controller implements StandardControllerInt
             )->whereHas('contratActuel.personne', fn (Builder $query) => $query->isClient())
             ->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false))->get();
         return response()->json(['emplacements' => $emplacements]);
+    }
+
+    public function getByZones(Request $request): JsonResponse
+    {
+        return response()->json($request->query('zones'));
     }
 }

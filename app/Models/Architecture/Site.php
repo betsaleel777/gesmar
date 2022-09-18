@@ -43,7 +43,6 @@ class Site extends Model
     }
 
     /**
-     * Undocumented function
      *
      * @return HasMany<Pavillon>
      */
@@ -55,11 +54,21 @@ class Site extends Model
     /**
      * Afficher directement tout les emplacements d'un site (marché)
      *
-     * @return HasManyDeep<Niveau>
+     * @return HasManyDeep<Emplacement>
      */
     public function emplacements(): HasManyDeep
     {
         return $this->hasManyDeep(Emplacement::class, [Pavillon::class, Niveau::class, Zone::class]);
+    }
+
+    /**
+     * Afficher directement toutes les zones d'un site (marché)
+     *
+     * @return HasManyDeep<Zone>
+     */
+    public function zones(): HasManyDeep
+    {
+        return $this->hasManyDeep(Zone::class, [Pavillon::class, Niveau::class]);
     }
 
     /**

@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logou
 Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     Route::controller(UtilisateursController::class)->prefix('users')->group(function () {
         Route::get('/', 'all');
+        Route::get('/uncommercials', 'uncommercials');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
         Route::post('/profile', 'profile');
@@ -109,9 +110,10 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     Route::controller(ZonesController::class)->prefix('zones')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
+        Route::get('{id}', 'show');
+        Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');
         Route::post('/push', 'push');
-        Route::get('{id}', 'show');
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');
@@ -351,6 +353,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
     });
     Route::controller(CommercialController::class)->prefix('commerciaux')->group(function () {
         Route::get('/', 'all');
+        Route::get('/users', 'user');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');

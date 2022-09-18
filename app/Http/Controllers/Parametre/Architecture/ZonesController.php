@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Parametre\Architecture;
 use App\Http\Controllers\Controller;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Niveau;
+use App\Models\Architecture\Site;
 use App\Models\Architecture\Zone;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,7 +46,7 @@ class ZonesController extends Controller implements StandardControllerInterface
                 $start++;
                 $zone = new Zone();
                 $zone->niveau_id = $niveau;
-                $zone->nom = 'zone '.$start;
+                $zone->nom = 'zone ' . $start;
                 $zone->code = (string) $start;
                 $zone->save();
             }
@@ -54,8 +55,7 @@ class ZonesController extends Controller implements StandardControllerInterface
 
     public function all(): JsonResponse
     {
-        $zones = Zone::with('niveau.pavillon.site')->get();
-
+        $zones = Zone::all();
         return response()->json(['zones' => $zones]);
     }
 
@@ -71,7 +71,6 @@ class ZonesController extends Controller implements StandardControllerInterface
             $zone->save();
         }
         $message = "La zone $request->nom a été crée avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -80,7 +79,6 @@ class ZonesController extends Controller implements StandardControllerInterface
         $request->validate(Zone::PUSH_RULES);
         self::pusher($request->niveaux, $request->nombre);
         $message = "$request->nombre zones ont été crée avec succès.";
-
         return response()->json(['message' => $message, 'zones' => self::getMany($request->niveaux)]);
     }
 
@@ -92,7 +90,6 @@ class ZonesController extends Controller implements StandardControllerInterface
         $zone->niveau_id = $request->niveau_id;
         $zone->save();
         $message = 'La zone a été modifié avec succès.';
-
         return response()->json(['message' => $message]);
     }
 
@@ -101,7 +98,6 @@ class ZonesController extends Controller implements StandardControllerInterface
         $zone = Zone::findOrFail($id);
         $zone->delete();
         $message = "La zone $zone->nom a été supprimé avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -110,39 +106,24 @@ class ZonesController extends Controller implements StandardControllerInterface
         $zone = Zone::withTrashed()->find($id);
         $zone->restore();
         $message = "La zone $zone->nom a été restauré avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
     public function trashed(): JsonResponse
     {
-        $zones = Zone::with('niveau')->onlyTrashed()->get();
-
+        $zones = Zone::onlyTrashed()->get();
         return response()->json(['zones' => $zones]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $zone = Zone::with('niveau.pavillon.site')->withTrashed()->find($id);
-
+        $zone = Zone::withTrashed()->find($id);
         return response()->json(['zone' => $zone]);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param  array<int>  $ids
-     * @return JsonResponse
-     */
-    public function getByZones(array $ids): JsonResponse
+    public function getByMarche(int $id): JsonResponse
     {
-        return response()->json(['zones' => self::getMany($ids)]);
-    }
-
-    public function getByZone(int $id): JsonResponse
-    {
-        $zones = Niveau::findOrFail($id)->zones;
-
+        $zones = Site::with('zones')->findOrFail($id)->zones;
         return response()->json(['zones' => $zones]);
     }
 }
