@@ -135,6 +135,17 @@ class Emplacement extends Model
         return $query->where('liaison', StatusEmplacement::UNLINKED->value);
     }
 
+    /**
+     * Obtenir les emplacements qui dont les contrat se valide sans passer par l'ordonnancement
+     *
+     * @param Builder<Emplacement> $query
+     * @return Builder<Emplacement>
+     */
+    public function scopeWithoutSchedule(Builder $query): Builder
+    {
+        return $query->whereHas('type', fn (Builder $query) => $query->where('auto_valid', true));
+    }
+
     //relations
 
     /**

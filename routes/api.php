@@ -120,6 +120,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     });
     Route::controller(EmplacementsController::class)->prefix('emplacements')->group(function () {
         Route::get('/', 'all');
+        Route::get('/autos', 'allAuto');
         Route::get('/equipables', 'equipables');
         Route::get('/trashed', 'trashed');
         Route::get('/rental/{date}', 'getRentalbyMonth');
@@ -357,6 +358,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');
+        Route::post('/attribuer', 'attribuate');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');

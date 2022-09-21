@@ -35,6 +35,12 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['emplacements' => $emplacements]);
     }
 
+    public function allAuto()
+    {
+        $emplacements = Emplacement::with('zone.niveau.pavillon.site')->withoutSchedule()->get();
+        return response()->json(['emplacements' => $emplacements]);
+    }
+
     public function equipables(): JsonResponse
     {
         $emplacements = DB::table('emplacements')->select('emplacements.*', 'pavillons.site_id')
@@ -201,10 +207,5 @@ class EmplacementsController extends Controller implements StandardControllerInt
             )->whereHas('contratActuel.personne', fn (Builder $query) => $query->isClient())
             ->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false))->get();
         return response()->json(['emplacements' => $emplacements]);
-    }
-
-    public function getByZones(Request $request): JsonResponse
-    {
-        return response()->json($request->query('zones'));
     }
 }

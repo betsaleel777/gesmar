@@ -3,18 +3,16 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Finance\Commercial;
-use App\Models\User;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Hash;
 
 class CommercialController extends Controller
 {
     public function all(): JsonResponse
     {
-        $commerciaux = Commercial::all();
+        $commerciaux = Commercial::with('emplacements')->get();
         return response()->json(['commerciaux' => $commerciaux]);
     }
 
@@ -53,13 +51,18 @@ class CommercialController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $commerciaux = Commercial::withTrashed()->get();
+        $commerciaux = Commercial::withTrashed()->findOrFail($id)->get();
         return response()->json(['commerciaux' => $commerciaux]);
     }
 
     public function attribuate(Request $request): JsonResponse
     {
         $request->validate(Commercial::ATTRIBUTION_RULES);
+
+        $commercial = Commercial::findOrFail($request->commercial);
+        foreach ($request->emplacements as $emplacement) {
+            $commercial->emplacements()->attach($emplacement['id'], ['jour' => $request->jour]);
+        }
         $message = "Emplacement(s) attribué(s) avec succès.";
         return response()->json(['message' => $message]);
     }
