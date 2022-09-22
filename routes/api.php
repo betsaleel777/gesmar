@@ -363,6 +363,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
+        Route::patch('/desattribuate/{id}', 'desattribuate');
     });
     Route::controller(BordereauController::class)->prefix('bordereaux')->group(function () {
         Route::get('/', 'all');

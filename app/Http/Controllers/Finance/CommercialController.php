@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Models\Architecture\Emplacement;
 use App\Models\Finance\Commercial;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -51,8 +52,8 @@ class CommercialController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $commerciaux = Commercial::withTrashed()->findOrFail($id)->get();
-        return response()->json(['commerciaux' => $commerciaux]);
+        $commercial = Commercial::with('emplacements')->withTrashed()->findOrFail($id);
+        return response()->json(['commercial' => $commercial]);
     }
 
     public function attribuate(Request $request): JsonResponse
@@ -64,6 +65,16 @@ class CommercialController extends Controller
             $commercial->emplacements()->attach($emplacement['id'], ['jour' => $request->jour]);
         }
         $message = "Emplacement(s) attribué(s) avec succès.";
+        return response()->json(['message' => $message]);
+    }
+
+    public function desattribuate(int $id, Request $request)
+    {
+        $commercial = Commercial::findOrFail($id);
+        $emplacement = Emplacement::findOrFail($request->emplacement);
+        $commercial->emplacements()->detach($request->emplacement, ['jour' => $request->jour]);
+        $message = "Annulation de l'attribution de l'emplacement $emplacement->code pour la date du $request->jour a été effectuée
+         avec succès";
         return response()->json(['message' => $message]);
     }
 }
