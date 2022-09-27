@@ -15,8 +15,10 @@ return new class extends Migration
     {
         Schema::create('bordereaus', function (Blueprint $table) {
             $table->id();
-            $table->date('jour');
+            $table->string('code')->unique();
             $table->foreignId('commercial_id')->constrained('commercials')->onDelete('cascade')->onUpdate('cascade');
+            $table->date('date_attribution')->unique();
+            $table->foreign('date_attribution')->references('jour')->on('attribution_emplacements')->onDelete('cascade');
             $table->timestamps();
         });
     }

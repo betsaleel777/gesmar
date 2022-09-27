@@ -14,4 +14,21 @@ class BordereauController extends Controller
         $bordereaux = Bordereau::all();
         return response()->json(['bordereaux' => $bordereaux]);
     }
+
+    public function store(Request $request): JsonResponse
+    {
+        $request->validate(Bordereau::RULES);
+        $bordereau = new Bordereau($request->all());
+        $bordereau->codeGenerate();
+        $bordereau->save();
+        $bordereau->pasEncaisser();
+        $message = "Le bordereau $bordereau->code a été crée avec succès.";
+        return response()->json(['message' => $message]);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        $bordereau = Bordereau::with('attributions.emplacement', 'attributions.commercial')->findOrFail($id);
+        return response()->json(['bordereau' => $bordereau]);
+    }
 }
