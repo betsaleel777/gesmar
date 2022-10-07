@@ -4,6 +4,7 @@ namespace App\Models\Architecture;
 
 use App\Enums\ModeServiceAnnexe;
 use App\Models\Exploitation\Contrat;
+use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class ServiceAnnexe extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, RecentOrder;
 
     protected $fillable = ['code', 'nom', 'site_id', 'prix', 'description', 'mode'];
 
@@ -28,7 +29,7 @@ class ServiceAnnexe extends Model
     public function codeGenerate(): void
     {
         $rang = $this->count() + 1;
-        $this->attributes['code'] = ANNEXE_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
+        $this->attributes['code'] = ANNEXE_CODE_PREFIXE . str_pad((string)$rang, 7, '0', STR_PAD_LEFT);
     }
 
     public function forfaitaire(): void

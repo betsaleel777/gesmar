@@ -6,6 +6,7 @@ use App\Enums\StatusEmplacement;
 use App\Models\Exploitation\Contrat;
 use App\States\Emplacement\StatusDisponibiliteState;
 use App\States\Emplacement\StatusLiaisonsState;
+use App\Traits\RecentOrder;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -24,6 +25,7 @@ class Emplacement extends Model
     use SoftDeletes;
     use HasStateMachines;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use RecentOrder;
 
 
     public $stateMachines = [

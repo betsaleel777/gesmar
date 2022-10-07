@@ -3,15 +3,19 @@
 namespace App\Models\Finance;
 
 use App\Enums\StatusBordereau;
+use App\Traits\HasCashStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\ModelStatus\HasStatuses;
 
+/**
+ * @mixin IdeHelperBordereau
+ */
 class Bordereau extends Model
 {
-    use HasStatuses;
+    use HasStatuses, HasCashStatus;
     protected $fillable = ['code', 'commercial_id', 'date_attribution'];
 
     /**
@@ -29,16 +33,6 @@ class Bordereau extends Model
     {
         $rang = $this->count() + 1;
         $this->attributes['code'] = BORDEREAU_CODE_PREFIXE . str_pad((string)$rang, 7, '0', STR_PAD_LEFT);
-    }
-
-    public function encaisser(): void
-    {
-        $this->setStatus(StatusBordereau::ENCAISSE->value);
-    }
-
-    public function pasEncaisser(): void
-    {
-        $this->setStatus(StatusBordereau::PAS_ENCAISSE->value);
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Enums\StatusEquipement;
 use App\Models\Finance\Facture;
 use App\States\Equipement\StatusAbonnementState;
 use App\States\Equipement\StatusLiaisonsState;
+use App\Traits\RecentOrder;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -19,9 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Equipement extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
-    use HasStateMachines;
+    use HasFactory,SoftDeletes,HasStateMachines,RecentOrder;
 
     /**
      *

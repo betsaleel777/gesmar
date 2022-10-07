@@ -2,17 +2,22 @@
 
 namespace App\Models\Finance;
 
-use App\Enums\StatusBordereau;
+
 use App\Models\Architecture\Emplacement;
+use App\Traits\HasCashStatus;
+use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\ModelStatus\HasStatuses;
 
 
+/**
+ * @mixin IdeHelperAttribution
+ */
 class Attribution extends Model
 {
-    use HasStatuses;
+    use HasStatuses, RecentOrder, HasCashStatus;
 
     protected $fillable = ['commercial_id', 'emplacement_id', 'jour'];
     protected $table = 'attribution_emplacements';
@@ -30,26 +35,6 @@ class Attribution extends Model
         'commercial_id' => 'required',
         'date' => 'required',
     ];
-
-    public function encaisser(): void
-    {
-        $this->setStatus(StatusBordereau::ENCAISSE->value);
-    }
-
-    public function pasEncaisser(): void
-    {
-        $this->setStatus(StatusBordereau::PAS_ENCAISSE->value);
-    }
-
-    public function cashed()
-    {
-        return $this->status === StatusBordereau::ENCAISSE->value;
-    }
-
-    public function uncashed()
-    {
-        return $this->status === StatusBordereau::PAS_ENCAISSE->value;
-    }
 
     /**
      * Obtenir les commerciaux d'une attribution d'emplacement

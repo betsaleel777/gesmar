@@ -109,6 +109,7 @@ namespace App\Models\Architecture{
  * @method static \Illuminate\Database\Eloquent\Builder|Emplacement whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Emplacement whereZoneId($value)
  * @method static \Illuminate\Database\Query\Builder|Emplacement withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Emplacement withoutSchedule()
  * @method static \Illuminate\Database\Query\Builder|Emplacement withoutTrashed()
  */
 	class IdeHelperEmplacement {}
@@ -236,6 +237,7 @@ namespace App\Models\Architecture{
  * App\Models\Architecture\ServiceAnnexe
  *
  * @property int $id
+ * @property string $code
  * @property string $nom
  * @property int $prix
  * @property string|null $description
@@ -251,6 +253,7 @@ namespace App\Models\Architecture{
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceAnnexe newQuery()
  * @method static \Illuminate\Database\Query\Builder|ServiceAnnexe onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceAnnexe query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceAnnexe whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceAnnexe whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceAnnexe whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceAnnexe whereDescription($value)
@@ -410,7 +413,6 @@ namespace App\Models\Architecture{
  * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement whereRaison($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ValidationAbonnement whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperValidationAbonnement {}
 }
@@ -543,7 +545,6 @@ namespace App\Models\Exploitation{
  * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ordonnancement whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperOrdonnancement {}
 }
@@ -569,7 +570,6 @@ namespace App\Models\Exploitation{
  * @method static \Illuminate\Database\Eloquent\Builder|Paiement whereMontant($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Paiement whereOrdonnancementId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Paiement whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperPaiement {}
 }
@@ -678,6 +678,73 @@ namespace App\Models\Exploitation{
 
 namespace App\Models\Finance{
 /**
+ * App\Models\Finance\Attribution
+ *
+ * @property int $id
+ * @property int $commercial_id
+ * @property int $emplacement_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $jour
+ * @property-read \App\Models\Finance\Bordereau|null $bordereau
+ * @property-read \App\Models\Finance\Collecte|null $collecte
+ * @property-read \App\Models\Finance\Commercial $commercial
+ * @property-read \App\Models\Architecture\Emplacement $emplacement
+ * @property-read string $status
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\ModelStatus\Status[] $statuses
+ * @property-read int|null $statuses_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution currentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution otherCurrentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution whereCommercialId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution whereEmplacementId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution whereJour($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribution whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	class IdeHelperAttribution {}
+}
+
+namespace App\Models\Finance{
+/**
+ * App\Models\Finance\Bordereau
+ *
+ * @property int $id
+ * @property string $code
+ * @property int $commercial_id
+ * @property string $date_attribution
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Finance\Attribution[] $attributions
+ * @property-read int|null $attributions_count
+ * @property-read \App\Models\Finance\Commercial $commercial
+ * @property-read string $status
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\ModelStatus\Status[] $statuses
+ * @property-read int|null $statuses_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau cashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau currentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau notCashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau otherCurrentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereCommercialId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereDateAttribution($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	class IdeHelperBordereau {}
+}
+
+namespace App\Models\Finance{
+/**
  * App\Models\Finance\Cheque
  *
  * @property int $id
@@ -699,6 +766,63 @@ namespace App\Models\Finance{
  * @method static \Illuminate\Database\Eloquent\Builder|Cheque whereVersementId($value)
  */
 	class IdeHelperCheque {}
+}
+
+namespace App\Models\Finance{
+/**
+ * App\Models\Finance\Collecte
+ *
+ * @property int $id
+ * @property int $nombre
+ * @property int $montant
+ * @property int $attribution_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Finance\Attribution $attribution
+ * @method static \Illuminate\Database\Eloquent\Builder|Collecte newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Collecte newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Collecte query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Collecte whereAttributionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collecte whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collecte whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collecte whereMontant($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collecte whereNombre($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collecte whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	class IdeHelperCollecte {}
+}
+
+namespace App\Models\Finance{
+/**
+ * App\Models\Finance\Commercial
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string $code
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Finance\Attribution[] $attributions
+ * @property-read int|null $attributions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Finance\Bordereau[] $bordereaux
+ * @property-read int|null $bordereaux_count
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|Commercial newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Commercial newQuery()
+ * @method static \Illuminate\Database\Query\Builder|Commercial onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Commercial query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Commercial whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commercial whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commercial whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commercial whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commercial whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commercial whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|Commercial withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|Commercial withoutTrashed()
+ * @mixin \Eloquent
+ */
+	class IdeHelperCommercial {}
 }
 
 namespace App\Models\Finance{
@@ -966,6 +1090,7 @@ namespace App\Models{
  * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property string|null $avatar
+ * @property-read \App\Models\Finance\Commercial|null $commercial
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Permission[] $permissions

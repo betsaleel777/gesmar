@@ -4,6 +4,7 @@ namespace App\Models\Architecture;
 
 use App\Enums\StatusAbonnement;
 use App\Enums\StatusEquipement;
+use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +15,7 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Abonnement extends Model
 {
-    use HasStatuses;
+    use HasStatuses, RecentOrder;
 
     protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'site_id'];
 
