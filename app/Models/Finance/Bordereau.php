@@ -14,7 +14,12 @@ class Bordereau extends Model
     use HasStatuses;
     protected $fillable = ['code', 'commercial_id', 'date_attribution'];
 
-    protected $with = ['commercial'];
+    /**
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['status'];
+
     const RULES = [
         'commercial_id' => 'required',
         'date_attribution' => 'required',
@@ -23,7 +28,7 @@ class Bordereau extends Model
     public function codeGenerate(): void
     {
         $rang = $this->count() + 1;
-        $this->attributes['code'] = BORDEREAU_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
+        $this->attributes['code'] = BORDEREAU_CODE_PREFIXE . str_pad((string)$rang, 7, '0', STR_PAD_LEFT);
     }
 
     public function encaisser(): void
@@ -63,7 +68,7 @@ class Bordereau extends Model
      */
     public function attributions(): HasMany
     {
-        return $this->hasMany(Attribution::class, 'date_attribution', 'jour');
+        return $this->hasMany(Attribution::class , 'jour', 'date_attribution');
     }
 
     /**

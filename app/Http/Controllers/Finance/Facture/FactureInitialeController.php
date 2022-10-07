@@ -45,7 +45,15 @@ class FactureInitialeController extends Controller
         $facture->proforma();
         $facture->save();
         $message = "La facture initiale: $facture->code a été crée avec succès.";
+        return response()->json(['message' => $message]);
+    }
 
+    public function update(int $id, Request $request): JsonResponse
+    {
+        $request->validate(Facture::INITIALE_EDIT_RULES);
+        $facture = Facture::findOrFail($id);
+        $facture->update($request->all());
+        $message = "La facture initiale: $facture->code a été modifiée avec succès.";
         return response()->json(['message' => $message]);
     }
 }

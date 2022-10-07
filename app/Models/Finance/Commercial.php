@@ -2,12 +2,11 @@
 
 namespace App\Models\Finance;
 
-use App\Models\Architecture\Emplacement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Commercial extends Model
@@ -48,11 +47,20 @@ class Commercial extends Model
     /**
      * Obtenir les emplacements attribués à un commercial
      *
-     * @return BelongsToMany<Emplacement>
+     * @return HasMany<Emplacement>
      */
-    public function emplacements(): BelongsToMany
+    public function attributions(): HasMany
     {
-        return $this->belongsToMany(Emplacement::class, 'attribution_emplacements', 'commercial_id', 'emplacement_id')
-            ->withPivot('jour')->withTimestamps();
+        return $this->hasMany(Attribution::class);
+    }
+
+    /**
+     * Obtenir les bordereaux d'un commercial
+     *
+     * @return HasMany<Bordereau>
+     */
+    public function bordereaux(): HasMany
+    {
+        return $this->hasMany(Bordereau::class);
     }
 }

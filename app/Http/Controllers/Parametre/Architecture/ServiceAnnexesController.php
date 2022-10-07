@@ -28,6 +28,7 @@ class ServiceAnnexesController extends Controller implements StandardControllerI
     {
         $request->validate(ServiceAnnexe::RULES);
         $annexe = new ServiceAnnexe($request->all());
+        $annexe->codeGenerate();
         $annexe->save();
         $message = "Le service annexe $request->nom a été crée avec succès.";
 

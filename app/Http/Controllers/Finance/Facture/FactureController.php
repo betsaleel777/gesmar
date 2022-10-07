@@ -46,10 +46,14 @@ class FactureController extends Controller
         $facturesInitiales = Facture::with('contrat.emplacement', 'paiements')->where('contrat_id', $id)->isInitiale()->isFacture()->isSuperMarket()->get();
         $facturesInitiales->each(fn ($facture) => $facture->setAttribute('sommeVersee', $facture->paiements->sum('montant')));
 
+        $facturesAnnexes = Facture::with('contrat.annexe', 'paiements')->where('contrat_id', $id)->isAnnexe()->isFacture()->get();
         $facturesLoyers = Facture::with('contrat.emplacement')->where('contrat_id', $id)->isLoyer()->isFacture()->get();
         $facturesEquipements = Facture::with('contrat.equipement.type')->where('contrat_id', $id)->isEquipement()->isFacture()->get();
         return response()->json([
-            'facturesInitiales' => $facturesInitiales, 'factureEquipements' => $facturesEquipements, 'facturesLoyers' => $facturesLoyers
+            'facturesInitiales' => $facturesInitiales,
+            'factureEquipements' => $facturesEquipements,
+            'facturesLoyers' => $facturesLoyers,
+            'facturesAnnexes' => $facturesAnnexes,
         ]);
     }
 }

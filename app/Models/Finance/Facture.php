@@ -67,6 +67,12 @@ class Facture extends Model
         ]];
     }
 
+    const INITIALE_EDIT_RULES =  [
+        'avance' => 'required|numeric',
+        'caution' => 'required|numeric',
+        'pas_porte' => 'required|numeric',
+    ];
+
     /**
      * règles du formulaire de création d'une facture d'équipement
      *

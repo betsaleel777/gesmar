@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('service_annexes', function (Blueprint $table) {
+        Schema::create('collectes', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 10);
-            $table->string('nom', 250);
-            $table->unsignedInteger('prix');
-            $table->longText('description')->nullable();
-            $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
-            $table->softDeletes();
+            $table->unsignedTinyInteger('nombre');
+            $table->unsignedInteger('montant');
+            $table->foreignId('attribution_id')->constrained('attribution_emplacements')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -32,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('service_annexes');
+        Schema::dropIfExists('collectes');
     }
 };

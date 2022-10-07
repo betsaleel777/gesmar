@@ -8,8 +8,10 @@ use App\Http\Controllers\Exploitation\Reception\OrdonnancementController;
 use App\Http\Controllers\Exploitation\Reception\PersonnesController;
 use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
+use App\Http\Controllers\Finance\AttributionEmplacementController;
 use App\Http\Controllers\Finance\BordereauController;
 use App\Http\Controllers\Finance\ChequeController;
+use App\Http\Controllers\Finance\CollecteController;
 use App\Http\Controllers\Finance\CommercialController;
 use App\Http\Controllers\Finance\Facture\FactureAnnexeController;
 use App\Http\Controllers\Finance\Facture\FactureController;
@@ -34,7 +36,6 @@ use App\Http\Controllers\Parametre\RolesController;
 use App\Http\Controllers\Parametre\Template\TermesContratsAnnexesController;
 use App\Http\Controllers\Parametre\Template\TermesContratsEmplacementsController;
 use App\Http\Controllers\Parametre\UtilisateursController;
-use App\Models\Architecture\ValidationAbonnement;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -363,7 +364,6 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
-        Route::patch('/desattribuate/{id}', 'desattribuate');
     });
     Route::controller(BordereauController::class)->prefix('bordereaux')->group(function () {
         Route::get('/', 'all');
@@ -374,5 +374,19 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
+    });
+    Route::controller(AttributionEmplacementController::class)->prefix('attributions')->group(function () {
+        Route::get('/', 'all');
+        Route::get('/with-bordereau', 'allWithBordereau');
+        Route::post('/store', 'store');
+        Route::patch('/transferer/{id}', 'transfer');
+        Route::get('{id}', 'show');
+        Route::delete('{id}', 'trash');
+    });
+    Route::controller(CollecteController::class)->prefix('collectes')->group(function () {
+        Route::get('/', 'all');
+        Route::post('/store', 'store');
+        Route::get('{id}', 'show');
+        Route::delete('{id}', 'trash');
     });
 });

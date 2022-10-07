@@ -13,7 +13,7 @@ class CommercialController extends Controller
 {
     public function all(): JsonResponse
     {
-        $commerciaux = Commercial::with('emplacements')->get();
+        $commerciaux = Commercial::with('attributions.emplacement', 'bordereaux')->get();
         return response()->json(['commerciaux' => $commerciaux]);
     }
 
@@ -52,7 +52,7 @@ class CommercialController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $commercial = Commercial::with('emplacements')->withTrashed()->findOrFail($id);
+        $commercial = Commercial::with('attributions.emplacement', 'bordereaux')->withTrashed()->findOrFail($id);
         return response()->json(['commercial' => $commercial]);
     }
 
@@ -65,16 +65,6 @@ class CommercialController extends Controller
             $commercial->emplacements()->attach($emplacement['id'], ['jour' => $request->jour]);
         }
         $message = "Emplacement(s) attribué(s) avec succès.";
-        return response()->json(['message' => $message]);
-    }
-
-    public function desattribuate(int $id, Request $request)
-    {
-        $commercial = Commercial::findOrFail($id);
-        $emplacement = Emplacement::findOrFail($request->emplacement);
-        $commercial->emplacements()->detach($request->emplacement, ['jour' => $request->jour]);
-        $message = "Annulation de l'attribution de l'emplacement $emplacement->code pour la date du $request->jour a été effectuée
-         avec succès";
         return response()->json(['message' => $message]);
     }
 }

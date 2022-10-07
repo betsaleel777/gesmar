@@ -29,7 +29,7 @@ class ValidationAbonnement extends Model
      */
     protected $with = ['statuses'];
 
-    public const RULES = ['raison' => 'required', 'abonnement_id' => 'required'];
+    public const RULES = ['raison' => 'required|min:50', 'abonnement_id' => 'required'];
 
     public function confirmer(): void
     {
