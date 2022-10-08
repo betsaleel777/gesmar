@@ -11,8 +11,7 @@ class FactureInitialeController extends Controller
 {
     public function all(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isSuperMarket()->isInitiale()->get();
-
+        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isSuperMarket()->isInitiale()->isFacture()->get();
         return response()->json(['factures' => $factures]);
     }
 

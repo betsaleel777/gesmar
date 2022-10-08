@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 class AttributionEmplacementController extends Controller
 {
+
     public function all(): JsonResponse
     {
         $attributions = Attribution::with('commercial', 'emplacement', 'bordereau')->orderBy('jour', 'desc')->get();
@@ -49,12 +50,13 @@ class AttributionEmplacementController extends Controller
     {
         $request->validate(ATTRIBUTION::TRANSFERT_RULES);
         $attributions = Attribution::where('commercial_id', $request->commercial_id)->where('jour', $request->date)->get();
-        foreach ($attributions as $attribution) {
+        $attributions->each(function (Attribution $attribution) use ($id) {
             if ($attribution->uncashed()) {
                 $attribution->commercial_id = $id;
                 $attribution->save();
             }
-        }
+        });
+        //TODO: vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
         $message = "Le transfert des tâches a bien été effectué.";
         return response()->json(['message' => $message]);
     }
