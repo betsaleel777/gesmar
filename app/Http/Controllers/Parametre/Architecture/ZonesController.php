@@ -23,6 +23,9 @@ class ZonesController extends Controller implements StandardControllerInterface
     {
         $niveaux = Niveau::with('zones')->findMany($ids);
         $zones = [];
+        /**
+         * @var $niveau Niveau
+         */
         foreach ($niveaux as $niveau) {
             $zones[] = $niveau->zones;
         }

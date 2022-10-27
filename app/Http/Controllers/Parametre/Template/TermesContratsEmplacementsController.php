@@ -10,7 +10,7 @@ class TermesContratsEmplacementsController extends TermesContratsController
 {
     public function all(): JsonResponse
     {
-        $termes = TermesContratEmplacement::with('site', 'user')->isEmplacement()->get();
+        $termes = TermesContratEmplacement::with(['site', 'user'])->isEmplacement()->get();
         return response()->json(['termes' => $termes]);
     }
 
@@ -35,7 +35,7 @@ class TermesContratsEmplacementsController extends TermesContratsController
 
     public function trashed(): JsonResponse
     {
-        $termes = TermesContratEmplacement::with('site', 'user')->onlyTrashed()->isEmplacement()->get();
+        $termes = TermesContratEmplacement::with(['site', 'user'])->onlyTrashed()->isEmplacement()->get();
         return response()->json(['termes' => $termes]);
     }
 }

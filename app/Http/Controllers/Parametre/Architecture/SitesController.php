@@ -14,7 +14,6 @@ class SitesController extends Controller implements StandardControllerInterface
     public function all(): JsonResponse
     {
         $marches = Site::get();
-
         return response()->json(['marches' => $marches]);
     }
 
@@ -24,7 +23,6 @@ class SitesController extends Controller implements StandardControllerInterface
         $marche = new Site($request->all());
         $marche->save();
         $message = "Le marché $request->nom a été crée avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -39,7 +37,6 @@ class SitesController extends Controller implements StandardControllerInterface
         $marche->postale = $request->postale;
         $marche->save();
         $message = "Le marché $request->nom a été crée avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -50,7 +47,6 @@ class SitesController extends Controller implements StandardControllerInterface
         $marche->save();
         $message = "Le marché $request->nom a été crée avec succès.";
         $freshMarche = $marche->fresh();
-
         return response()->json(['message' => $message, 'marche' => $freshMarche]);
     }
 
@@ -59,7 +55,6 @@ class SitesController extends Controller implements StandardControllerInterface
         $marche = Site::findOrFail($id);
         $marche->delete();
         $message = "Le marché $marche->nom a été supprimé avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -68,21 +63,18 @@ class SitesController extends Controller implements StandardControllerInterface
         $marche = Site::withTrashed()->find($id);
         $marche->restore();
         $message = "Le marché $marche->nom a été restauré avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
     public function trashed(): JsonResponse
     {
         $marches = Site::onlyTrashed()->get();
-
         return response()->json(['marches' => $marches]);
     }
 
     public function show(int $id): JsonResponse
     {
         $marche = Site::withTrashed()->find($id);
-
         return response()->json(['marche' => $marche]);
     }
 
@@ -107,26 +99,26 @@ class SitesController extends Controller implements StandardControllerInterface
         if (empty($id)) {
             $sites = Site::select('id', 'nom')->with([
                 'pavillons' => function ($query) {
-                $query->withCount('niveaux');
+                    $query->withCount('niveaux');
                 },
                 'pavillons.niveaux' => function ($query) {
-                $query->withCount('zones');
+                    $query->withCount('zones');
                 },
                 'pavillons.niveaux.zones' => function ($query) {
-                $query->withCount('emplacements');
+                    $query->withCount('emplacements');
                 },
                 'pavillons.niveaux.zones.emplacements',
             ])->withCount('pavillons')->get();
         } else {
             $sites = Site::select('id', 'nom')->with([
                 'pavillons' => function ($query) {
-                $query->withCount('niveaux');
+                    $query->withCount('niveaux');
                 },
                 'pavillons.niveaux' => function ($query) {
-                $query->withCount('zones');
+                    $query->withCount('zones');
                 },
                 'pavillons.niveaux.zones' => function ($query) {
-                $query->withCount('emplacements');
+                    $query->withCount('emplacements');
                 },
                 'pavillons.niveaux.zones.emplacements',
             ])->withCount('pavillons')->findOrFail($id)->get();
@@ -141,35 +133,38 @@ class SitesController extends Controller implements StandardControllerInterface
                         'name' => $pavillon->nom,
                         'value' => (int) $pavillon->niveaux_count,
                         'children' => $pavillon->niveaux->map(function ($niveau) {
-                            return new Collection([
-                                'name' => $niveau->nom,
-                                'value' => (int) $niveau->zones_count,
-                                'children' => $niveau->zones->map(function ($zone) {
-                                    if ((int) $zone->emplacements_count === 0) {
-                                        return new Collection([
-                                            'name' => $zone->nom,
-                                            'value' => 1,
-                                        ]);
-                                    } else {
-                                        return new Collection([
-                                            'name' => $zone->nom,
-                                            'value' => (int) $zone->emplacements_count,
-                                            'children' => $zone->emplacements->map(function ($emplacement) {
-                                                return new Collection([
-                                                    'name' => $emplacement->code,
-                                                    'value' => 1,
-                                                ]);
-                                            }),
-                                        ]);
-                                    }
-                                }),
-                            ]);
-                        }),
+                                return new Collection([
+                                    'name' => $niveau->nom,
+                                    'value' => (int) $niveau->zones_count,
+                                    'children' => $niveau->zones->map(function ($zone) {
+                                                    if ((int) $zone->emplacements_count === 0) {
+                                                        return new Collection([
+                                                            'name' => $zone->nom,
+                                                            'value' => 1,
+                                                        ]);
+                                                    } else {
+                                                        return new Collection([
+                                                            'name' => $zone->nom,
+                                                            'value' => (int) $zone->emplacements_count,
+                                                            'children' => $zone->emplacements->map(function ($emplacement) {
+                                                                                            return new Collection([
+                                                                                                'name' => $emplacement->code,
+                                                                                                'value' => 1,
+                                                                                            ]);
+                                                                                        }
+                                                            ),
+                                                        ]);
+                                                    }
+                                                }
+                                    ),
+                                ]);
+                            }
+                        ),
                     ]);
-                }),
+                }
+                ),
             ]);
         });
-
         return $structure;
     }
 }

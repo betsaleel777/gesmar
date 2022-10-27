@@ -13,7 +13,7 @@ class CommercialController extends Controller
 {
     public function all(): JsonResponse
     {
-        $commerciaux = Commercial::with('attributions.emplacement', 'bordereaux')->get();
+        $commerciaux = Commercial::with(['attributions.emplacement', 'bordereaux'])->get();
         return response()->json(['commerciaux' => $commerciaux]);
     }
 
@@ -52,7 +52,7 @@ class CommercialController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $commercial = Commercial::with('attributions.emplacement', 'bordereaux')->withTrashed()->findOrFail($id);
+        $commercial = Commercial::with(['attributions.emplacement', 'bordereaux'])->withTrashed()->findOrFail($id);
         return response()->json(['commercial' => $commercial]);
     }
 

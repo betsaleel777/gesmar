@@ -12,13 +12,13 @@ class AttributionEmplacementController extends Controller
 
     public function all(): JsonResponse
     {
-        $attributions = Attribution::with('commercial', 'emplacement', 'bordereau')->orderBy('jour', 'desc')->get();
+        $attributions = Attribution::with(['commercial', 'emplacement', 'bordereau'])->orderBy('jour', 'desc')->get();
         return response()->json(['attributions' => $attributions]);
     }
 
     public function allWithBordereau(): JsonResponse
     {
-        $attributions = Attribution::has('bordereau')->with('commercial', 'emplacement', 'bordereau')->orderBy('jour', 'desc')->get();
+        $attributions = Attribution::has('bordereau')->with(['commercial', 'emplacement', 'bordereau'])->orderBy('jour', 'desc')->get();
         return response()->json(['attributions' => $attributions]);
     }
 

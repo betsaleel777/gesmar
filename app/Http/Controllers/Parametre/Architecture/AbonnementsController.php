@@ -23,7 +23,7 @@ class AbonnementsController extends Controller
 
     public function all(): JsonResponse
     {
-        $abonnements = Abonnement::with('emplacement', 'equipement.type')->get();
+        $abonnements = Abonnement::with(['emplacement', 'equipement.type'])->get();
         return response()->json(['abonnements' => $abonnements]);
     }
 
@@ -68,14 +68,14 @@ class AbonnementsController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $abonnement = Abonnement::with('emplacement', 'equipement.type')->find($id);
+        $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->find($id);
         return response()->json(['abonnement' => $abonnement]);
     }
 
     public function lastIndex(int $id): JsonResponse
     {
         $equipement = null;
-        $abonnement = Abonnement::with('emplacement', 'equipement.type')->orderBy('id', 'DESC')->firstWhere('equipement_id', $id);
+        $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->orderBy('id', 'DESC')->firstWhere('equipement_id', $id);
         if (empty($abonnement->index_depart)) {
             $equipement = Equipement::findOrFail($id);
         }
@@ -89,7 +89,7 @@ class AbonnementsController extends Controller
         $abonnement->index_fin = $request->indexFin;
         $abonnement->save();
         $abonnement->stop();
-        AbonnementResilied::dispatch($abonnement);
+        (new AbonnementResilied($abonnement))->dispatch();
         $message = "L'abonnement $request->code a été résilié avec succès.";
         return response()->json(['message' => $message]);
     }

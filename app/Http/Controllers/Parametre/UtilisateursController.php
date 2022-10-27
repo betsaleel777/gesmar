@@ -26,7 +26,7 @@ class UtilisateursController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $user = User::with('roles', 'permissions')->withTrashed()->findOrFail($id);
+        $user = User::with(['roles', 'permissions'])->withTrashed()->findOrFail($id);
         $permissions = $user->getAllPermissions();
         return response()->json(['user' => $user, 'permissions' => $permissions]);
     }
@@ -70,7 +70,6 @@ class UtilisateursController extends Controller
     public function notifications(Request $request): JsonResponse
     {
         $message = '';
-
         return response()->json(['message' => $message]);
     }
 

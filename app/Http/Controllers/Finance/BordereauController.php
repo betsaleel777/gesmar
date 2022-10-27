@@ -28,7 +28,7 @@ class BordereauController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $bordereau = Bordereau::with('attributions.emplacement', 'attributions.collecte', 'commercial')->findOrFail($id);
+        $bordereau = Bordereau::with(['attributions.emplacement', 'attributions.collecte', 'commercial'])->findOrFail($id);
         return response()->json(['bordereau' => $bordereau]);
     }
 }

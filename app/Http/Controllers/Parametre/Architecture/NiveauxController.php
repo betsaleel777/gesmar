@@ -22,6 +22,9 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     {
         $pavillons = Pavillon::with('niveaux')->findMany($ids);
         $niveaux = [];
+        /**
+         * @var $pavillon Pavillon
+         */
         foreach ($pavillons as $pavillon) {
             $niveaux[] = $pavillon->niveaux;
         }
@@ -45,7 +48,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
                 $start++;
                 $niveau = new Niveau();
                 $niveau->pavillon_id = $pavillon;
-                $niveau->nom = 'niveau '.$start;
+                $niveau->nom = 'niveau ' . $start;
                 $niveau->code = (string) $start;
                 $niveau->save();
             }

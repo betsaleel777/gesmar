@@ -19,7 +19,7 @@ class PavillonsController extends Controller implements StandardControllerInterf
             $start++;
             $pavillon = new Pavillon();
             $pavillon->site_id = $site;
-            $pavillon->nom = 'pavillon '.$start;
+            $pavillon->nom = 'pavillon ' . $start;
             $pavillon->code = (string) $start;
             $pavillon->save();
         }
@@ -28,7 +28,6 @@ class PavillonsController extends Controller implements StandardControllerInterf
     public function all(): JsonResponse
     {
         $pavillons = Pavillon::with('site')->get();
-
         return response()->json(['pavillons' => $pavillons]);
     }
 
@@ -44,7 +43,6 @@ class PavillonsController extends Controller implements StandardControllerInterf
             $pavillon->save();
         }
         $message = "Le pavillon $request->nom a été crée avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -56,7 +54,6 @@ class PavillonsController extends Controller implements StandardControllerInterf
         $pavillon->site_id = $request->site_id;
         $pavillon->save();
         $message = 'Le pavillon a été modifié crée avec succès.';
-
         return response()->json(['message' => $message]);
     }
 
@@ -66,7 +63,6 @@ class PavillonsController extends Controller implements StandardControllerInterf
         self::pusher($request->id, $request->nombre);
         $message = "$request->nombre pavillons ont été crée avec succès.";
         $pavillons = Site::findOrFail($request->id)->pavillons;
-
         return response()->json(['message' => $message, 'pavillons' => $pavillons]);
     }
 
@@ -75,7 +71,6 @@ class PavillonsController extends Controller implements StandardControllerInterf
         $pavillon = Pavillon::findOrFail($id);
         $pavillon->delete();
         $message = "Le pavillon $pavillon->nom a été supprimé avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -84,28 +79,24 @@ class PavillonsController extends Controller implements StandardControllerInterf
         $pavillon = Pavillon::withTrashed()->find($id);
         $pavillon->restore();
         $message = "Le pavillon $pavillon->nom a été restauré avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
     public function trashed(): JsonResponse
     {
         $pavillons = Pavillon::with('site')->onlyTrashed()->get();
-
         return response()->json(['pavillons' => $pavillons]);
     }
 
     public function show(int $id): JsonResponse
     {
         $pavillon = Pavillon::withTrashed()->find($id);
-
         return response()->json(['pavillon' => $pavillon]);
     }
 
     public function getByMarche(int $id): JsonResponse
     {
         $pavillons = Site::findOrFail($id)->pavillons;
-
         return response()->json(['pavillons' => $pavillons]);
     }
 }

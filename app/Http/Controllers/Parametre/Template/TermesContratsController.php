@@ -10,7 +10,7 @@ class TermesContratsController extends Controller
 {
     public function all(): JsonResponse
     {
-        $termes = TermesContrat::with('site', 'user')->get();
+        $termes = TermesContrat::with(['site', 'user'])->get();
 
         return response()->json(['termes' => $termes]);
     }
@@ -35,14 +35,14 @@ class TermesContratsController extends Controller
 
     public function trashed(): JsonResponse
     {
-        $termes = TermesContrat::with('site', 'user')->onlyTrashed()->get();
+        $termes = TermesContrat::with(['site', 'user'])->onlyTrashed()->get();
 
         return response()->json(['termes' => $termes]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $terme = TermesContrat::with('site', 'user')->withTrashed()->find($id);
+        $terme = TermesContrat::with(['site', 'user'])->withTrashed()->find($id);
 
         return response()->json(['terme' => $terme]);
     }

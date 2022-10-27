@@ -6,7 +6,6 @@ use App\Models\Template\TermesContratAnnexe;
 use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class TermesContratsAnnexesController extends TermesContratsController
 {
@@ -45,17 +44,16 @@ class TermesContratsAnnexesController extends TermesContratsController
 
     public function pdf(int $id)
     {
-        $terme = TermesContratAnnexe::with('site', 'user')->findOrFail($id);
+        $terme = TermesContratAnnexe::with(['site', 'user'])->findOrFail($id);
         $filename = 'exampleContrat.pdf';
         $html = $terme->contenu;
-        $pdf = new TCPDF();
-        $pdf::SetTitle('Example de Contrat');
-        $pdf::setCellHeightRatio(0.7);
-        $pdf::AddPage();
-        $pdf::writeHTML($html, true, false, true, false, '');
+        TCPDF::SetTitle('Example de Contrat');
+        TCPDF::setCellHeightRatio(0.7);
+        TCPDF::AddPage();
+        TCPDF::writeHTML($html, true, false, true, false, '');
         $pathStorage = public_path() . '/storage/user-' . $terme->user->id . '/' . $filename;
         $pathDisplay = 'user-' . $terme->user->id . '/' . $filename;
-        $pdf::Output($pathStorage, 'F');
+        TCPDF::Output($pathStorage, 'F');
         return response()->json(['path' => $pathDisplay]);
     }
 }

@@ -9,29 +9,31 @@ use Illuminate\Http\Request;
 
 class FactureInitialeController extends Controller
 {
+    const RELATIONS = ['contrat.site', 'contrat.emplacement', 'contrat.personne'];
+
     public function all(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isSuperMarket()->isInitiale()->isFacture()->get();
+        $factures = Facture::with(self::RELATIONS)->isSuperMarket()->isInitiale()->isFacture()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isSuperMarket()->isPaid()->isInitiale()->get();
+        $factures = Facture::with(self::RELATIONS)->isSuperMarket()->isPaid()->isInitiale()->get();
 
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isSuperMarket()->isUnpaid()->isInitiale()->get();
+        $factures = Facture::with(self::RELATIONS)->isSuperMarket()->isUnpaid()->isInitiale()->get();
 
         return response()->json(['factures' => $factures]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with('contrat.site', 'contrat.emplacement', 'contrat.personne')->isSuperMarket()->isInitiale()->find($id);
+        $facture = Facture::with(self::RELATIONS)->isSuperMarket()->isInitiale()->find($id);
 
         return response()->json(['facture' => $facture]);
     }
