@@ -20,8 +20,9 @@ class GuichetController extends Controller implements StandardControllerInterfac
     {
         $request->validate(Guichet::RULES);
         $guichet = new Guichet($request->all());
+        $guichet->codeGenerate();
         $guichet->save();
-        $guichet->closed();
+        $guichet->close();
         $message = "Le guichet $guichet->nom a été crée avec succès.";
         return response()->json(['message' => $message]);
     }
@@ -39,6 +40,7 @@ class GuichetController extends Controller implements StandardControllerInterfac
     {
         $guichet = Guichet::findOrFail($id);
         $guichet->delete();
+        $guichet->close();
         $message = "Le guichet $guichet->code a été supprimé avec succès.";
         return response()->json(['message' => $message]);
     }
