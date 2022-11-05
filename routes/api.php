@@ -31,6 +31,7 @@ use App\Http\Controllers\Parametre\Architecture\TypeEquipementsController;
 use App\Http\Controllers\Parametre\Architecture\ValidationAbonnementController;
 use App\Http\Controllers\Parametre\Architecture\ZonesController;
 use App\Http\Controllers\Parametre\AuthController;
+use App\Http\Controllers\Parametre\caisse\GuichetController;
 use App\Http\Controllers\Parametre\PermissionsController;
 use App\Http\Controllers\Parametre\RolesController;
 use App\Http\Controllers\Parametre\Template\TermesContratsAnnexesController;
@@ -49,16 +50,20 @@ use Illuminate\Support\Facades\Route;
  | is assigned the "api" middleware group. Enjoy building your API!
  |
  */
-Route::controller(AuthController::class)->group(function () {
+Route::controller(AuthController::class)->group(function ()
+{
     Route::post('login', 'login');
 });
 Route::middleware('auth:sanctum')->get('/user', fn(Request $request) => $request->user());
-Route::middleware('auth:sanctum')->controller(AuthController::class)->group(function () {
+Route::middleware('auth:sanctum')->controller(AuthController::class)->group(function ()
+{
     Route::post('deconnecter', 'deconnecter');
     Route::post('logout', 'logout');
 });
-Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
-    Route::controller(UtilisateursController::class)->prefix('users')->group(function () {
+Route::middleware('auth:sanctum')->prefix('parametres')->group(function ()
+{
+    Route::controller(UtilisateursController::class)->prefix('users')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/uncommercials', 'uncommercials');
         Route::get('/trashed', 'trashed');
@@ -72,19 +77,22 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(RolesController::class)->prefix('roles')->group(function () {
+    Route::controller(RolesController::class)->prefix('roles')->group(function ()
+    {
         Route::get('/', 'all');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
     }
     );
-    Route::prefix('permissions')->group(function () {
+    Route::prefix('permissions')->group(function ()
+    {
         Route::get('/', [PermissionsController::class, 'all']);
         Route::get('/show/{id}', [PermissionsController::class, 'show']);
     }
     );
-    Route::controller(SitesController::class)->prefix('marches')->group(function () {
+    Route::controller(SitesController::class)->prefix('marches')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
@@ -97,7 +105,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(PavillonsController::class)->prefix('pavillons')->group(function () {
+    Route::controller(PavillonsController::class)->prefix('pavillons')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
@@ -109,7 +118,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(NiveauxController::class)->prefix('niveaux')->group(function () {
+    Route::controller(NiveauxController::class)->prefix('niveaux')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
@@ -120,7 +130,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(ZonesController::class)->prefix('zones')->group(function () {
+    Route::controller(ZonesController::class)->prefix('zones')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::get('{id}', 'show');
@@ -132,7 +143,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(EmplacementsController::class)->prefix('emplacements')->group(function () {
+    Route::controller(EmplacementsController::class)->prefix('emplacements')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/autos', 'allAuto');
         Route::get('/equipables', 'equipables');
@@ -151,7 +163,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(AbonnementsController::class)->prefix('abonnements')->group(function () {
+    Route::controller(AbonnementsController::class)->prefix('abonnements')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
@@ -164,7 +177,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/indexing/{id}', 'lastIndex');
     }
     );
-    Route::controller(ServiceAnnexesController::class)->prefix('annexes')->group(function () {
+    Route::controller(ServiceAnnexesController::class)->prefix('annexes')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
@@ -175,7 +189,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::put('{id}', 'update');
     }
     );
-    Route::controller(EquipementsController::class)->prefix('equipements')->group(function () {
+    Route::controller(EquipementsController::class)->prefix('equipements')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::get('/unlinkedsubscribed', 'getUnlinkedsubscribed');
@@ -187,7 +202,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(TypeEquipementsController::class)->prefix('equipement/types')->group(function () {
+    Route::controller(TypeEquipementsController::class)->prefix('equipement/types')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
@@ -197,7 +213,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(TypeEmplacementsController::class)->prefix('emplacement/types')->group(function () {
+    Route::controller(TypeEmplacementsController::class)->prefix('emplacement/types')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
@@ -207,8 +224,10 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::prefix('termes')->group(function () {
-        Route::controller(TermesContratsAnnexesController::class)->prefix('annexes')->group(function () {
+    Route::prefix('termes')->group(function ()
+    {
+        Route::controller(TermesContratsAnnexesController::class)->prefix('annexes')->group(function ()
+        {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
             Route::post('/store', 'store');
@@ -219,7 +238,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
             Route::patch('/restore/{id}', 'restore');
         }
         );
-        Route::controller(TermesContratsEmplacementsController::class)->prefix('emplacements')->group(function () {
+        Route::controller(TermesContratsEmplacementsController::class)->prefix('emplacements')->group(function ()
+        {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
             Route::post('/store', 'store');
@@ -232,18 +252,31 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         );
     }
     );
-    Route::controller(ValidationAbonnementController::class)->prefix('validations/abonnement')->group(function () {
+    Route::controller(ValidationAbonnementController::class)->prefix('validations/abonnement')->group(function ()
+    {
         Route::get('/', 'all');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
     }
     );
+    Route::controller(GuichetController::class)->prefix('guichets')->group(function ()
+    {
+        Route::get('/', 'all');
+        Route::get('/trashed', 'trashed');
+        Route::post('/store', 'store');
+        Route::put('{id}', 'update');
+        Route::get('{id}', 'show');
+    }
+     );
 });
 
-Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
-    Route::prefix('receptions')->group(function () {
-        Route::controller(PersonnesController::class)->prefix('personnes')->group(function () {
+Route::middleware('auth:sanctum')->prefix('exploitations')->group(function ()
+{
+    Route::prefix('receptions')->group(function ()
+    {
+        Route::controller(PersonnesController::class)->prefix('personnes')->group(function ()
+        {
             Route::get('/', 'all');
             Route::post('/store', 'store');
             Route::get('/marche/{id}', 'getByMarche');
@@ -253,7 +286,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::patch('/restore/{id}', 'restore');
         }
         );
-        Route::controller(ProspectsController::class)->prefix('prospects')->group(function () {
+        Route::controller(ProspectsController::class)->prefix('prospects')->group(function ()
+        {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
             Route::post('/store', 'store');
@@ -263,7 +297,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::delete('{id}', 'trash');
         }
         );
-        Route::controller(ClientsController::class)->prefix('clients')->group(function () {
+        Route::controller(ClientsController::class)->prefix('clients')->group(function ()
+        {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
             Route::post('/store', 'store');
@@ -273,7 +308,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::delete('{id}', 'trash');
         }
         );
-        Route::controller(OrdonnancementController::class)->prefix('ordonnancements')->group(function () {
+        Route::controller(OrdonnancementController::class)->prefix('ordonnancements')->group(function ()
+        {
             Route::get('/', 'all');
             Route::post('/store', 'store');
             Route::get('{id}', 'show');
@@ -281,10 +317,12 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::delete('{id}', 'trash');
         }
         );
-        Route::prefix('contrats')->group(function () {
+        Route::prefix('contrats')->group(function ()
+        {
             Route::get('/', [ContratController::class, 'all']);
             Route::get('/scheduling', [ContratController::class, 'schedulableContrats']);
-            Route::controller(ContratsAnnexesController::class)->prefix('annexes')->group(function () {
+            Route::controller(ContratsAnnexesController::class)->prefix('annexes')->group(function ()
+            {
                 Route::get('/', 'all');
                 Route::get('/valides', 'valides');
                 Route::get('/trashed', 'trashed');
@@ -296,7 +334,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
                 Route::delete('{id}', 'trash');
             }
             );
-            Route::controller(ContratsEmplacementsController::class)->prefix('emplacements')->group(function () {
+            Route::controller(ContratsEmplacementsController::class)->prefix('emplacements')->group(function ()
+            {
                 Route::get('/', 'all');
                 Route::get('/valides', 'valides');
                 Route::get('/trashed', 'trashed');
@@ -311,7 +350,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             );
         }
         );
-        Route::controller(TypePersonnesController::class)->prefix('personne/types')->group(function () {
+        Route::controller(TypePersonnesController::class)->prefix('personne/types')->group(function ()
+        {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
             Route::get('/marche/{id}', 'getByMarche');
@@ -325,11 +365,14 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
     }
     );
 });
-Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
-    Route::prefix('factures')->group(function () {
+Route::middleware('auth:sanctum')->prefix('finances')->group(function ()
+{
+    Route::prefix('factures')->group(function ()
+    {
         Route::get('/', [FactureController::class, 'all']);
         Route::get('/contrat/{id}', [FactureController::class, 'getByContrat']);
-        Route::controller(FactureAnnexeController::class)->prefix('annexes')->group(function () {
+        Route::controller(FactureAnnexeController::class)->prefix('annexes')->group(function ()
+        {
             Route::get('/', 'all');
             Route::post('/store', 'store');
             Route::get('/marche/{id}', 'getByMarche');
@@ -339,18 +382,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
             Route::patch('/restore/{id}', 'restore');
         }
         );
-        Route::controller(FactureLoyerController::class)->prefix('loyers')->group(function () {
-            Route::get('/', 'all');
-            Route::get('/trashed', 'trashed');
-            Route::post('/store', 'store');
-            Route::get('/marche/{id}', 'getByMarche');
-            Route::get('{id}', 'show');
-            Route::put('{id}', 'update');
-            Route::delete('{id}', 'trash');
-            Route::patch('/restore/{id}', 'restore');
-        }
-        );
-        Route::controller(FactureInitialeController::class)->prefix('initiales')->group(function () {
+        Route::controller(FactureLoyerController::class)->prefix('loyers')->group(function ()
+        {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
             Route::post('/store', 'store');
@@ -361,7 +394,20 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
             Route::patch('/restore/{id}', 'restore');
         }
         );
-        Route::controller(FactureEquipementController::class)->prefix('equipements')->group(function () {
+        Route::controller(FactureInitialeController::class)->prefix('initiales')->group(function ()
+        {
+            Route::get('/', 'all');
+            Route::get('/trashed', 'trashed');
+            Route::post('/store', 'store');
+            Route::get('/marche/{id}', 'getByMarche');
+            Route::get('{id}', 'show');
+            Route::put('{id}', 'update');
+            Route::delete('{id}', 'trash');
+            Route::patch('/restore/{id}', 'restore');
+        }
+        );
+        Route::controller(FactureEquipementController::class)->prefix('equipements')->group(function ()
+        {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
             Route::post('/store', 'store');
@@ -374,7 +420,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         );
     }
     );
-    Route::controller(ChequeController::class)->prefix('cheques')->group(function () {
+    Route::controller(ChequeController::class)->prefix('cheques')->group(function ()
+    {
         Route::get('/', 'all');
         Route::post('/store', 'store');
         Route::get('/marche/{id}', 'getByMarche');
@@ -384,7 +431,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(PaiementLigneController::class)->prefix('paiementsLignes')->group(function () {
+    Route::controller(PaiementLigneController::class)->prefix('paiementsLignes')->group(function ()
+    {
         Route::get('/', 'all');
         Route::post('/store', 'store');
         Route::get('/marche/{id}', 'getByMarche');
@@ -394,7 +442,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(CommercialController::class)->prefix('commerciaux')->group(function () {
+    Route::controller(CommercialController::class)->prefix('commerciaux')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/users', 'user');
         Route::get('/trashed', 'trashed');
@@ -407,7 +456,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(BordereauController::class)->prefix('bordereaux')->group(function () {
+    Route::controller(BordereauController::class)->prefix('bordereaux')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
@@ -418,7 +468,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::patch('/restore/{id}', 'restore');
     }
     );
-    Route::controller(AttributionEmplacementController::class)->prefix('attributions')->group(function () {
+    Route::controller(AttributionEmplacementController::class)->prefix('attributions')->group(function ()
+    {
         Route::get('/', 'all');
         Route::get('/with-bordereau', 'allWithBordereau');
         Route::post('/store', 'store');
@@ -427,7 +478,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::delete('{id}', 'trash');
     }
     );
-    Route::controller(CollecteController::class)->prefix('collectes')->group(function () {
+    Route::controller(CollecteController::class)->prefix('collectes')->group(function ()
+    {
         Route::get('/', 'all');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
