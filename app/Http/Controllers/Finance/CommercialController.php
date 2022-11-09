@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
-use App\Models\Architecture\Emplacement;
 use App\Models\Finance\Commercial;
-use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 

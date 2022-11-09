@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Models\caisse;
+namespace App\Models\Caisse;
 
 use App\Enums\StatusGuichet;
 use App\Models\Architecture\Site;
+use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Guichet extends Model
 {
-    use HasStatuses, SoftDeletes;
+    use HasStatuses, RecentOrder, SoftDeletes;
 
     protected $fillable = ['nom', 'code', 'site_id'];
     /**
@@ -29,7 +30,7 @@ class Guichet extends Model
     public function codeGenerate(): void
     {
         $rang = $this->count() + 1;
-        $this->attributes['code'] = GUICHET_CODE_PREFIXE . str_pad((string)$rang, 7, '0', STR_PAD_LEFT);
+        $this->attributes['code'] = GUICHET_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
     public function close(): void

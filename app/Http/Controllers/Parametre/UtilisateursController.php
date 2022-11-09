@@ -59,6 +59,9 @@ class UtilisateursController extends Controller
                 unlink(public_path() . '/storage/' . $user->avatar);
                 $path = substr($request->file('image')->store('public/user-' . $request->id), 7);
                 $user->avatar = $path;
+            } else if ($request->hasFile('image') and empty($user->avatar)) {
+                $path = substr($request->file('image')->store('public/user-' . $request->id), 7);
+                $user->avatar = $path;
             }
             $user->save();
             $message = "Utilisateur a été modifié avec succes. \n
@@ -113,11 +116,13 @@ class UtilisateursController extends Controller
             }
         }
 
-        return response()->json([
-            'message' => $message,
-            'directs' => $directPermissions,
-            'requete' => $request->all(),
-        ]);
+        return response()->json(
+            [
+                'message' => $message,
+                'directs' => $directPermissions,
+                'requete' => $request->all(),
+            ]
+        );
     }
 
     public function autoriserByRole(Request $request): JsonResponse
@@ -152,6 +157,12 @@ class UtilisateursController extends Controller
     public function uncommercials()
     {
         $users = User::doesntHave('commercial')->get();
+        return response()->json(['users' => $users]);
+    }
+
+    public function uncashiers()
+    {
+        $users = User::doesntHave('caissier')->get();
         return response()->json(['users' => $users]);
     }
 }

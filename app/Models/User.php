@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Caisse\Caissier;
 use App\Models\Finance\Commercial;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -97,5 +98,10 @@ class User extends Authenticatable
     public function commercial()
     {
         return $this->hasOne(Commercial::class);
+    }
+
+    public function caissier()
+    {
+        return $this->hasOne(Caissier::class);
     }
 }

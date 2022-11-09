@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Parametre\caisse;
+namespace App\Http\Controllers\Parametre\Caisse;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\StandardControllerInterface;
-use App\Models\caisse\Guichet;
+use App\Models\Caisse\Guichet;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
