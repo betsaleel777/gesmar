@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Caisse;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Caisse\Caissier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -37,18 +36,18 @@ class CaissierController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $caissier = Caissier::withTrashed()->findOrFail($id);
+        $caissier = Caissier::with('attributions')->findOrFail($id);
         return response()->json(['caissier' => $caissier]);
     }
 
     public function attribuate(Request $request): JsonResponse
     {
         $request->validate(Caissier::ATTRIBUTION_RULES);
-        $caissier = Caissier::findOrFail($request->commercial);
-        foreach ($request->emplacements as $emplacement) {
-            $caissier->emplacements()->attach($emplacement['id'], ['jour' => $request->jour]);
+        $caissier = Caissier::findOrFail($request->caissier_id);
+        foreach ($request->dates as $dates) {
+            $caissier->attributions()->attach($request->guichet_id, ['date' => $dates]);
         }
-        $message = "Emplacement(s) attribué(s) avec succès.";
+        $message = "Guichet attribué avec succès.";
         return response()->json(['message' => $message]);
     }
 }

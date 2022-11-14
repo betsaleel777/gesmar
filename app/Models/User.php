@@ -6,6 +6,7 @@ use App\Models\Caisse\Caissier;
 use App\Models\Finance\Commercial;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -95,12 +96,20 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function commercial()
+    /**
+     * Summary of commercial
+     * @return HasOne<Commercial>
+     */
+    public function commercial(): HasOne
     {
         return $this->hasOne(Commercial::class);
     }
 
-    public function caissier()
+    /**
+     * Summary of caissier
+     * @return HasOne<Caissier>
+     */
+    public function caissier(): HasOne
     {
         return $this->hasOne(Caissier::class);
     }

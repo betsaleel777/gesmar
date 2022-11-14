@@ -47,9 +47,8 @@ class Attribution extends Model
     }
 
     /**
-     * Obtenir les commerciaux d'une attribution d'emplacement
      *
-     * @return BelongsTo<Commercial, Attribution>
+     * @return BelongsTo<Emplacement, Attribution>
      */
     public function emplacement(): BelongsTo
     {
@@ -63,7 +62,7 @@ class Attribution extends Model
      */
     public function bordereau(): BelongsTo
     {
-        return $this->belongsTo(Bordereau::class , 'jour', 'date_attribution');
+        return $this->belongsTo(Bordereau::class, 'jour', 'date_attribution');
     }
 
     /**

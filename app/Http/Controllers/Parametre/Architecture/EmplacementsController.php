@@ -35,7 +35,7 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['emplacements' => $emplacements]);
     }
 
-    public function allAuto()
+    public function allAuto(): JsonResponse
     {
         $emplacements = Emplacement::with('zone.niveau.pavillon.site')->withoutSchedule()->get();
         return response()->json(['emplacements' => $emplacements]);

@@ -18,12 +18,12 @@ trait HasCashStatus
         $this->setStatus(StatusBordereau::PAS_ENCAISSE->value);
     }
 
-    public function cashed()
+    public function cashed(): bool
     {
         return $this->status === StatusBordereau::ENCAISSE->value;
     }
 
-    public function uncashed()
+    public function uncashed(): bool
     {
         return $this->status === StatusBordereau::PAS_ENCAISSE->value;
     }

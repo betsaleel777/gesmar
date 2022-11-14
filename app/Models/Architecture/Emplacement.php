@@ -28,6 +28,10 @@ class Emplacement extends Model
     use RecentOrder;
 
 
+    /**
+     * Summary of stateMachines
+     * @var array<string, string>
+     */
     public $stateMachines = [
         'disponibilite' => StatusDisponibiliteState::class,
         'liaison' => StatusLiaisonsState::class
@@ -67,7 +71,7 @@ class Emplacement extends Model
     protected function auto(): Attribute
     {
         return Attribute::make(
-            get: fn () =>  $this->type->auto_valid,
+        get: fn() => $this->type->auto_valid,
         );
     }
 
@@ -145,7 +149,7 @@ class Emplacement extends Model
      */
     public function scopeWithoutSchedule(Builder $query): Builder
     {
-        return $query->whereHas('type', fn (Builder $query) => $query->where('auto_valid', true));
+        return $query->whereHas('type', fn(Builder $query) => $query->where('auto_valid', true));
     }
 
     //relations

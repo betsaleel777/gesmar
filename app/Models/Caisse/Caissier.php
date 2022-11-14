@@ -7,6 +7,7 @@ use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Caissier extends Model
 {
@@ -23,7 +24,7 @@ class Caissier extends Model
     ];
 
     const ATTRIBUTION_RULES = [
-        'jours' => 'required',
+        'dates' => 'required',
         'guichet_id' => 'required|numeric',
     ];
 
@@ -41,5 +42,15 @@ class Caissier extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Obtenir les attributions de guichet d'un caissier
+     *
+     * @return BelongsToMany<Guichet>
+     */
+    public function attributions(): BelongsToMany
+    {
+        return $this->belongsToMany(Guichet::class, 'attribution_guichets', 'caissier_id', 'guichet_id')->withPivot('date')->withTimestamps();
     }
 }

@@ -30,8 +30,9 @@ class AbonnementsController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate(Abonnement::RULES);
+        $abonnement = new Abonnement;
         foreach ($request->equipements as $equipement) {
-            $abonnement = new Abonnement($request->all());
+            $abonnement->fill($request->all());
             $abonnement->code = self::codeGenerate($request->site_id);
             $abonnement->index_depart = $equipement['index_depart'];
             $abonnement->index_autre = $equipement['index_autre'];
