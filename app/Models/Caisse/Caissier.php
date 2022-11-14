@@ -2,6 +2,7 @@
 
 namespace App\Models\Caisse;
 
+use App\Models\User;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
