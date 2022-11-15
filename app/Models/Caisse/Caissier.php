@@ -51,6 +51,6 @@ class Caissier extends Model
      */
     public function attributions(): BelongsToMany
     {
-        return $this->belongsToMany(Guichet::class, 'attribution_guichets', 'caissier_id', 'guichet_id')->withPivot('date')->withTimestamps();
+        return $this->belongsToMany(Guichet::class, 'attribution_guichets', 'caissier_id', 'guichet_id')->withPivot('date', 'id')->withTimestamps();
     }
 }
