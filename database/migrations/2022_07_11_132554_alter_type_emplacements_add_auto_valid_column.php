@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('type_emplacements', function (Blueprint $table) {
-            //
+            $table->boolean('auto_valid')->default(false);
         });
     }
 };

@@ -25,7 +25,7 @@ return new class extends Migration {
     public function down()
     {
         Schema::table('caissiers', function (Blueprint $table) {
-            //
+            $table->string('code', 10)->unique();
         });
     }
 };

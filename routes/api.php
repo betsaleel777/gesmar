@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Caisse\BanqueController;
 use App\Http\Controllers\Caisse\CaissierController;
 use App\Http\Controllers\Exploitation\Reception\ClientsController;
 use App\Http\Controllers\Exploitation\Reception\ContratController;
@@ -255,6 +256,14 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
         Route::post('/attribuer', 'attribuate');
+        Route::put('{id}', 'update');
+        Route::get('{id}', 'show');
+    }
+    );
+    Route::controller(BanqueController::class)->prefix('banques')->group(function () {
+        Route::get('/', 'all');
+        Route::get('/trashed', 'trashed');
+        Route::post('/store', 'store');
         Route::put('{id}', 'update');
         Route::get('{id}', 'show');
     }

@@ -12,8 +12,12 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::table('commercials', function (Blueprint $table) {
-            $table->string('code', 10);
+        Schema::create('banques', function (Blueprint $table) {
+            $table->id();
+            $table->string('code', 50)->unique();
+            $table->string('nom');
+            $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
+            $table->timestamps();
         });
     }
 
@@ -24,8 +28,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::table('commercials', function (Blueprint $table) {
-            $table->string('code', 10);
-        });
+        Schema::dropIfExists('banques');
     }
 };

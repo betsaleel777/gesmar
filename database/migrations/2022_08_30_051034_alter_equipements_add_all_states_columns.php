@@ -26,7 +26,8 @@ return new class () extends Migration {
     public function down()
     {
         Schema::table('equipements', function (Blueprint $table) {
-            //
+            $table->string('liaison');
+            $table->string('abonnement');
         });
     }
 };
