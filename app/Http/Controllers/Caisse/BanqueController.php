@@ -24,7 +24,7 @@ class BanqueController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    public function show($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         $banque = Banque::findOrFail($id);
         return response()->json(['banque' => $banque]);

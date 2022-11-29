@@ -57,7 +57,7 @@ class Abonnement extends Model
             $equipement = Equipement::findOrFail($abonnement->equipement_id);
             $equipement->emplacement_id = $abonnement->emplacement_id;
             $equipement->save();
-            $equipement->abonement === StatusEquipement::LINKED->value ?: $equipement->lier();
+            $equipement->abonnement === StatusEquipement::LINKED->value ?: $equipement->lier();
             $equipement->abonner();
         });
     }

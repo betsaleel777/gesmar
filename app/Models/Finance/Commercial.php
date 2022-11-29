@@ -3,6 +3,7 @@
 namespace App\Models\Finance;
 
 use App\Models\User;
+use App\Models\Finance\Attribution;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,7 @@ class Commercial extends Model
     public function codeGenerate(): void
     {
         $rang = $this->count() + 1;
-        $this->attributes['code'] = COMMERCIAL_CODE_PREFIXE . str_pad((string)$rang, 7, '0', STR_PAD_LEFT);
+        $this->attributes['code'] = COMMERCIAL_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -51,7 +52,7 @@ class Commercial extends Model
     /**
      * Obtenir les emplacements attribués à un commercial
      *
-     * @return HasMany<Emplacement>
+     * @return HasMany<Attribution>
      */
     public function attributions(): HasMany
     {

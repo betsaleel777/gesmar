@@ -43,7 +43,7 @@ class Collecte extends Model
                 $attribution->encaisser();
             }
             // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
-            $bordereau = Bordereau::with('attributions')->findOrFail($attribution->bordereau->id);
+            $bordereau = Bordereau::with('attributions')->findOrFail($attribution->bordereau?->id);
             $bordereau->attributions->contains('status', StatusBordereau::PAS_ENCAISSE->value) ?: $bordereau->encaisser();
         });
 
@@ -51,7 +51,7 @@ class Collecte extends Model
             $attribution = Attribution::with('bordereau')->findOrFail($collecte->attribution_id);
             $attribution->pasEncaisser();
             // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
-            $bordereau = Bordereau::with('attributions')->findOrFail($attribution->bordereau->id);
+            $bordereau = Bordereau::with('attributions')->findOrFail($attribution->bordereau?->id);
             $bordereau->attributions->contains('status', StatusBordereau::PAS_ENCAISSE->value) ?: $bordereau->encaisser();
         });
     }

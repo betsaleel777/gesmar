@@ -25,7 +25,16 @@ class Facture extends Model
     use RecentOrder;
 
     protected $fillable = [
-        'code', 'contrat_id', 'annexe_id', 'index_debut', 'index_fin', 'equipement_id', 'avance', 'caution', 'pas_porte', 'periode',
+        'code',
+        'contrat_id',
+        'annexe_id',
+        'index_debut',
+        'index_fin',
+        'equipement_id',
+        'avance',
+        'caution',
+        'pas_porte',
+        'periode',
     ];
     /**
      *
@@ -52,7 +61,7 @@ class Facture extends Model
     public function codeGenerate(string $prefix): void
     {
         $rang = $this->count() + 1;
-        $this->attributes['code'] = $prefix . str_pad((string)$rang, 7, '0', STR_PAD_LEFT);
+        $this->attributes['code'] = $prefix . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -62,11 +71,13 @@ class Facture extends Model
      */
     public static function initialeRules(): array
     {
-        return [...self::RULES, ...[
+        return [
+            ...self::RULES, ...[
                 'avance' => 'required|numeric',
                 'caution' => 'required|numeric',
                 'pas_porte' => 'required|numeric',
-            ]];
+            ]
+        ];
     }
 
     const INITIALE_EDIT_RULES = [
@@ -82,11 +93,13 @@ class Facture extends Model
      */
     public static function gearRules(): array
     {
-        return [...self::RULES, ...[
+        return [
+            ...self::RULES, ...[
                 'equipement_id' => 'required|numeric',
                 'index_debut' => 'required|numeric',
                 'index_fin' => 'required|numeric',
-            ]];
+            ]
+        ];
     }
 
     /**
@@ -264,7 +277,7 @@ class Facture extends Model
     /**
      * Obtenir les paiements d'une facture
      *
-     * @return HasMany<Versement>
+     * @return HasMany<Paiement>
      */
     public function paiements(): HasMany
     {

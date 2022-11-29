@@ -448,6 +448,91 @@ namespace App\Models\Architecture{
 	class IdeHelperZone {}
 }
 
+namespace App\Models\Caisse{
+/**
+ * App\Models\Caisse\Banque
+ *
+ * @property int $id
+ * @property string $code
+ * @property string $nom
+ * @property int $site_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Architecture\Site $site
+ * @method static \Illuminate\Database\Eloquent\Builder|Banque newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Banque newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Banque query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Banque whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Banque whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Banque whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Banque whereNom($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Banque whereSiteId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Banque whereUpdatedAt($value)
+ */
+	class IdeHelperBanque {}
+}
+
+namespace App\Models\Caisse{
+/**
+ * App\Models\Caisse\Caissier
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $code
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Caisse\Guichet[] $attributions
+ * @property-read int|null $attributions_count
+ * @property-read \App\Models\User $user
+ * @method static \Database\Factories\Caisse\CaissierFactory factory(...$parameters)
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier whereUserId($value)
+ */
+	class IdeHelperCaissier {}
+}
+
+namespace App\Models\Caisse{
+/**
+ * App\Models\Caisse\Guichet
+ *
+ * @property int $id
+ * @property string $nom
+ * @property string $code
+ * @property int $site_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read string $status
+ * @property-read \App\Models\Architecture\Site $site
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\ModelStatus\Status[] $statuses
+ * @property-read int|null $statuses_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet closed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet currentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet newQuery()
+ * @method static \Illuminate\Database\Query\Builder|Guichet onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet opened()
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet otherCurrentStatus(...$names)
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet whereNom($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet whereSiteId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Guichet whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|Guichet withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|Guichet withoutTrashed()
+ */
+	class IdeHelperGuichet {}
+}
+
 namespace App\Models\Exploitation{
 /**
  * App\Models\Exploitation\Contrat
@@ -487,9 +572,9 @@ namespace App\Models\Exploitation{
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat aborted()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat currentStatus(...$names)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat enAttente()
+ * @method static \Illuminate\Database\Eloquent\Builder|Contrat inProcess()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat isAnnexe()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat isBail()
- * @method static \Illuminate\Database\Eloquent\Builder|Contrat isValidated()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat notAborted()
@@ -498,6 +583,7 @@ namespace App\Models\Exploitation{
  * @method static \Illuminate\Database\Query\Builder|Contrat onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat otherCurrentStatus(...$names)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Contrat validated()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat whereAnnexeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat whereAttachment($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat whereAutoValid($value)
@@ -584,7 +670,7 @@ namespace App\Models\Exploitation{
  * @property string $code
  * @property string $adresse
  * @property string $contact
- * @property string|null $email
+ * @property string $email
  * @property string $ville
  * @property int $site_id
  * @property int|null $type_personne_id
@@ -704,7 +790,6 @@ namespace App\Models\Finance{
  * @method static \Illuminate\Database\Eloquent\Builder|Attribution whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Attribution whereJour($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Attribution whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperAttribution {}
 }
@@ -738,7 +823,6 @@ namespace App\Models\Finance{
  * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereDateAttribution($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperBordereau {}
 }
@@ -788,7 +872,6 @@ namespace App\Models\Finance{
  * @method static \Illuminate\Database\Eloquent\Builder|Collecte whereMontant($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collecte whereNombre($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collecte whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperCollecte {}
 }
@@ -820,7 +903,6 @@ namespace App\Models\Finance{
  * @method static \Illuminate\Database\Eloquent\Builder|Commercial whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|Commercial withTrashed()
  * @method static \Illuminate\Database\Query\Builder|Commercial withoutTrashed()
- * @mixin \Eloquent
  */
 	class IdeHelperCommercial {}
 }
@@ -969,6 +1051,7 @@ namespace App\Models\Template{
  *
  * @property int $id
  * @property string $code
+ * @property string $type
  * @property string $contenu
  * @property int $user_id
  * @property int $site_id
@@ -976,7 +1059,6 @@ namespace App\Models\Template{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string $type
  * @property-read \App\Models\Architecture\Site $site
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat newModelQuery()
@@ -1005,6 +1087,7 @@ namespace App\Models\Template{
  *
  * @property int $id
  * @property string $code
+ * @property string $type
  * @property string $contenu
  * @property int $user_id
  * @property int $site_id
@@ -1012,7 +1095,6 @@ namespace App\Models\Template{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string $type
  * @property-read \App\Models\Architecture\Site $site
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe isAnnexe()
@@ -1042,6 +1124,7 @@ namespace App\Models\Template{
  *
  * @property int $id
  * @property string $code
+ * @property string $type
  * @property string $contenu
  * @property int $user_id
  * @property int $site_id
@@ -1049,7 +1132,6 @@ namespace App\Models\Template{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string $type
  * @property-read \App\Models\Architecture\Site $site
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement isEmplacement()
@@ -1090,6 +1172,7 @@ namespace App\Models{
  * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property string|null $avatar
+ * @property-read \App\Models\Caisse\Caissier|null $caissier
  * @property-read \App\Models\Finance\Commercial|null $commercial
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count

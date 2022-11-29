@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\ModelStatus\HasStatuses;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @mixin IdeHelperGuichet
+ */
 class Guichet extends Model
 {
     use HasStatuses, RecentOrder, SoftDeletes;

@@ -154,13 +154,13 @@ class UtilisateursController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    public function uncommercials()
+    public function uncommercials(): JsonResponse
     {
         $users = User::doesntHave('commercial')->get();
         return response()->json(['users' => $users]);
     }
 
-    public function uncashiers()
+    public function uncashiers(): JsonResponse
     {
         $users = User::doesntHave('caissier')->get();
         return response()->json(['users' => $users]);

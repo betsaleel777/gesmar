@@ -30,7 +30,7 @@ class Emplacement extends Model
 
     /**
      * Summary of stateMachines
-     * @var array<string, string>
+     * @var array<string, class-string>
      */
     public $stateMachines = [
         'disponibilite' => StatusDisponibiliteState::class,
@@ -226,7 +226,7 @@ class Emplacement extends Model
      */
     public function contratActuel(): HasOne
     {
-        return $this->hasOne(Contrat::class)->isValidated();
+        return $this->hasOne(Contrat::class)->validated();
     }
 
     /**

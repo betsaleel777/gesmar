@@ -20,11 +20,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Equipement extends Model
 {
-    use HasFactory,SoftDeletes,HasStateMachines,RecentOrder;
+    use HasFactory, SoftDeletes, HasStateMachines, RecentOrder;
 
     /**
      *
-     * @var array<string, string>
+     * @var array<string, class-string>
      */
     public $stateMachines = [
         'abonnement' => StatusAbonnementState::class,
@@ -68,7 +68,7 @@ class Equipement extends Model
     {
         static::deleted(function (Equipement $equipement): void {
             Emplacement::findOrFail($equipement->emplacement_id)->delier();
-            Facture::whereHas('equipement', fn ($query) => $query->where('equipement_id', $equipement->id))->get()->all()->map->delete();
+            Facture::whereHas('equipement', fn($query) => $query->where('equipement_id', $equipement->id))->get()->all()->map->delete();
         });
     }
     /**
@@ -78,7 +78,7 @@ class Equipement extends Model
     protected function alias(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->attributes['code'] . ' ' . $this->type->nom,
+        get: fn() => $this->attributes['code'] . ' ' . $this->type->nom,
         );
     }
 

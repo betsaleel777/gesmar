@@ -61,7 +61,7 @@ class GuichetController extends Controller implements StandardControllerInterfac
 
     public function show(int $id): JsonResponse
     {
-        $guichet = Guichet::withTrashed()->findOrFail($id);
+        $guichet = Guichet::findOrFail($id)->withTrashed();
         return response()->json(['guichet' => $guichet]);
     }
 }

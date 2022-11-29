@@ -42,7 +42,7 @@ class AttributionEmplacementController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    public function trash(int $id)
+    public function trash(int $id): JsonResponse
     {
         $attribution = Attribution::with('emplacement')->findOrFail($id);
         $attribution->delete();
@@ -51,7 +51,7 @@ class AttributionEmplacementController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    public function transfer(int $id, Request $request)
+    public function transfer(int $id, Request $request): JsonResponse
     {
         $request->validate(ATTRIBUTION::TRANSFERT_RULES);
         $attributions = Attribution::where('commercial_id', $request->commercial_id)->where('jour', $request->date)->get();
