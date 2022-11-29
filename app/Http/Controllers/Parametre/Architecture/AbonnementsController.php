@@ -90,7 +90,7 @@ class AbonnementsController extends Controller
         $abonnement->index_fin = $request->indexFin;
         $abonnement->save();
         $abonnement->stop();
-        (new AbonnementResilied($abonnement))->dispatch();
+        AbonnementResilied::dispatch($abonnement);
         $message = "L'abonnement $request->code a été résilié avec succès.";
         return response()->json(['message' => $message]);
     }

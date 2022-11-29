@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
 use App\Models\Finance\Attribution;
+use App\Models\Finance\Bordereau;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -33,6 +34,10 @@ class AttributionEmplacementController extends Controller
             $attribution->save();
             $attribution->pasEncaisser();
         }
+        $bordereau = new Bordereau(['date_attribution' => $request->jour, 'commercial_id' => $request->commercial]);
+        $bordereau->codeGenerate();
+        $bordereau->save();
+        $bordereau->pasEncaisser();
         $message = "Emplacement(s) attribué(s) avec succès.";
         return response()->json(['message' => $message]);
     }

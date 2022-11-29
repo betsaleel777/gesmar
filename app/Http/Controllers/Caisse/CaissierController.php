@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Caisse\Caissier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CaissierController extends Controller
 {
@@ -48,6 +49,13 @@ class CaissierController extends Controller
             $caissier->attributions()->attach($request->guichet_id, ['date' => $dates]);
         }
         $message = "Guichet attribué avec succès.";
+        return response()->json(['message' => $message]);
+    }
+
+    public function desattribuate(int $id): JsonResponse
+    {
+        DB::table('attribution_guichets')->delete($id);
+        $message = "Cette attribution de guichet a bien été modifiée.";
         return response()->json(['message' => $message]);
     }
 }

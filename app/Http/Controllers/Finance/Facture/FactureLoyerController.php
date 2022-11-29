@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class FactureLoyerController extends Controller
 {
-    const RELATIONS = [self::RELATIONS];
+    const RELATIONS = ['contrat.site', 'contrat.emplacement', 'contrat.personne'];
 
     public function all(): JsonResponse
     {

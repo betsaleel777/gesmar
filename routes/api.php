@@ -256,6 +256,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
         Route::post('/attribuer', 'attribuate');
+        Route::delete('/desattribuer/{id}', 'desattribuate');
         Route::put('{id}', 'update');
         Route::get('{id}', 'show');
     }
