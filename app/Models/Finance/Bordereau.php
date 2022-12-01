@@ -32,7 +32,7 @@ class Bordereau extends Model
     public function codeGenerate(): void
     {
         $rang = $this->count() + 1;
-        $this->attributes['code'] = BORDEREAU_CODE_PREFIXE . str_pad((string)$rang, 7, '0', STR_PAD_LEFT);
+        $this->attributes['code'] = BORDEREAU_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -62,7 +62,7 @@ class Bordereau extends Model
      */
     public function attributions(): HasMany
     {
-        return $this->hasMany(Attribution::class , 'jour', 'date_attribution');
+        return $this->hasMany(Attribution::class);
     }
 
     /**

@@ -12,12 +12,8 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('bordereaus', function (Blueprint $table) {
-            $table->id();
-            $table->string('code')->unique();
-            $table->foreignId('commercial_id')->constrained('commercials')->onDelete('cascade')->onUpdate('cascade');
-            $table->date('date_attribution');
-            $table->timestamps();
+        Schema::table('attribution_emplacements', function (Blueprint $table) {
+            $table->foreignId('bordereau_id')->constrained('bordereaus')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -28,6 +24,8 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('bordereaus');
+        Schema::table('attribution_emplacements', function (Blueprint $table) {
+            $table->foreignId('bordereau_id')->constrained('bordereaus')->onDelete('cascade')->onUpdate('cascade');
+        });
     }
 };

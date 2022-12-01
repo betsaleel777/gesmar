@@ -19,7 +19,7 @@ class Attribution extends Model
 {
     use HasStatuses, RecentOrder, HasCashStatus;
 
-    protected $fillable = ['commercial_id', 'emplacement_id', 'jour'];
+    protected $fillable = ['commercial_id', 'emplacement_id', 'bordereau_id', 'jour'];
     protected $table = 'attribution_emplacements';
     /**
      *
@@ -62,7 +62,7 @@ class Attribution extends Model
      */
     public function bordereau(): BelongsTo
     {
-        return $this->belongsTo(Bordereau::class, 'jour', 'date_attribution');
+        return $this->belongsTo(Bordereau::class);
     }
 
     /**

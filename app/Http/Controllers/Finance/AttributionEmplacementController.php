@@ -26,18 +26,20 @@ class AttributionEmplacementController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate(Attribution::RULES);
+        $bordereau = new Bordereau(['date_attribution' => $request->jour, 'commercial_id' => $request->commercial]);
+        $bordereau->codeGenerate();
+        $bordereau->save();
+        $bordereau->pasEncaisser();
+        $attributions_avances = Attribution::where('jour', $request->jour)->where('commercial_id', $request->commercial);
         foreach ($request->emplacements as $emplacement) {
             $attribution = new Attribution();
             $attribution->commercial_id = $request->commercial;
             $attribution->jour = $request->jour;
             $attribution->emplacement_id = $emplacement['id'];
+            $attribution->bordereau_id = $bordereau->id;
             $attribution->save();
             $attribution->pasEncaisser();
         }
-        $bordereau = new Bordereau(['date_attribution' => $request->jour, 'commercial_id' => $request->commercial]);
-        $bordereau->codeGenerate();
-        $bordereau->save();
-        $bordereau->pasEncaisser();
         $message = "Emplacement(s) attribué(s) avec succès.";
         return response()->json(['message' => $message]);
     }

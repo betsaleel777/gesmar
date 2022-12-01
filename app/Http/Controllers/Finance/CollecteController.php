@@ -35,6 +35,7 @@ class CollecteController extends Controller
                     'commercial_id' => $attribution->commercial_id,
                     'emplacement_id' => $attribution->emplacement_id,
                     'jour' => $date->format('Y-m-d'),
+                    'bordereau_id' => $attribution->bordereau_id,
                 ]);
                 $futurAttribution->save();
                 $futurAttribution->encaisser();
