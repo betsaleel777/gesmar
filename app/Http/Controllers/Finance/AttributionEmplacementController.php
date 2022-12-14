@@ -23,20 +23,29 @@ class AttributionEmplacementController extends Controller
         return response()->json(['attributions' => $attributions]);
     }
 
+    public function allAttribuated(string $date, int $commercial): JsonResponse
+    {
+        $emplacements = Attribution::where('jour', $date)->where('commercial_id', $commercial)->pluck('emplacement_id');
+        return response()->json(['emplacements' => $emplacements]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $request->validate(Attribution::RULES);
-        $bordereau = new Bordereau(['date_attribution' => $request->jour, 'commercial_id' => $request->commercial]);
-        $bordereau->codeGenerate();
-        $bordereau->save();
-        $bordereau->pasEncaisser();
-        $attributions_avances = Attribution::where('jour', $request->jour)->where('commercial_id', $request->commercial);
+        $id_bordereau = $request->input('bordereau');
+        if (empty($id_bordereau)) {
+            $bordereau = new Bordereau(['date_attribution' => $request->jour, 'commercial_id' => $request->commercial]);
+            $bordereau->codeGenerate();
+            $bordereau->save();
+            $bordereau->pasEncaisser();
+            $id_bordereau = $bordereau->id;
+        }
         foreach ($request->emplacements as $emplacement) {
             $attribution = new Attribution();
             $attribution->commercial_id = $request->commercial;
             $attribution->jour = $request->jour;
             $attribution->emplacement_id = $emplacement['id'];
-            $attribution->bordereau_id = $bordereau->id;
+            $attribution->bordereau_id = $id_bordereau;
             $attribution->save();
             $attribution->pasEncaisser();
         }

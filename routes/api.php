@@ -450,6 +450,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
     );
     Route::controller(AttributionEmplacementController::class)->prefix('attributions')->group(function () {
         Route::get('/', 'all');
+        Route::get('/attribuated/{date}/{commercial}', 'allAttribuated');
         Route::get('/with-bordereau', 'allWithBordereau');
         Route::post('/store', 'store');
         Route::patch('/transferer/{id}', 'transfer');

@@ -2,6 +2,7 @@
 
 namespace App\Models\Finance;
 
+use App\Models\Architecture\Site;
 use App\Models\User;
 use App\Models\Finance\Attribution;
 use App\Traits\RecentOrder;
@@ -18,14 +19,15 @@ class Commercial extends Model
 {
     use HasFactory, RecentOrder, SoftDeletes;
 
-    protected $fillable = ['code', 'user_id'];
+    protected $fillable = ['code', 'user_id', 'site_id'];
     /**
      *
      * @var array<int, string>
      */
-    protected $with = ['user'];
+    protected $with = ['user', 'site'];
     const RULES = [
         'user_id' => 'required|numeric',
+        'site_id' => 'required|numeric',
     ];
 
     const ATTRIBUTION_RULES = [
@@ -67,5 +69,15 @@ class Commercial extends Model
     public function bordereaux(): HasMany
     {
         return $this->hasMany(Bordereau::class);
+    }
+
+    /**
+     * Obtenir le marche d'un commercial
+     *
+     * @return BelongsTo<Site, Commercial>
+     */
+    public function site(): BelongsTo
+    {
+        return $this->belongsTo(Site::class);
     }
 }
