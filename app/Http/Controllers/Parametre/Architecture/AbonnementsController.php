@@ -23,15 +23,16 @@ class AbonnementsController extends Controller
 
     public function all(): JsonResponse
     {
-        $abonnements = Abonnement::with('emplacement', 'equipement.type')->get();
+        $abonnements = Abonnement::with(['emplacement', 'equipement.type'])->get();
         return response()->json(['abonnements' => $abonnements]);
     }
 
     public function store(Request $request): JsonResponse
     {
         $request->validate(Abonnement::RULES);
+        $abonnement = new Abonnement;
         foreach ($request->equipements as $equipement) {
-            $abonnement = new Abonnement($request->all());
+            $abonnement->fill($request->all());
             $abonnement->code = self::codeGenerate($request->site_id);
             $abonnement->index_depart = $equipement['index_depart'];
             $abonnement->index_autre = $equipement['index_autre'];
@@ -68,14 +69,14 @@ class AbonnementsController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $abonnement = Abonnement::with('emplacement', 'equipement.type')->find($id);
+        $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->find($id);
         return response()->json(['abonnement' => $abonnement]);
     }
 
     public function lastIndex(int $id): JsonResponse
     {
         $equipement = null;
-        $abonnement = Abonnement::with('emplacement', 'equipement.type')->orderBy('id', 'DESC')->firstWhere('equipement_id', $id);
+        $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->orderBy('id', 'DESC')->firstWhere('equipement_id', $id);
         if (empty($abonnement->index_depart)) {
             $equipement = Equipement::findOrFail($id);
         }

@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('service_annexes', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 10);
             $table->string('nom', 250);
             $table->unsignedInteger('prix');
             $table->longText('description')->nullable();

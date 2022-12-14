@@ -17,17 +17,20 @@ class Zone extends Model
 
     protected $fillable = ['nom', 'code', 'niveau_id'];
 
-    /**
-     * Undocumented variable
-     *
-     * @var array<int, string>
-     */
-    protected $appends = ['code'];
-
     const RULES = [
         'nom' => 'required|max:150',
         'niveau_id' => 'required',
     ];
+    /**
+     *
+     * @var array<int, string>
+     */
+    protected $with = ['niveau.pavillon.site'];
+    /**
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['code'];
 
     const MIDDLE_RULES = [
         'niveau_id' => 'required',
@@ -45,12 +48,12 @@ class Zone extends Model
     protected function code(): Attribute
     {
         return Attribute::make(
-            get: fn () => str_pad((string) $this->attributes['code'], 4, '0', STR_PAD_LEFT),
+            get: fn () => $this->niveau->pavillon->code . $this->niveau->code . str_pad((string) $this->attributes['code'], 4, '0', STR_PAD_LEFT),
         );
     }
 
     /**
-     * Undocumented function
+     * Obtenir le niveau d'une zone
      *
      * @return BelongsTo<Niveau, Zone>
      */
@@ -60,7 +63,7 @@ class Zone extends Model
     }
 
     /**
-     * Undocumented function
+     * Obtenir les emplacement d'une zone
      *
      * @return HasMany<Emplacement>
      */

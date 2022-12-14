@@ -4,6 +4,7 @@ namespace App\Models\Architecture;
 
 use App\Enums\ModeServiceAnnexe;
 use App\Models\Exploitation\Contrat;
+use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,9 +15,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class ServiceAnnexe extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, RecentOrder;
 
-    protected $fillable = ['nom', 'site_id', 'prix', 'description', 'mode'];
+    protected $fillable = ['code', 'nom', 'site_id', 'prix', 'description', 'mode'];
 
     public const RULES = [
         'nom' => 'required|max:250',
@@ -24,6 +25,12 @@ class ServiceAnnexe extends Model
         'site_id' => 'required',
         'mode' => 'required',
     ];
+
+    public function codeGenerate(): void
+    {
+        $rang = $this->count() + 1;
+        $this->attributes['code'] = ANNEXE_CODE_PREFIXE . str_pad((string)$rang, 7, '0', STR_PAD_LEFT);
+    }
 
     public function forfaitaire(): void
     {
@@ -41,7 +48,7 @@ class ServiceAnnexe extends Model
     }
 
     /**
-     * Undocumented function
+     * Obtenir le site d'un service annexe
      *
      * @return BelongsTo<Site, ServiceAnnexe>
      */
@@ -51,7 +58,7 @@ class ServiceAnnexe extends Model
     }
 
     /**
-     * Undocumented function
+     * Obtenir les contrats d'un service annexe
      *
      * @return HasMany<Contrat>
      */

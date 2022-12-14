@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 class ValidationAbonnementController extends Controller implements WithoutTrashControllerInterface
 {
 
-    private static function statusChange(Request $request, ValidationAbonnement $validation)
+    private static function statusChange(Request $request, ValidationAbonnement $validation): void
     {
         if ($request->boolean('verdict')) {
             $validation->confirmer();

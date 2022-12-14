@@ -13,7 +13,6 @@ class TypeEmplacementsController extends Controller implements StandardControlle
     public function all(): JsonResponse
     {
         $types = Type::with('site')->get();
-
         return response()->json(['types' => $types]);
     }
 
@@ -24,7 +23,6 @@ class TypeEmplacementsController extends Controller implements StandardControlle
         $type->code = (string) (Type::count() + 1);
         $type->save();
         $message = "Le type d'emplacement $request->nom a été crée avec succès.";
-
         return response()->json(['message' => $message, 'id' => $type->id]);
     }
 
@@ -34,7 +32,6 @@ class TypeEmplacementsController extends Controller implements StandardControlle
         $type = Type::findOrFail($id);
         $type->update($request->all());
         $message = "Le type d'emplacement $request->nom a été modifié avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -45,7 +42,6 @@ class TypeEmplacementsController extends Controller implements StandardControlle
         $type->save();
         $message = "Le type d'emplacement $request->nom a été crée avec succès.";
         $freshMarche = $type->fresh();
-
         return response()->json(['message' => $message, 'marche' => $freshMarche]);
     }
 
@@ -54,7 +50,6 @@ class TypeEmplacementsController extends Controller implements StandardControlle
         $type = Type::findOrFail($id);
         $type->delete();
         $message = "Le type d'emplacement $type->nom a été supprimé avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -63,21 +58,18 @@ class TypeEmplacementsController extends Controller implements StandardControlle
         $type = Type::withTrashed()->find($id);
         $type->restore();
         $message = "Le type d'emplacement $type->nom a été restauré avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
     public function trashed(): JsonResponse
     {
         $types = Type::with('site')->onlyTrashed()->get();
-
         return response()->json(['types' => $types]);
     }
 
     public function show(int $id): JsonResponse
     {
         $type = Type::withTrashed()->find($id);
-
         return response()->json(['type' => $type]);
     }
 }

@@ -22,10 +22,10 @@ class EmplacementsController extends Controller implements StandardControllerInt
      */
     private static function codeGenerate(int $id): array
     {
-        $zone = Zone::with('niveau.pavillon', 'emplacements')->findOrFail($id);
+        $zone = Zone::with('emplacements')->findOrFail($id);
         $rang = (string) ($zone->emplacements->count() + 1);
         $place = str_pad($rang, 3, '0', STR_PAD_LEFT);
-        $code = $zone->niveau->pavillon->code . $zone->niveau->code . $zone->code . $place;
+        $code = $zone->code . $place;
         return ['code' => $code, 'rang' => $rang];
     }
 
@@ -35,9 +35,15 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['emplacements' => $emplacements]);
     }
 
+    public function allAuto(): JsonResponse
+    {
+        $emplacements = Emplacement::with('zone.niveau.pavillon.site')->withoutSchedule()->get();
+        return response()->json(['emplacements' => $emplacements]);
+    }
+
     public function equipables(): JsonResponse
     {
-        $emplacements = DB::table('emplacements')->select('emplacements.*', 'pavillons.site_id')
+        $emplacements = DB::table('emplacements')->select(['emplacements.*', 'pavillons.site_id'])
             ->join('zones', 'zones.id', '=', 'emplacements.zone_id')
             ->join('niveaux', 'zones.niveau_id', '=', 'niveaux.id')->join('pavillons', 'niveaux.pavillon_id', '=', 'pavillons.id')
             ->join('type_emplacements', 'type_emplacements.id', '=', 'emplacements.type_emplacement_id')
@@ -47,7 +53,7 @@ class EmplacementsController extends Controller implements StandardControllerInt
 
     public function show(int $id): JsonResponse
     {
-        $emplacement = Emplacement::with('type', 'zone.niveau.pavillon.site')->findOrFail($id);
+        $emplacement = Emplacement::with(['type', 'zone.niveau.pavillon.site'])->findOrFail($id);
         return response()->json(['emplacement' => $emplacement]);
     }
 
@@ -136,7 +142,7 @@ class EmplacementsController extends Controller implements StandardControllerInt
      */
     public function getByMarche(int $id): JsonResponse
     {
-        $emplacements = Emplacement::whereHas('site', fn (Builder $query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
@@ -148,8 +154,8 @@ class EmplacementsController extends Controller implements StandardControllerInt
      */
     public function getByMarcheWithGearsAndContracts(int $id): JsonResponse
     {
-        $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn (Builder $query) => $query->notAborted())
-            ->whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn(Builder $query) => $query->notAborted())
+            ->whereHas('site', fn($query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
@@ -161,7 +167,7 @@ class EmplacementsController extends Controller implements StandardControllerInt
      */
     public function getUnlinkedByMarche(int $id): JsonResponse
     {
-        $emplacements = Emplacement::isUnlinked()->whereHas('site', fn (Builder $query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::isUnlinked()->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
@@ -173,7 +179,7 @@ class EmplacementsController extends Controller implements StandardControllerInt
      */
     public function getFreeByMarche(int $id): JsonResponse
     {
-        $emplacements = Emplacement::isFree()->whereHas('site', fn (Builder $query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::isFree()->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
@@ -185,21 +191,21 @@ class EmplacementsController extends Controller implements StandardControllerInt
      */
     public function getBusyByMarche(int $id): JsonResponse
     {
-        $emplacements = Emplacement::isBusy()->whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::isBusy()->whereHas('site', fn($query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
     public function getRentalbyMonth(string $date): JsonResponse
     {
-        $emplacements = Emplacement::with('contratActuel.factureInitiale', 'contratActuel.personne')
+        $emplacements = Emplacement::with(['contratActuel.factureInitiale', 'contratActuel.personne'])
             ->whereHas(
                 'contratActuel.factureInitiale',
                 function (Builder $query) use ($date) {
                     $query->where('factures.code', 'LIKE', 'FAL%')->whereMonth('factures.periode', '!=', Carbon::parse($date)->format('m'))
                         ->whereYear('factures.periode', '!=', Carbon::parse($date)->format('Y'))->orWhereNull('factures.periode');
                 }
-            )->whereHas('contratActuel.personne', fn (Builder $query) => $query->isClient())
-            ->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false))->get();
+            )->whereHas('contratActuel.personne', fn(Builder $query) => $query->isClient())
+            ->whereHas('contratActuel', fn(Builder $query) => $query->where('auto_valid', false))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 }

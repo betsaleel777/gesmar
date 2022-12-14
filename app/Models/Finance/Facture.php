@@ -7,6 +7,7 @@ use App\Models\Architecture\Equipement;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Paiement;
+use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,9 +22,19 @@ class Facture extends Model
 {
     use HasFactory;
     use HasStatuses;
+    use RecentOrder;
 
     protected $fillable = [
-        'code', 'contrat_id', 'annexe_id', 'index_debut', 'index_fin', 'equipement_id', 'avance', 'caution', 'pas_porte', 'periode',
+        'code',
+        'contrat_id',
+        'annexe_id',
+        'index_debut',
+        'index_fin',
+        'equipement_id',
+        'avance',
+        'caution',
+        'pas_porte',
+        'periode',
     ];
     /**
      *
@@ -60,12 +71,20 @@ class Facture extends Model
      */
     public static function initialeRules(): array
     {
-        return [...self::RULES, ...[
-            'avance' => 'required|numeric',
-            'caution' => 'required|numeric',
-            'pas_porte' => 'required|numeric',
-        ]];
+        return [
+            ...self::RULES, ...[
+                'avance' => 'required|numeric',
+                'caution' => 'required|numeric',
+                'pas_porte' => 'required|numeric',
+            ]
+        ];
     }
+
+    const INITIALE_EDIT_RULES = [
+        'avance' => 'required|numeric',
+        'caution' => 'required|numeric',
+        'pas_porte' => 'required|numeric',
+    ];
 
     /**
      * règles du formulaire de création d'une facture d'équipement
@@ -74,11 +93,13 @@ class Facture extends Model
      */
     public static function gearRules(): array
     {
-        return [...self::RULES, ...[
-            'equipement_id' => 'required|numeric',
-            'index_debut' => 'required|numeric',
-            'index_fin' => 'required|numeric',
-        ]];
+        return [
+            ...self::RULES, ...[
+                'equipement_id' => 'required|numeric',
+                'index_debut' => 'required|numeric',
+                'index_fin' => 'required|numeric',
+            ]
+        ];
     }
 
     /**
@@ -209,7 +230,7 @@ class Facture extends Model
      */
     public function scopeIsSuperMarket(Builder $query): Builder
     {
-        return $query->whereHas('contrat', fn (Builder $query) => $query->where('auto_valid', false));
+        return $query->whereHas('contrat', fn(Builder $query) => $query->where('auto_valid', false));
     }
 
     // relations
@@ -256,7 +277,7 @@ class Facture extends Model
     /**
      * Obtenir les paiements d'une facture
      *
-     * @return HasMany<Versement>
+     * @return HasMany<Paiement>
      */
     public function paiements(): HasMany
     {

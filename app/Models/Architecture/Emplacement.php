@@ -6,6 +6,7 @@ use App\Enums\StatusEmplacement;
 use App\Models\Exploitation\Contrat;
 use App\States\Emplacement\StatusDisponibiliteState;
 use App\States\Emplacement\StatusLiaisonsState;
+use App\Traits\RecentOrder;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -24,8 +25,13 @@ class Emplacement extends Model
     use SoftDeletes;
     use HasStateMachines;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use RecentOrder;
 
 
+    /**
+     * Summary of stateMachines
+     * @var array<string, class-string>
+     */
     public $stateMachines = [
         'disponibilite' => StatusDisponibiliteState::class,
         'liaison' => StatusLiaisonsState::class
@@ -37,6 +43,11 @@ class Emplacement extends Model
      * @var array<int, string>
      */
     protected $with = ['type'];
+    /**
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['auto'];
 
     public const RULES = [
         'nom' => 'required|max:255',
@@ -60,7 +71,7 @@ class Emplacement extends Model
     protected function auto(): Attribute
     {
         return Attribute::make(
-            get: fn () =>  $this->type->auto_valid,
+        get: fn() => $this->type->auto_valid,
         );
     }
 
@@ -128,6 +139,17 @@ class Emplacement extends Model
     public function scopeIsUnlinked(Builder $query): Builder
     {
         return $query->where('liaison', StatusEmplacement::UNLINKED->value);
+    }
+
+    /**
+     * Obtenir les emplacements qui dont les contrat se valide sans passer par l'ordonnancement
+     *
+     * @param Builder<Emplacement> $query
+     * @return Builder<Emplacement>
+     */
+    public function scopeWithoutSchedule(Builder $query): Builder
+    {
+        return $query->whereHas('type', fn(Builder $query) => $query->where('auto_valid', true));
     }
 
     //relations
@@ -204,7 +226,7 @@ class Emplacement extends Model
      */
     public function contratActuel(): HasOne
     {
-        return $this->hasOne(Contrat::class)->isValidated();
+        return $this->hasOne(Contrat::class)->validated();
     }
 
     /**

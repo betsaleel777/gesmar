@@ -16,7 +16,7 @@ class AuthController extends Controller
             'email' => 'required',
             'password' => 'required',
         ]);
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only(['email', 'password']);
         if (Auth::attempt($credentials)) {
             $user = User::firstWhere('email', $request->email);
             $user->connect();
@@ -25,7 +25,7 @@ class AuthController extends Controller
 
             return response()->json(['message' => 'Bienvenue Dans Gesmar !!']);
         } else {
-            return response()->json(['message' => 'Invalid login details', 'credentials' => $credentials], 401);
+            return response()->json(['message' => 'Adresse ou mot de passe incorrecte', 'credentials' => $credentials], 401);
         }
     }
 
@@ -53,16 +53,5 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param  Request  $request
-     * @return JsonResponse
-     */
-    public function me(Request $request): JsonResponse
-    {
-        return response()->json($request->user());
     }
 }

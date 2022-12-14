@@ -3,6 +3,7 @@
 namespace App\Models\Architecture;
 
 use App\Models\Exploitation\Contrat;
+use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class TypeEquipement extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, RecentOrder;
 
     protected $fillable = ['nom', 'site_id', 'frais_penalite', 'caution_abonnement'];
 
@@ -53,6 +54,6 @@ class TypeEquipement extends Model
      */
     public function propositions(): BelongsToMany
     {
-        return $this->belongsToMany(Contrat::class, 'contrats_type_equipements', 'type_equipement_id', 'contrat_id')->withPivot('abonnable');
+        return $this->belongsToMany(Contrat::class , 'contrats_type_equipements', 'type_equipement_id', 'contrat_id')->withPivot('abonnable');
     }
 }

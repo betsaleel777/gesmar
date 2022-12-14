@@ -8,27 +8,29 @@ use Illuminate\Http\JsonResponse;
 
 class FactureController extends Controller
 {
+    const RELATIONS = ['contrat.personne', 'contrat.site'];
+
     public function all(): JsonResponse
     {
-        $factures = Facture::with('contrat.personne', 'contrat.site')->get();
+        $factures = Facture::with(self::RELATIONS)->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.personne', 'contrat.site')->isPaid()->get();
+        $factures = Facture::with(self::RELATIONS)->isPaid()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.personne', 'contrat.site')->isUnpaid()->get();
+        $factures = Facture::with(self::RELATIONS)->isUnpaid()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with('contrat.personne', 'contrat.site')->find($id);
+        $facture = Facture::with(self::RELATIONS)->find($id);
         return response()->json(['facture' => $facture]);
     }
 
@@ -43,13 +45,17 @@ class FactureController extends Controller
 
     public function getByContrat(int $id): JsonResponse
     {
-        $facturesInitiales = Facture::with('contrat.emplacement', 'paiements')->where('contrat_id', $id)->isInitiale()->isFacture()->isSuperMarket()->get();
-        $facturesInitiales->each(fn ($facture) => $facture->setAttribute('sommeVersee', $facture->paiements->sum('montant')));
+        $facturesInitiales = Facture::with(['contrat.emplacement', 'paiements'])->where('contrat_id', $id)->isInitiale()->isFacture()->isSuperMarket()->get();
+        $facturesInitiales->each(fn($facture) => $facture->setAttribute('sommeVersee', $facture->paiements->sum('montant')));
 
+        $facturesAnnexes = Facture::with(['contrat.annexe', 'paiements'])->where('contrat_id', $id)->isAnnexe()->isFacture()->get();
         $facturesLoyers = Facture::with('contrat.emplacement')->where('contrat_id', $id)->isLoyer()->isFacture()->get();
-        $facturesEquipements = Facture::with('contrat.equipement.type')->where('contrat_id', $id)->isEquipement()->isFacture()->get();
+        $facturesEquipements = Facture::with('contrat.factureEquipement.type')->where('contrat_id', $id)->isEquipement()->isFacture()->get();
         return response()->json([
-            'facturesInitiales' => $facturesInitiales, 'factureEquipements' => $facturesEquipements, 'facturesLoyers' => $facturesLoyers
+            'facturesInitiales' => $facturesInitiales,
+            'factureEquipements' => $facturesEquipements,
+            'facturesLoyers' => $facturesLoyers,
+            'facturesAnnexes' => $facturesAnnexes,
         ]);
     }
 }

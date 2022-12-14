@@ -22,10 +22,12 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     {
         $pavillons = Pavillon::with('niveaux')->findMany($ids);
         $niveaux = [];
+        /**
+         * @var $pavillon Pavillon
+         */
         foreach ($pavillons as $pavillon) {
             $niveaux[] = $pavillon->niveaux;
         }
-
         return $niveaux;
     }
 
@@ -45,7 +47,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
                 $start++;
                 $niveau = new Niveau();
                 $niveau->pavillon_id = $pavillon;
-                $niveau->nom = 'niveau '.$start;
+                $niveau->nom = 'niveau ' . $start;
                 $niveau->code = (string) $start;
                 $niveau->save();
             }
@@ -55,7 +57,6 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     public function all(): JsonResponse
     {
         $niveaux = Niveau::with('pavillon.site')->get();
-
         return response()->json(['niveaux' => $niveaux]);
     }
 
@@ -84,7 +85,6 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         $niveau->pavillon_id = $request->pavillon_id;
         $niveau->save();
         $message = 'Le niveau a été modifié avec succès.';
-
         return response()->json(['message' => $message]);
     }
 
@@ -93,7 +93,6 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         $request->validate(Niveau::PUSH_RULES);
         self::pusher($request->pavillons, $request->nombre);
         $message = "$request->nombre niveaux ont été crée avec succès.";
-
         return response()->json(['message' => $message, 'niveaux' => self::getMany($request->pavillons)]);
     }
 
@@ -102,7 +101,6 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         $niveau = Niveau::findOrFail($id);
         $niveau->delete();
         $message = "Le niveau $niveau->nom a été supprimé avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -111,21 +109,18 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         $niveau = Niveau::withTrashed()->find($id);
         $niveau->restore();
         $message = "Le niveau $niveau->nom a été restauré avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
     public function trashed(): JsonResponse
     {
         $niveaux = Niveau::with('pavillon')->onlyTrashed()->get();
-
         return response()->json(['niveaux' => $niveaux]);
     }
 
     public function show(int $id): JsonResponse
     {
         $niveau = Niveau::withTrashed()->find($id);
-
         return response()->json(['niveau' => $niveau]);
     }
 
@@ -143,7 +138,6 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     public function getByPavillon(int $id): JsonResponse
     {
         $niveaux = Pavillon::findOrFail($id)->niveaux;
-
         return response()->json(['niveaux' => $niveaux]);
     }
 }

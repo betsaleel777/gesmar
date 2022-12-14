@@ -11,29 +11,25 @@ class FactureEquipementController extends Controller
 {
     public function all(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'equipement')->isEquipement()->get();
-
+        $factures = Facture::with(['contrat.site', 'contrat.emplacement', 'equipement'])->isEquipement()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'equipement')->isPaid()->isEquipement()->get();
-
+        $factures = Facture::with(['contrat.site', 'contrat.emplacement', 'equipement'])->isPaid()->isEquipement()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with('contrat.site', 'contrat.emplacement', 'equipement')->isUnpaid()->isEquipement()->get();
-
+        $factures = Facture::with(['contrat.site', 'contrat.emplacement', 'equipement'])->isUnpaid()->isEquipement()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with('contrat.site', 'annexe')->isEquipement()->find($id);
-
+        $facture = Facture::with(['contrat.site', 'annexe'])->isEquipement()->find($id);
         return response()->json(['facture' => $facture]);
     }
 
@@ -45,7 +41,6 @@ class FactureEquipementController extends Controller
         $facture->codeGenerate(EQUIPEMENT_FACTURE_PREFIXE);
         $facture->save();
         $message = "La facture d'équipement $facture->code a été crée avec succès.";
-
         return response()->json(['message' => $message]);
     }
 }
