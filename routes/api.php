@@ -12,6 +12,7 @@ use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
 use App\Http\Controllers\Finance\AttributionEmplacementController;
 use App\Http\Controllers\Finance\BordereauController;
+use App\Http\Controllers\Finance\Caisse\OuvertureController;
 use App\Http\Controllers\Finance\ChequeController;
 use App\Http\Controllers\Finance\CollecteController;
 use App\Http\Controllers\Finance\CommercialController;
@@ -51,7 +52,7 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/
+ */
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
 });
@@ -74,20 +75,17 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('{id}', 'show');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(RolesController::class)->prefix('roles')->group(function () {
         Route::get('/', 'all');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
-    }
-    );
+    });
     Route::prefix('permissions')->group(function () {
         Route::get('/', [PermissionsController::class, 'all']);
         Route::get('/show/{id}', [PermissionsController::class, 'show']);
-    }
-    );
+    });
     Route::controller(SitesController::class)->prefix('marches')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -99,8 +97,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(PavillonsController::class)->prefix('pavillons')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -111,8 +108,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(NiveauxController::class)->prefix('niveaux')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -122,8 +118,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(ZonesController::class)->prefix('zones')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -134,8 +129,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(EmplacementsController::class)->prefix('emplacements')->group(function () {
         Route::get('/', 'all');
         Route::get('/autos', 'allAuto');
@@ -153,8 +147,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(AbonnementsController::class)->prefix('abonnements')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -166,8 +159,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::patch('finished/{id}', 'finish');
         Route::patch('/restore/{id}', 'restore');
         Route::get('/indexing/{id}', 'lastIndex');
-    }
-    );
+    });
     Route::controller(ServiceAnnexesController::class)->prefix('annexes')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -177,8 +169,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('{id}', 'show');
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
-    }
-    );
+    });
     Route::controller(EquipementsController::class)->prefix('equipements')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -189,8 +180,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(TypeEquipementsController::class)->prefix('equipement/types')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -199,8 +189,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(TypeEmplacementsController::class)->prefix('emplacement/types')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -209,8 +198,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::prefix('termes')->group(function () {
         Route::controller(TermesContratsAnnexesController::class)->prefix('annexes')->group(function () {
             Route::get('/', 'all');
@@ -221,8 +209,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
             Route::delete('{id}', 'trash');
             Route::put('{id}', 'update');
             Route::patch('/restore/{id}', 'restore');
-        }
-        );
+        });
         Route::controller(TermesContratsEmplacementsController::class)->prefix('emplacements')->group(function () {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
@@ -232,25 +219,21 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
             Route::delete('{id}', 'trash');
             Route::put('{id}', 'update');
             Route::patch('/restore/{id}', 'restore');
-        }
-        );
-    }
-    );
+        });
+    });
     Route::controller(ValidationAbonnementController::class)->prefix('validations/abonnement')->group(function () {
         Route::get('/', 'all');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
-    }
-    );
+    });
     Route::controller(GuichetController::class)->prefix('guichets')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
         Route::put('{id}', 'update');
         Route::get('{id}', 'show');
-    }
-    );
+    });
     Route::controller(CaissierController::class)->prefix('caissiers')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -259,16 +242,14 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('/desattribuer/{id}', 'desattribuate');
         Route::put('{id}', 'update');
         Route::get('{id}', 'show');
-    }
-    );
+    });
     Route::controller(BanqueController::class)->prefix('banques')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
         Route::put('{id}', 'update');
         Route::get('{id}', 'show');
-    }
-    );
+    });
 });
 
 Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
@@ -281,8 +262,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::put('{id}', 'update');
             Route::delete('{id}', 'trash');
             Route::patch('/restore/{id}', 'restore');
-        }
-        );
+        });
         Route::controller(ProspectsController::class)->prefix('prospects')->group(function () {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
@@ -291,8 +271,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::patch('/restore/{id}', 'restore');
             Route::put('{id}', 'update');
             Route::delete('{id}', 'trash');
-        }
-        );
+        });
         Route::controller(ClientsController::class)->prefix('clients')->group(function () {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
@@ -301,16 +280,14 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::patch('/restore/{id}', 'restore');
             Route::put('{id}', 'update');
             Route::delete('{id}', 'trash');
-        }
-        );
+        });
         Route::controller(OrdonnancementController::class)->prefix('ordonnancements')->group(function () {
             Route::get('/', 'all');
             Route::post('/store', 'store');
             Route::get('{id}', 'show');
             Route::put('{id}', 'update');
             Route::delete('{id}', 'trash');
-        }
-        );
+        });
         Route::prefix('contrats')->group(function () {
             Route::get('/', [ContratController::class, 'all']);
             Route::get('/scheduling', [ContratController::class, 'schedulableContrats']);
@@ -324,8 +301,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
                 Route::patch('/restore/{id}', 'restore');
                 Route::patch('/schedule/{id}', 'toSchedule');
                 Route::delete('{id}', 'trash');
-            }
-            );
+            });
             Route::controller(ContratsEmplacementsController::class)->prefix('emplacements')->group(function () {
                 Route::get('/', 'all');
                 Route::get('/valides', 'valides');
@@ -337,10 +313,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
                 Route::patch('/restore/{id}', 'restore');
                 Route::patch('/schedule/{id}', 'toSchedule');
                 Route::delete('{id}', 'trash');
-            }
-            );
-        }
-        );
+            });
+        });
         Route::controller(TypePersonnesController::class)->prefix('personne/types')->group(function () {
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
@@ -350,10 +324,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             Route::put('{id}', 'update');
             Route::delete('{id}', 'trash');
             Route::patch('/restore/{id}', 'restore');
-        }
-        );
-    }
-    );
+        });
+    });
 });
 Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
     Route::prefix('factures')->group(function () {
@@ -402,8 +374,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
             Route::patch('/restore/{id}', 'restore');
         }
         );
-    }
-    );
+    });
     Route::controller(ChequeController::class)->prefix('cheques')->group(function () {
         Route::get('/', 'all');
         Route::post('/store', 'store');
@@ -412,8 +383,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(PaiementLigneController::class)->prefix('paiementsLignes')->group(function () {
         Route::get('/', 'all');
         Route::post('/store', 'store');
@@ -422,8 +392,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(CommercialController::class)->prefix('commerciaux')->group(function () {
         Route::get('/', 'all');
         Route::get('/users', 'user');
@@ -435,8 +404,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(BordereauController::class)->prefix('bordereaux')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
@@ -446,8 +414,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
-    }
-    );
+    });
     Route::controller(AttributionEmplacementController::class)->prefix('attributions')->group(function () {
         Route::get('/', 'all');
         Route::get('/attribuated/{date}/{commercial}', 'allAttribuated');
@@ -456,13 +423,20 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
         Route::patch('/transferer/{id}', 'transfer');
         Route::get('{id}', 'show');
         Route::delete('{id}', 'trash');
-    }
-    );
+    });
     Route::controller(CollecteController::class)->prefix('collectes')->group(function () {
         Route::get('/', 'all');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
         Route::delete('{id}', 'trash');
-    }
-    );
+    });
+    Route::prefix('caisses')->group(function () {
+        Route::controller(OuvertureController::class)->prefix('ouvertures')->group(function () {
+            Route::get('/', 'all');
+            Route::post('/store', 'store');
+            Route::get('/marche/{id}', 'getByMarche');
+            Route::get('{id}', 'show');
+            Route::put('{id}', 'update');
+        });
+    });
 });
