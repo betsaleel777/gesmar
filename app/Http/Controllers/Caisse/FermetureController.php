@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Finance\Caisse;
+namespace App\Http\Controllers\Caisse;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class FermetureController extends Controller
 {

@@ -13,13 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('versements', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('monnaie')->nullable();
+        Schema::table('paiement_lignes', function (Blueprint $table) {
             $table->unsignedInteger('montant');
-            $table->unsignedInteger('espece')->nullable();
-            $table->foreignId('facture_id')->constrained('factures')->onDelete('cascade')->onUpdate('cascade');
-            $table->timestamps();
         });
     }
 
@@ -30,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('versements');
+        Schema::table('paiement_lignes', function (Blueprint $table) {
+            $table->unsignedInteger('montant');
+        });
     }
 };

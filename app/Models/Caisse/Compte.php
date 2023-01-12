@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @mixin IdeHelperBanque
  */
-class Banque extends Model
+class Compte extends Model
 {
     use HasFactory;
 
@@ -24,7 +24,7 @@ class Banque extends Model
 
     const RULES = [
         'code' => 'required',
-        'nom' => 'required|max:191'
+        'nom' => 'required|max:191',
     ];
 
     /**

@@ -1,7 +1,9 @@
 <?php
 
-use App\Http\Controllers\Caisse\BanqueController;
 use App\Http\Controllers\Caisse\CaissierController;
+use App\Http\Controllers\Caisse\CompteController;
+use App\Http\Controllers\Caisse\EncaissementController;
+use App\Http\Controllers\Caisse\OuvertureController;
 use App\Http\Controllers\Exploitation\Reception\ClientsController;
 use App\Http\Controllers\Exploitation\Reception\ContratController;
 use App\Http\Controllers\Exploitation\Reception\ContratsAnnexesController;
@@ -12,7 +14,6 @@ use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
 use App\Http\Controllers\Finance\AttributionEmplacementController;
 use App\Http\Controllers\Finance\BordereauController;
-use App\Http\Controllers\Finance\Caisse\OuvertureController;
 use App\Http\Controllers\Finance\ChequeController;
 use App\Http\Controllers\Finance\CollecteController;
 use App\Http\Controllers\Finance\CommercialController;
@@ -243,7 +244,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::put('{id}', 'update');
         Route::get('{id}', 'show');
     });
-    Route::controller(BanqueController::class)->prefix('banques')->group(function () {
+    Route::controller(CompteController::class)->prefix('comptes')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
@@ -432,6 +433,14 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
     });
     Route::prefix('caisses')->group(function () {
         Route::controller(OuvertureController::class)->prefix('ouvertures')->group(function () {
+            Route::get('/', 'all');
+            Route::post('/store', 'store');
+            Route::get('/marche/{id}', 'getByMarche');
+            Route::get('/exists/{id}', 'exists');
+            Route::get('{id}', 'show');
+            Route::put('{id}', 'update');
+        });
+        Route::controller(EncaissementController::class)->prefix('encaissements')->group(function () {
             Route::get('/', 'all');
             Route::post('/store', 'store');
             Route::get('/marche/{id}', 'getByMarche');

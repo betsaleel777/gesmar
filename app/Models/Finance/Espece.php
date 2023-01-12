@@ -2,29 +2,23 @@
 
 namespace App\Models\Finance;
 
+use App\Models\Caisse\Encaissement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-/**
- * @mixin IdeHelperPaiementLigne
- */
-class PaiementLigne extends Model
+class Espece extends Model
 {
     use HasFactory;
-
-    protected $table = 'paiement_lignes';
-
-    protected $fillable = ['fournisseur', 'code', 'montant'];
+    protected $fillable = ['montant', 'versement'];
 
     const RULES = [
-        'fournisseur' => 'required',
         'montant' => 'required',
+        'versement' => 'required',
     ];
 
     public function encaissement(): MorphOne
     {
         return $this->morphOne(Encaissement::class, 'payable');
     }
-
 }

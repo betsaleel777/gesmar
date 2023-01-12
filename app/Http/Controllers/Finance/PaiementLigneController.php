@@ -11,7 +11,7 @@ class PaiementLigneController extends Controller
 {
     public function all(): JsonResponse
     {
-        $paiements = PaiementLigne::with('versement')->get();
+        $paiements = PaiementLigne::get();
         return response()->json(['cheques' => $paiements]);
     }
 
@@ -23,7 +23,7 @@ class PaiementLigneController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $paiement = PaiementLigne::with('versement')->find($id);
+        $paiement = PaiementLigne::find($id);
         return response()->json(['cheque' => $paiement]);
     }
 }

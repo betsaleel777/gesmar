@@ -76,7 +76,7 @@ class Facture extends Model
                 'avance' => 'required|numeric',
                 'caution' => 'required|numeric',
                 'pas_porte' => 'required|numeric',
-            ]
+            ],
         ];
     }
 
@@ -98,7 +98,7 @@ class Facture extends Model
                 'equipement_id' => 'required|numeric',
                 'index_debut' => 'required|numeric',
                 'index_fin' => 'required|numeric',
-            ]
+            ],
         ];
     }
 
@@ -265,15 +265,6 @@ class Facture extends Model
         return $this->belongsTo(Contrat::class);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return HasMany<Versement>
-     */
-    public function versements(): HasMany
-    {
-        return $this->hasMany(Versement::class);
-    }
     /**
      * Obtenir les paiements d'une facture
      *

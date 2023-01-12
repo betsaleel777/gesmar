@@ -13,11 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('paiement_lignes', function (Blueprint $table) {
-            $table->id();
-            $table->string('fournisseur');
-            $table->string('code', 50);
-            $table->timestamps();
+        Schema::table('encaissements', function (Blueprint $table) {
+            $table->morphs('payable');
         });
     }
 
@@ -28,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('paiement_lignes');
+        Schema::table('encaissements', function (Blueprint $table) {
+            $table->dropMorphs('payable');
+        });
     }
 };

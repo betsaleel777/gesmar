@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('paiement_lignes', function (Blueprint $table) {
+        Schema::create('comptes', function (Blueprint $table) {
             $table->id();
-            $table->string('fournisseur');
-            $table->string('code', 50);
+            $table->string('code', 50)->unique();
+            $table->string('nom');
+            $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('paiement_lignes');
+        Schema::dropIfExists('comptes');
     }
 };
