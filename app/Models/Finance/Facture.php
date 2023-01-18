@@ -3,10 +3,10 @@
 namespace App\Models\Finance;
 
 use App\Enums\StatusFacture;
-use App\Models\Architecture\Equipement;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Paiement;
+use App\Traits\HasOneEquipment;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,6 +23,7 @@ class Facture extends Model
     use HasFactory;
     use HasStatuses;
     use RecentOrder;
+    use HasOneEquipment;
 
     protected $fillable = [
         'code',
@@ -243,16 +244,6 @@ class Facture extends Model
     public function annexe(): BelongsTo
     {
         return $this->belongsTo(ServiceAnnexe::class);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return BelongsTo<Equipement, Facture>
-     */
-    public function equipement(): BelongsTo
-    {
-        return $this->belongsTo(Equipement::class);
     }
 
     /**

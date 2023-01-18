@@ -3,11 +3,14 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusAbonnement;
-use App\Enums\StatusEquipement;
+use App\Events\AbonnementRegistred;
+use App\Events\AbonnementResilied;
+use App\Traits\HasEmplacement;
+use App\Traits\HasOneEquipment;
+use App\Traits\HasSites;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
@@ -15,7 +18,7 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Abonnement extends Model
 {
-    use HasStatuses, RecentOrder;
+    use HasStatuses, HasSites, HasOneEquipment, HasEmplacement, RecentOrder;
 
     protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'site_id'];
 
@@ -49,16 +52,11 @@ class Abonnement extends Model
     protected static function booted()
     {
         static::deleted(function (Abonnement $abonnement) {
-            $equipement = Equipement::findOrFail($abonnement->equipement_id);
-            $equipement->desabonner();
+            AbonnementResilied::dispatch($abonnement);
         });
 
         static::saved(function (Abonnement $abonnement) {
-            $equipement = Equipement::findOrFail($abonnement->equipement_id);
-            $equipement->emplacement_id = $abonnement->emplacement_id;
-            $equipement->save();
-            $equipement->abonnement === StatusEquipement::LINKED->value ?: $equipement->lier();
-            $equipement->abonner();
+            AbonnementRegistred::dispatch($abonnement);
         });
     }
 
@@ -120,35 +118,5 @@ class Abonnement extends Model
     public function scopeWithoutError(Builder $query): Builder
     {
         return $query->otherCurrentStatus(StatusAbonnement::ERROR->value);
-    }
-
-    /**
-     * Obtenir l'unique équipement qui est lié à cet abonnement
-     *
-     * @return BelongsTo<Equipement, Abonnement>
-     */
-    public function equipement(): BelongsTo
-    {
-        return $this->belongsTo(Equipement::class);
-    }
-
-    /**
-     * Obtenir l'unique emplacement qui est lié à cet abonnement
-     *
-     * @return BelongsTo<Emplacement, Abonnement>
-     */
-    public function emplacement(): BelongsTo
-    {
-        return $this->belongsTo(Emplacement::class);
-    }
-
-    /**
-     * Obtenir l'unique site (marché) qui est lié à cet abonnement
-     *
-     * @return BelongsTo<Site, Abonnement>
-     */
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(Site::class);
     }
 }

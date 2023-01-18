@@ -3,17 +3,12 @@
 namespace App\Models\Caisse;
 
 use App\Traits\HasSites;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @mixin IdeHelperBanque
- */
-class Compte extends Model
+class Banque extends Model
 {
-    use HasFactory, HasSites;
-
-    protected $fillable = ['code', 'nom', 'site_id'];
+    use HasSites;
+    protected $fillable = ['sigle', 'nom', 'site_id'];
 
     /**
      *
@@ -22,7 +17,7 @@ class Compte extends Model
     protected $with = ['site'];
 
     const RULES = [
-        'code' => 'required',
+        'sigle' => 'required',
         'nom' => 'required|max:191',
     ];
 }

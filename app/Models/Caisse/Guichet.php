@@ -3,20 +3,19 @@
 namespace App\Models\Caisse;
 
 use App\Enums\StatusGuichet;
-use App\Models\Architecture\Site;
+use App\Traits\HasSites;
 use App\Traits\RecentOrder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\ModelStatus\HasStatuses;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @mixin IdeHelperGuichet
  */
 class Guichet extends Model
 {
-    use HasStatuses, RecentOrder, SoftDeletes;
+    use HasStatuses, HasSites, RecentOrder, SoftDeletes;
 
     protected $fillable = ['nom', 'code', 'site_id'];
     /**
@@ -27,7 +26,7 @@ class Guichet extends Model
 
     const RULES = [
         'nom' => 'required|max:255',
-        'site_id' => 'required|numeric'
+        'site_id' => 'required|numeric',
     ];
 
     public function codeGenerate(): void
@@ -68,15 +67,5 @@ class Guichet extends Model
     public function scopeOpened(Builder $query): Builder
     {
         return $query->currentStatus(StatusGuichet::OPEN->value);
-    }
-
-    /**
-     * Obtenir les sites correspondant à un Guichet
-     * @return BelongsTo<Site, Guichet>
-     * @author Ahoussou Jean-Chris
-     */
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(Site::class);
     }
 }

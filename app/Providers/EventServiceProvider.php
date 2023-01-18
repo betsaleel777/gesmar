@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Listeners\AbonnementSubscriber;
+use App\Listeners\CollecteSubscriber;
 use App\Listeners\ContratSubscriber;
+use App\Listeners\EncaissementSubscriber;
 use App\Listeners\EquipementSubscriber;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -32,6 +34,8 @@ class EventServiceProvider extends ServiceProvider
         ContratSubscriber::class,
         AbonnementSubscriber::class,
         EquipementSubscriber::class,
+        EncaissementSubscriber::class,
+        CollecteSubscriber::class,
     ];
 
     /**

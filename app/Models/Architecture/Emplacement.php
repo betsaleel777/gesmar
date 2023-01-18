@@ -6,6 +6,7 @@ use App\Enums\StatusEmplacement;
 use App\Models\Exploitation\Contrat;
 use App\States\Emplacement\StatusDisponibiliteState;
 use App\States\Emplacement\StatusLiaisonsState;
+use App\Traits\HasContrats;
 use App\Traits\RecentOrder;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,7 +27,7 @@ class Emplacement extends Model
     use HasStateMachines;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use RecentOrder;
-
+    use HasContrats;
 
     /**
      * Summary of stateMachines
@@ -34,7 +35,7 @@ class Emplacement extends Model
      */
     public $stateMachines = [
         'disponibilite' => StatusDisponibiliteState::class,
-        'liaison' => StatusLiaisonsState::class
+        'liaison' => StatusLiaisonsState::class,
     ];
 
     protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'loyer', 'pas_porte', 'caution'];
@@ -71,7 +72,7 @@ class Emplacement extends Model
     protected function auto(): Attribute
     {
         return Attribute::make(
-        get: fn() => $this->type->auto_valid,
+            get:fn() => $this->type->auto_valid,
         );
     }
 
@@ -207,16 +208,6 @@ class Emplacement extends Model
     public function abonnementActuels(): hasMany
     {
         return $this->hasMany(Abonnement::class)->progressing();
-    }
-
-    /**
-     * Obtenir les contrats d'un emplacement
-     *
-     * @return HasMany<Contrat>
-     */
-    public function contrats(): HasMany
-    {
-        return $this->hasMany(Contrat::class);
     }
 
     /**

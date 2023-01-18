@@ -2,22 +2,21 @@
 
 namespace App\Models\Finance;
 
-
 use App\Models\Architecture\Emplacement;
 use App\Traits\HasCashStatus;
+use App\Traits\HasEmplacement;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\ModelStatus\HasStatuses;
 
-
 /**
  * @mixin IdeHelperAttribution
  */
 class Attribution extends Model
 {
-    use HasStatuses, RecentOrder, HasCashStatus;
+    use HasStatuses, RecentOrder, HasEmplacement, HasCashStatus;
 
     protected $fillable = ['commercial_id', 'emplacement_id', 'bordereau_id', 'jour'];
     protected $table = 'attribution_emplacements';
@@ -44,15 +43,6 @@ class Attribution extends Model
     public function commercial(): BelongsTo
     {
         return $this->belongsTo(Commercial::class);
-    }
-
-    /**
-     *
-     * @return BelongsTo<Emplacement, Attribution>
-     */
-    public function emplacement(): BelongsTo
-    {
-        return $this->belongsTo(Emplacement::class);
     }
 
     /**

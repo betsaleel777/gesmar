@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('cheques', function (Blueprint $table) {
-            $table->unsignedInteger('valeur');
+        Schema::table('banques', function (Blueprint $table) {
+            $table->foreignId('site_id')->constrained('sites')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('cheques', function (Blueprint $table) {
-            $table->unsignedInteger('valeur');
+        Schema::table('banques', function (Blueprint $table) {
+            $table->foreignId('site_id')->constrained('sites')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 };

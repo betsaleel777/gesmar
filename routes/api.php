@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Caisse\BanqueController;
 use App\Http\Controllers\Caisse\CaissierController;
 use App\Http\Controllers\Caisse\CompteController;
 use App\Http\Controllers\Caisse\EncaissementController;
@@ -251,6 +252,13 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::put('{id}', 'update');
         Route::get('{id}', 'show');
     });
+    Route::controller(BanqueController::class)->prefix('banques')->group(function () {
+        Route::get('/', 'all');
+        Route::get('/trashed', 'trashed');
+        Route::post('/store', 'store');
+        Route::put('{id}', 'update');
+        Route::get('{id}', 'show');
+    });
 });
 
 Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
@@ -284,6 +292,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
         });
         Route::controller(OrdonnancementController::class)->prefix('ordonnancements')->group(function () {
             Route::get('/', 'all');
+            Route::get('/unpaid', 'unpaids');
             Route::post('/store', 'store');
             Route::get('{id}', 'show');
             Route::put('{id}', 'update');

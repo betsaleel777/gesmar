@@ -2,9 +2,9 @@
 
 namespace App\Models\Finance;
 
-use App\Models\Architecture\Site;
-use App\Models\User;
 use App\Models\Finance\Attribution;
+use App\Models\User;
+use App\Traits\HasSites;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Commercial extends Model
 {
-    use HasFactory, RecentOrder, SoftDeletes;
+    use HasFactory, RecentOrder, HasSites, SoftDeletes;
 
     protected $fillable = ['code', 'user_id', 'site_id'];
     /**
@@ -69,15 +69,5 @@ class Commercial extends Model
     public function bordereaux(): HasMany
     {
         return $this->hasMany(Bordereau::class);
-    }
-
-    /**
-     * Obtenir le marche d'un commercial
-     *
-     * @return BelongsTo<Site, Commercial>
-     */
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(Site::class);
     }
 }

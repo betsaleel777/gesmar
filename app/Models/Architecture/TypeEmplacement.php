@@ -2,12 +2,12 @@
 
 namespace App\Models\Architecture;
 
+use App\Traits\HasSites;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class TypeEmplacement extends Model
 {
-    use HasFactory,SoftDeletes,RecentOrder;
+    use HasFactory, HasSites, SoftDeletes, RecentOrder;
 
     protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'equipable'];
 
@@ -46,7 +46,7 @@ class TypeEmplacement extends Model
     protected function code(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->attributes['prefix'] . str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
+            get:fn() => $this->attributes['prefix'] . str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
         );
     }
 
@@ -69,15 +69,5 @@ class TypeEmplacement extends Model
     public function emplacements(): HasMany
     {
         return $this->hasMany(Emplacement::class, 'type_emplacement_id');
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return BelongsTo<Site, TypeEmplacement>
-     */
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(Site::class);
     }
 }

@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('cheques', function (Blueprint $table) {
             $table->id();
             $table->string('numero', 20);
-            $table->boolean('encaisse')->default(false);
             $table->timestamps();
         });
     }

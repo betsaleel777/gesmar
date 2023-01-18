@@ -2,7 +2,8 @@
 
 namespace App\Models\Finance;
 
-use App\Enums\StatusBordereau;
+use App\Events\CollecteRegistred;
+use App\Events\CollecteRemoved;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,21 +39,11 @@ class Collecte extends Model
     protected static function booted(): void
     {
         static::saved(function (Collecte $collecte) {
-            $attribution = Attribution::with('bordereau')->findOrFail($collecte->attribution_id);
-            if ($collecte->nombre === 1) {
-                $attribution->encaisser();
-            }
-            // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
-            $bordereau = Bordereau::with('attributions')->findOrFail($attribution->bordereau?->id);
-            $bordereau->attributions->contains('status', StatusBordereau::PAS_ENCAISSE->value) ?: $bordereau->encaisser();
+            CollecteRegistred::dispatch($collecte);
         });
 
         static::deleted(function (Collecte $collecte) {
-            $attribution = Attribution::with('bordereau')->findOrFail($collecte->attribution_id);
-            $attribution->pasEncaisser();
-            // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
-            $bordereau = Bordereau::with('attributions')->findOrFail($attribution->bordereau?->id);
-            $bordereau->attributions->contains('status', StatusBordereau::PAS_ENCAISSE->value) ?: $bordereau->encaisser();
+            CollecteRemoved::dispatch($collecte);
         });
     }
     /**

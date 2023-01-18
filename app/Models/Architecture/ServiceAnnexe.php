@@ -3,11 +3,10 @@
 namespace App\Models\Architecture;
 
 use App\Enums\ModeServiceAnnexe;
-use App\Models\Exploitation\Contrat;
+use App\Traits\HasContrats;
+use App\Traits\HasSites;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -15,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class ServiceAnnexe extends Model
 {
-    use SoftDeletes, RecentOrder;
+    use SoftDeletes, HasSites, HasContrats, RecentOrder;
 
     protected $fillable = ['code', 'nom', 'site_id', 'prix', 'description', 'mode'];
 
@@ -29,7 +28,7 @@ class ServiceAnnexe extends Model
     public function codeGenerate(): void
     {
         $rang = $this->count() + 1;
-        $this->attributes['code'] = ANNEXE_CODE_PREFIXE . str_pad((string)$rang, 7, '0', STR_PAD_LEFT);
+        $this->attributes['code'] = ANNEXE_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
     public function forfaitaire(): void
@@ -45,25 +44,5 @@ class ServiceAnnexe extends Model
     public function mensuel(): void
     {
         $this->attributes['mode'] = ModeServiceAnnexe::MENSUEL;
-    }
-
-    /**
-     * Obtenir le site d'un service annexe
-     *
-     * @return BelongsTo<Site, ServiceAnnexe>
-     */
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(Site::class);
-    }
-
-    /**
-     * Obtenir les contrats d'un service annexe
-     *
-     * @return HasMany<Contrat>
-     */
-    public function contrats(): HasMany
-    {
-        return $this->hasMany(Contrat::class);
     }
 }

@@ -13,8 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('cheques', function (Blueprint $table) {
-            $table->string('banque', 70);
+        Schema::create('banques', function (Blueprint $table) {
+            $table->id();
+            $table->string('sigle', 10);
+            $table->string('nom', 191);
+            $table->timestamps();
         });
     }
 
@@ -25,8 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('cheques', function (Blueprint $table) {
-            $table->string('banque', 70);
-        });
+        Schema::dropIfExists('banques');
     }
 };

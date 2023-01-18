@@ -14,7 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('cheques', function (Blueprint $table) {
-            $table->unsignedInteger('valeur');
+            $table->foreignId('compte_id')->constrained('comptes')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('banque_id')->constrained('banques')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 
@@ -26,7 +27,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('cheques', function (Blueprint $table) {
-            $table->unsignedInteger('valeur');
+            $table->foreignId('compte_id')->constrained('comptes')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('banque_id')->constrained('banques')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 };

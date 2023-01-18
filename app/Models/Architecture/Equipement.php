@@ -3,9 +3,11 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusEquipement;
-use App\Models\Finance\Facture;
+use App\Events\EquipementRemoved;
 use App\States\Equipement\StatusAbonnementState;
 use App\States\Equipement\StatusLiaisonsState;
+use App\Traits\HasEmplacement;
+use App\Traits\HasSites;
 use App\Traits\RecentOrder;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,7 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Equipement extends Model
 {
-    use HasFactory, SoftDeletes, HasStateMachines, RecentOrder;
+    use HasFactory, SoftDeletes, HasStateMachines, HasSites, HasEmplacement, RecentOrder;
 
     /**
      *
@@ -28,7 +30,7 @@ class Equipement extends Model
      */
     public $stateMachines = [
         'abonnement' => StatusAbonnementState::class,
-        'liaison' => StatusLiaisonsState::class
+        'liaison' => StatusLiaisonsState::class,
     ];
 
     protected $fillable = [
@@ -67,8 +69,7 @@ class Equipement extends Model
     protected static function booted(): void
     {
         static::deleted(function (Equipement $equipement): void {
-            Emplacement::findOrFail($equipement->emplacement_id)->delier();
-            Facture::whereHas('equipement', fn($query) => $query->where('equipement_id', $equipement->id))->get()->all()->map->delete();
+            EquipementRemoved::dispatch($equipement);
         });
     }
     /**
@@ -78,7 +79,7 @@ class Equipement extends Model
     protected function alias(): Attribute
     {
         return Attribute::make(
-        get: fn() => $this->attributes['code'] . ' ' . $this->type->nom,
+            get:fn() => $this->attributes['code'] . ' ' . $this->type->nom,
         );
     }
 
@@ -148,7 +149,6 @@ class Equipement extends Model
         return $query->where('liaison', StatusEquipement::UNLINKED->value);
     }
 
-
     /**
      * Undocumented function
      *
@@ -157,25 +157,5 @@ class Equipement extends Model
     public function type(): BelongsTo
     {
         return $this->belongsTo(TypeEquipement::class, 'type_equipement_id');
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return BelongsTo<Site, Equipement>
-     */
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(Site::class);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return BelongsTo<Emplacement, Equipement>
-     */
-    public function emplacement(): BelongsTo
-    {
-        return $this->belongsTo(Emplacement::class);
     }
 }

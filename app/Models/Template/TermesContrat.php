@@ -2,8 +2,8 @@
 
 namespace App\Models\Template;
 
-use App\Models\Architecture\Site;
 use App\Models\User;
+use App\Traits\HasSites;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class TermesContrat extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasSites;
 
     protected $fillable = ['code', 'user_id', 'site_id', 'contenu', 'date_using', 'type'];
 
@@ -36,7 +36,7 @@ class TermesContrat extends Model
     protected function status(): Attribute
     {
         return Attribute::make(
-            get: fn () => !empty($this->atrributes['date_using']) ? self::USING : null
+            get:fn() => !empty($this->atrributes['date_using']) ? self::USING : null
         );
     }
 
@@ -69,15 +69,5 @@ class TermesContrat extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return BelongsTo<Site, TermesContrat>
-     */
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(Site::class);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Models\Architecture;
 
-use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Personne;
+use App\Traits\HasContrats;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,6 +16,7 @@ class Site extends Model
 {
     use SoftDeletes;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use HasContrats;
 
     protected $fillable = ['nom', 'pays', 'ville', 'commune', 'postale'];
 
@@ -89,16 +90,6 @@ class Site extends Model
     public function personnes(): HasMany
     {
         return $this->hasMany(Personne::class);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return HasMany<Contrat>
-     */
-    public function contrats(): HasMany
-    {
-        return $this->hasMany(Contrat::class);
     }
 
     /**
