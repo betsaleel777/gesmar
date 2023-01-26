@@ -45,8 +45,10 @@ class FactureController extends Controller
 
     public function getByContrat(int $id): JsonResponse
     {
-        $facturesInitiales = Facture::with(['contrat.emplacement', 'paiements'])->where('contrat_id', $id)->isInitiale()->isFacture()->isSuperMarket()->get();
-        $facturesInitiales->each(fn($facture) => $facture->setAttribute('sommeVersee', $facture->paiements->sum('montant')));
+        $facturesInitiales = Facture::with(['contrat.emplacement', 'paiements.ordonnancement'])->where('contrat_id', $id)->isInitiale()->isFacture()->isSuperMarket()->get();
+        $facturesInitiales->each(function ($facture) {
+            $facture->setAttribute('sommeVersee', $facture->paiements[0]->ordonnancement->paid() ? $facture->paiements->sum('montant') : 0);
+        });
 
         $facturesAnnexes = Facture::with(['contrat.annexe', 'paiements'])->where('contrat_id', $id)->isAnnexe()->isFacture()->get();
         $facturesLoyers = Facture::with('contrat.emplacement')->where('contrat_id', $id)->isLoyer()->isFacture()->get();
