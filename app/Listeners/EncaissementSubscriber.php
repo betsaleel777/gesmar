@@ -2,8 +2,11 @@
 
 namespace App\Listeners;
 
+use App\Enums\StatusContrat;
+use App\Enums\StatusPersonne;
 use App\Events\EncaissementRegistred;
 use App\Models\Exploitation\Contrat;
+use App\Services\FactureService;
 
 class EncaissementSubscriber
 {
@@ -11,10 +14,11 @@ class EncaissementSubscriber
     {
         $event->ordonnancement->payer();
         $contrat = Contrat::with('personne', 'emplacement')->findOrFail($event->ordonnancement->paiements->first()->facture->contrat_id);
-        $contrat->validated();
-        $contrat->personne->client();
+        $contrat->status === StatusContrat::VALIDATED->value ?: $contrat->validated();
+        $contrat->personne->status === StatusPersonne::CLIENT->name ?: $contrat->personne->client();
         $contrat?->emplacement->occuper();
-        // facture soldé oui ou non
+        $service = new FactureService($event->ordonnancement);
+        $service->checkPaid();
     }
 
     /**

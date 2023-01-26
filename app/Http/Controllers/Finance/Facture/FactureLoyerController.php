@@ -37,12 +37,13 @@ class FactureLoyerController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $request->validate(Facture::loyerRules());
-        $facture = new Facture($request->all());
-        $facture->codeGenerate(LOYER_FACTURE_PREFIXE);
-        $facture->facturable();
-        $facture->save();
-        $message = "La facture de loyer: $facture->code a été crée avec succès.";
+        foreach ($request->all() as $data) {
+            $facture = new Facture($data);
+            $facture->codeGenerate(LOYER_FACTURE_PREFIXE);
+            $facture->save();
+            $facture->facturable();
+        }
+        $message = "Factures générées avec succès.";
         return response()->json(['message' => $message]);
     }
 }

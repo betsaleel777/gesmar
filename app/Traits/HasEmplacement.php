@@ -1,6 +1,7 @@
 <?php
 namespace App\Traits;
 
+use App\Models\Architecture\Emplacement;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**

@@ -6,7 +6,7 @@ use App\Enums\StatusAbonnement;
 use App\Events\AbonnementRegistred;
 use App\Events\AbonnementResilied;
 use App\Traits\HasEmplacement;
-use App\Traits\HasOneEquipment;
+use App\Traits\HasEquipement;
 use App\Traits\HasSites;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,7 +18,7 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Abonnement extends Model
 {
-    use HasStatuses, HasSites, HasOneEquipment, HasEmplacement, RecentOrder;
+    use HasStatuses, HasSites, HasEquipement, HasEmplacement, RecentOrder;
 
     protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'site_id'];
 

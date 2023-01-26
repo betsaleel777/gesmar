@@ -1,6 +1,7 @@
 <?php
 namespace App\Traits;
 
+use App\Models\Exploitation\Contrat;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**

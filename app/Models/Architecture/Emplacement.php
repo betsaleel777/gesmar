@@ -49,6 +49,13 @@ class Emplacement extends Model
      * @var array<int, string>
      */
     protected $appends = ['auto'];
+    /**
+     * les propriétés qui doivent être caster.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = ['superficie' => 'integer', 'loyer' => 'integer',
+        'pas_porte' => 'integer', 'caution' => 'integer'];
 
     public const RULES = [
         'nom' => 'required|max:255',

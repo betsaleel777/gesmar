@@ -6,13 +6,14 @@ use App\Enums\StatusFacture;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Paiement;
-use App\Traits\HasOneEquipment;
+use App\Traits\HasEquipement;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
@@ -23,7 +24,7 @@ class Facture extends Model
     use HasFactory;
     use HasStatuses;
     use RecentOrder;
-    use HasOneEquipment;
+    use HasEquipement;
 
     protected $fillable = [
         'code',
@@ -133,6 +134,26 @@ class Facture extends Model
         $this->setStatus(StatusFacture::PROFORMA->value);
     }
 
+    public function isAnnexe(): bool
+    {
+        return Str::substr($this->attributes['code'], 0, 3) === ANNEXE_FACTURE_PREFIXE;
+    }
+
+    public function isEquipement(): bool
+    {
+        return Str::substr($this->attributes['code'], 0, 3) === EQUIPEMENT_FACTURE_PREFIXE;
+    }
+
+    public function isInitiale(): bool
+    {
+        return Str::substr($this->attributes['code'], 0, 3) === INITIALE_FACTURE_PREFIXE;
+    }
+
+    public function isLoyer(): bool
+    {
+        return Str::substr($this->attributes['code'], 0, 3) === LOYER_FACTURE_PREFIXE;
+    }
+
     // scopes
 
     /**
@@ -231,7 +252,7 @@ class Facture extends Model
      */
     public function scopeIsSuperMarket(Builder $query): Builder
     {
-        return $query->whereHas('contrat', fn(Builder $query) => $query->where('auto_valid', false));
+        return $query->whereHas('contrat', fn (Builder $query) => $query->where('auto_valid', false));
     }
 
     // relations
