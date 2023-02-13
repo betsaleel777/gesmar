@@ -54,8 +54,10 @@ class Emplacement extends Model
      *
      * @var array<string, string>
      */
-    protected $casts = ['superficie' => 'integer', 'loyer' => 'integer',
-        'pas_porte' => 'integer', 'caution' => 'integer'];
+    protected $casts = [
+        'superficie' => 'integer', 'loyer' => 'integer',
+        'pas_porte' => 'integer', 'caution' => 'integer'
+    ];
 
     public const RULES = [
         'nom' => 'required|max:255',
@@ -79,7 +81,7 @@ class Emplacement extends Model
     protected function auto(): Attribute
     {
         return Attribute::make(
-            get:fn() => $this->type->auto_valid,
+            get: fn () => $this->type->auto_valid,
         );
     }
 
@@ -157,7 +159,7 @@ class Emplacement extends Model
      */
     public function scopeWithoutSchedule(Builder $query): Builder
     {
-        return $query->whereHas('type', fn(Builder $query) => $query->where('auto_valid', true));
+        return $query->whereHas('type', fn (Builder $query) => $query->where('auto_valid', true));
     }
 
     //relations
@@ -212,7 +214,7 @@ class Emplacement extends Model
      *
      * @return HasMany<Abonnement>
      */
-    public function abonnementActuels(): hasMany
+    public function abonnementsActuels(): hasMany
     {
         return $this->hasMany(Abonnement::class)->progressing();
     }

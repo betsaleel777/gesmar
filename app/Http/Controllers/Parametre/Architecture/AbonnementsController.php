@@ -8,6 +8,7 @@ use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
 use App\Models\Exploitation\Contrat;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -93,5 +94,16 @@ class AbonnementsController extends Controller
         AbonnementResilied::dispatch($abonnement);
         $message = "L'abonnement $request->code a été résilié avec succès.";
         return response()->json(['message' => $message]);
+    }
+
+    public function getRentalbyMonthGear(string $date): JsonResponse
+    {
+        $nestedRelation = 'emplacement.contratActuel.facturesEquipements';
+        $requete = Abonnement::with(['equipement', 'emplacement.contratActuel' => ['personne', 'facturesEquipements']])->progressing()
+            ->whereHas('emplacement.contratActuel', fn (Builder $query) => $query->where('auto_valid', false));
+        $abonnements = $requete->whereDoesntHave($nestedRelation, fn (Builder $query) => $query->where('periode', $date))->get();
+        $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn (Builder $query) => $query->where('periode', $date)->isUnpaid())->get();
+        $abonnements->merge($abonnementsFactureUnpaid)->filter();
+        return response()->json(['abonnements' => $abonnements]);
     }
 }

@@ -17,7 +17,7 @@ class EncaissementSubscriber
         $contrat->status === StatusContrat::VALIDATED->value ?: $contrat->validated();
         $contrat->personne->status === StatusPersonne::CLIENT->name ?: $contrat->personne->client();
         $contrat?->emplacement->occuper();
-        $service = new FactureService($event->ordonnancement);
+        $service = new FactureService($event->ordonnancement->paiements);
         $service->checkPaid();
     }
 

@@ -55,10 +55,11 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
  */
+
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
 });
-Route::middleware('auth:sanctum')->get('/user', fn(Request $request) => $request->user());
+Route::middleware('auth:sanctum')->get('/user', fn (Request $request) => $request->user());
 Route::middleware('auth:sanctum')->controller(AuthController::class)->group(function () {
     Route::post('deconnecter', 'deconnecter');
     Route::post('logout', 'logout');
@@ -137,7 +138,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/autos', 'allAuto');
         Route::get('/equipables', 'equipables');
         Route::get('/trashed', 'trashed');
-        Route::get('/rental/{date}', 'getRentalbyMonth');
+        Route::get('/rental/{date}', 'getRentalbyMonthLoyer');
         Route::get('/marche/{id}', 'getByMarche');
         Route::get('/marche/gears/{id}', 'getByMarcheWithGearsAndContracts');
         Route::get('/marche/unlinked/{id}', 'getUnlinkedByMarche');
@@ -153,6 +154,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
     Route::controller(AbonnementsController::class)->prefix('abonnements')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
+        Route::get('/rental-gear/{date}', 'getRentalbyMonthGear');
         Route::post('/store', 'store');
         Route::post('/abonner', 'insert');
         Route::get('{id}', 'show');
@@ -341,48 +343,52 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function () {
     Route::prefix('factures')->group(function () {
         Route::get('/', [FactureController::class, 'all']);
         Route::get('/contrat/{id}', [FactureController::class, 'getByContrat']);
-        Route::controller(FactureAnnexeController::class)->prefix('annexes')->group(function () {
-            Route::get('/', 'all');
-            Route::post('/store', 'store');
-            Route::get('/marche/{id}', 'getByMarche');
-            Route::get('{id}', 'show');
-            Route::put('{id}', 'update');
-            Route::delete('{id}', 'trash');
-            Route::patch('/restore/{id}', 'restore');
-        }
+        Route::controller(FactureAnnexeController::class)->prefix('annexes')->group(
+            function () {
+                Route::get('/', 'all');
+                Route::post('/store', 'store');
+                Route::get('/marche/{id}', 'getByMarche');
+                Route::get('{id}', 'show');
+                Route::put('{id}', 'update');
+                Route::delete('{id}', 'trash');
+                Route::patch('/restore/{id}', 'restore');
+            }
         );
-        Route::controller(FactureLoyerController::class)->prefix('loyers')->group(function () {
-            Route::get('/', 'all');
-            Route::get('/trashed', 'trashed');
-            Route::post('/store', 'store');
-            Route::get('/marche/{id}', 'getByMarche');
-            Route::get('{id}', 'show');
-            Route::put('{id}', 'update');
-            Route::delete('{id}', 'trash');
-            Route::patch('/restore/{id}', 'restore');
-        }
+        Route::controller(FactureLoyerController::class)->prefix('loyers')->group(
+            function () {
+                Route::get('/', 'all');
+                Route::get('/trashed', 'trashed');
+                Route::post('/store', 'store');
+                Route::get('/marche/{id}', 'getByMarche');
+                Route::get('{id}', 'show');
+                Route::put('{id}', 'update');
+                Route::delete('{id}', 'trash');
+                Route::patch('/restore/{id}', 'restore');
+            }
         );
-        Route::controller(FactureInitialeController::class)->prefix('initiales')->group(function () {
-            Route::get('/', 'all');
-            Route::get('/trashed', 'trashed');
-            Route::post('/store', 'store');
-            Route::get('/marche/{id}', 'getByMarche');
-            Route::get('{id}', 'show');
-            Route::put('{id}', 'update');
-            Route::delete('{id}', 'trash');
-            Route::patch('/restore/{id}', 'restore');
-        }
+        Route::controller(FactureInitialeController::class)->prefix('initiales')->group(
+            function () {
+                Route::get('/', 'all');
+                Route::get('/trashed', 'trashed');
+                Route::post('/store', 'store');
+                Route::get('/marche/{id}', 'getByMarche');
+                Route::get('{id}', 'show');
+                Route::put('{id}', 'update');
+                Route::delete('{id}', 'trash');
+                Route::patch('/restore/{id}', 'restore');
+            }
         );
-        Route::controller(FactureEquipementController::class)->prefix('equipements')->group(function () {
-            Route::get('/', 'all');
-            Route::get('/trashed', 'trashed');
-            Route::post('/store', 'store');
-            Route::get('/marche/{id}', 'getByMarche');
-            Route::get('{id}', 'show');
-            Route::put('{id}', 'update');
-            Route::delete('{id}', 'trash');
-            Route::patch('/restore/{id}', 'restore');
-        }
+        Route::controller(FactureEquipementController::class)->prefix('equipements')->group(
+            function () {
+                Route::get('/', 'all');
+                Route::get('/trashed', 'trashed');
+                Route::post('/store', 'store');
+                Route::get('/marche/{id}', 'getByMarche');
+                Route::get('{id}', 'show');
+                Route::put('{id}', 'update');
+                Route::delete('{id}', 'trash');
+                Route::patch('/restore/{id}', 'restore');
+            }
         );
     });
     Route::controller(ChequeController::class)->prefix('cheques')->group(function () {

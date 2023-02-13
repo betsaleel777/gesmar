@@ -30,7 +30,7 @@ class Facture extends Model
         'code',
         'contrat_id',
         'annexe_id',
-        'index_debut',
+        'index_depart',
         'index_fin',
         'equipement_id',
         'avance',
@@ -48,6 +48,15 @@ class Facture extends Model
      * @var array<int, string>
      */
     protected $appends = ['status'];
+    /**
+     * les propriétés qui doivent être caster.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'avance' => 'integer', 'caution' => 'integer', 'index_fin' => 'integer',
+        'pas_porte' => 'integer', 'index_depart' => 'integer'
+    ];
 
     public const RULES = [
         'contrat_id' => 'required',
@@ -98,7 +107,7 @@ class Facture extends Model
         return [
             ...self::RULES, ...[
                 'equipement_id' => 'required|numeric',
-                'index_debut' => 'required|numeric',
+                'index_depart' => 'required|numeric',
                 'index_fin' => 'required|numeric',
             ],
         ];
@@ -117,11 +126,6 @@ class Facture extends Model
     public function payer(): void
     {
         $this->setStatus(StatusFacture::PAID->value);
-    }
-
-    public function impayer(): void
-    {
-        $this->setStatus(StatusFacture::UNPAID->value);
     }
 
     public function facturable(): void
@@ -219,7 +223,7 @@ class Facture extends Model
      */
     public function scopeIsUnpaid(Builder $query): Builder
     {
-        return $query->currentStatus(StatusFacture::UNPAID->value);
+        return $query->otherCurrentStatus(StatusFacture::PAID->value);
     }
 
     /**

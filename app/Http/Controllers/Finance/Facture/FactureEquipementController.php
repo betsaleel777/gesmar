@@ -9,21 +9,22 @@ use Illuminate\Http\Request;
 
 class FactureEquipementController extends Controller
 {
+    const RELATIONS = ['contrat.site', 'contrat' => ['emplacement', 'personne'], 'equipement'];
     public function all(): JsonResponse
     {
-        $factures = Facture::with(['contrat.site', 'contrat.emplacement', 'equipement'])->isEquipement()->get();
+        $factures = Facture::with(self::RELATIONS)->isEquipement()->isFacture()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with(['contrat.site', 'contrat.emplacement', 'equipement'])->isPaid()->isEquipement()->get();
+        $factures = Facture::with(self::RELATIONS)->isPaid()->isEquipement()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with(['contrat.site', 'contrat.emplacement', 'equipement'])->isUnpaid()->isEquipement()->get();
+        $factures = Facture::with(self::RELATIONS)->isUnpaid()->isEquipement()->get();
         return response()->json(['factures' => $factures]);
     }
 
@@ -35,11 +36,12 @@ class FactureEquipementController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $request->validate(Facture::gearRules());
-        $facture = new Facture($request->all());
-        $facture->facturable();
-        $facture->codeGenerate(EQUIPEMENT_FACTURE_PREFIXE);
-        $facture->save();
+        foreach ($request->all() as $ligne) {
+            $facture = new Facture($ligne);
+            $facture->codeGenerate(EQUIPEMENT_FACTURE_PREFIXE);
+            $facture->save();
+            $facture->facturable();
+        }
         $message = "La facture d'équipement $facture->code a été crée avec succès.";
         return response()->json(['message' => $message]);
     }

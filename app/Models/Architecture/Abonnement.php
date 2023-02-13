@@ -11,6 +11,7 @@ use App\Traits\HasSites;
 use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
@@ -29,11 +30,6 @@ class Abonnement extends Model
      * @var array<int, string>
      */
     protected $appends = ['status'];
-    /**
-     *
-     * @var array<int, string>
-     */
-    protected $with = ['statuses'];
 
     public const RULES = [
         'emplacement_id' => 'required',
@@ -118,5 +114,10 @@ class Abonnement extends Model
     public function scopeWithoutError(Builder $query): Builder
     {
         return $query->otherCurrentStatus(StatusAbonnement::ERROR->value);
+    }
+
+    public function equipement(): BelongsTo
+    {
+        return $this->belongsTo(Equipement::class);
     }
 }

@@ -13,7 +13,7 @@ class FactureLoyerController extends Controller
 
     public function all(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->isLoyer()->get();
+        $factures = Facture::with(self::RELATIONS)->isLoyer()->isFacture()->get();
         return response()->json(['factures' => $factures]);
     }
 

@@ -23,11 +23,6 @@ class ValidationAbonnement extends Model
      * @var array<int, string>
      */
     protected $appends = ['status'];
-    /**
-     *
-     * @var array<int, string>
-     */
-    protected $with = ['statuses'];
 
     public const RULES = ['raison' => 'required|min:50', 'abonnement_id' => 'required'];
 

@@ -12,7 +12,7 @@ class FactureAnnexeController extends FactureController
 
     public function all(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->isAnnexe()->get();
+        $factures = Facture::with(self::RELATIONS)->isAnnexe()->isFacture()->get();
         return response()->json(['factures' => $factures]);
     }
 

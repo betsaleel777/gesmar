@@ -7,7 +7,6 @@ use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
 use App\Models\Finance\Facture;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -175,13 +174,11 @@ class EmplacementsController extends Controller implements StandardControllerInt
         return response()->json(['emplacements' => $emplacements]);
     }
 
-    public function getRentalbyMonth(string $date): JsonResponse
+    public function getRentalbyMonthLoyer(string $date): JsonResponse
     {
-        $data = Emplacement::with(['contratActuel.facturesLoyers', 'contratActuel.personne'])
-            ->whereHas('contratActuel.personne', fn (Builder $query) => $query->isClient())
-            ->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false))->get();
-        $dejaGeneres = Facture::where('periode', $date)->get()->pluck('contrat_id');
-        $emplacements = $data->filter(fn ($emplacement) => !in_array($emplacement->contratActuel->id, $dejaGeneres->all()));
+        $emplacements = Emplacement::with(['contratActuel.facturesLoyers', 'contratActuel.personne'])
+            ->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false))
+            ->whereDoesntHave('contratActuel.facturesLoyers', fn (Builder $query) => $query->where('periode', $date))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 }
