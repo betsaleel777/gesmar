@@ -15,42 +15,21 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     /**
      * Undocumented function
      *
-     * @param  array<int>  $ids
-     * @return array<int, Collection<int, Niveau>>
-     */
-    private static function getMany(array $ids): array
-    {
-        $pavillons = Pavillon::with('niveaux')->findMany($ids);
-        $niveaux = [];
-        /**
-         * @var $pavillon Pavillon
-         */
-        foreach ($pavillons as $pavillon) {
-            $niveaux[] = $pavillon->niveaux;
-        }
-        return $niveaux;
-    }
-
-    /**
-     * Undocumented function
-     *
      * @param  array<int>  $pavillons
      * @param  int  $nombre
      * @return void
      */
-    private static function pusher(array $pavillons, int $nombre): void
+    private static function pusher(int $pavillon, int $nombre): void
     {
-        foreach ($pavillons as $pavillon) {
-            $start = (int) Pavillon::findOrFail($pavillon)->niveaux->count();
-            $fin = $start + $nombre;
-            while ($start < $fin) {
-                $start++;
-                $niveau = new Niveau();
-                $niveau->pavillon_id = $pavillon;
-                $niveau->nom = 'niveau ' . $start;
-                $niveau->code = (string) $start;
-                $niveau->save();
-            }
+        $start = (int) Pavillon::with('niveaux')->findOrFail($pavillon)->niveaux->count();
+        $fin = $start + $nombre;
+        while ($start < $fin) {
+            $start++;
+            $niveau = new Niveau();
+            $niveau->pavillon_id = $pavillon;
+            $niveau->nom = 'niveau ' . $start;
+            $niveau->code = (string) $start;
+            $niveau->save();
         }
     }
 
@@ -88,14 +67,6 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         return response()->json(['message' => $message]);
     }
 
-    public function push(Request $request): JsonResponse
-    {
-        $request->validate(Niveau::PUSH_RULES);
-        self::pusher($request->pavillons, $request->nombre);
-        $message = "$request->nombre niveaux ont été crée avec succès.";
-        return response()->json(['message' => $message, 'niveaux' => self::getMany($request->pavillons)]);
-    }
-
     public function trash(int $id): JsonResponse
     {
         $niveau = Niveau::findOrFail($id);
@@ -122,17 +93,6 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     {
         $niveau = Niveau::withTrashed()->find($id);
         return response()->json(['niveau' => $niveau]);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param  array<int>  $ids
-     * @return JsonResponse
-     */
-    public function getByPavillons(array $ids): JsonResponse
-    {
-        return response()->json(['niveaux' => self::getMany($ids)]);
     }
 
     public function getByPavillon(int $id): JsonResponse

@@ -13,7 +13,7 @@ class PavillonsController extends Controller implements StandardControllerInterf
 {
     private static function pusher(int $site, int $nombre): void
     {
-        $start = (int) Site::findOrFail($site)->pavillons->count();
+        $start = (int) Site::with('pavillons')->findOrFail($site)->pavillons->count();
         $fin = $start + $nombre;
         while ($start < $fin) {
             $start++;
@@ -55,15 +55,6 @@ class PavillonsController extends Controller implements StandardControllerInterf
         $pavillon->save();
         $message = 'Le pavillon a été modifié crée avec succès.';
         return response()->json(['message' => $message]);
-    }
-
-    public function push(Request $request): JsonResponse
-    {
-        $request->validate(Pavillon::PUSH_RULES);
-        self::pusher($request->id, $request->nombre);
-        $message = "$request->nombre pavillons ont été crée avec succès.";
-        $pavillons = Site::findOrFail($request->id)->pavillons;
-        return response()->json(['message' => $message, 'pavillons' => $pavillons]);
     }
 
     public function trash(int $id): JsonResponse

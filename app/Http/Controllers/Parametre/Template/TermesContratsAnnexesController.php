@@ -45,7 +45,7 @@ class TermesContratsAnnexesController extends TermesContratsController
     public function pdf(int $id)
     {
         $terme = TermesContratAnnexe::with(['site', 'user'])->findOrFail($id);
-        $filename = 'exampleContrat.pdf';
+        $filename = 'exampleContratAnnexe.pdf';
         $html = $terme->contenu;
         TCPDF::SetTitle('Example de Contrat');
         TCPDF::setCellHeightRatio(0.7);

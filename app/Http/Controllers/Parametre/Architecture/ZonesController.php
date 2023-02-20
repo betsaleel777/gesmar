@@ -16,43 +16,21 @@ class ZonesController extends Controller implements StandardControllerInterface
     /**
      * Undocumented function
      *
-     * @param  array<int>  $ids
-     * @return array<int, Collection<int, Zone>>
-     */
-    public static function getMany(array $ids): array
-    {
-        $niveaux = Niveau::with('zones')->findMany($ids);
-        $zones = [];
-        /**
-         * @var $niveau Niveau
-         */
-        foreach ($niveaux as $niveau) {
-            $zones[] = $niveau->zones;
-        }
-
-        return $zones;
-    }
-
-    /**
-     * Undocumented function
-     *
      * @param  array<int>  $niveaux
      * @param  int  $nombre
      * @return void
      */
-    private static function pusher(array $niveaux, int $nombre): void
+    private static function pusher(int $niveau, int $nombre): void
     {
-        foreach ($niveaux as $niveau) {
-            $start = (int) Niveau::findOrFail($niveau)->zones->count();
-            $fin = $start + $nombre;
-            while ($start < $fin) {
-                $start++;
-                $zone = new Zone();
-                $zone->niveau_id = $niveau;
-                $zone->nom = 'zone ' . $start;
-                $zone->code = (string) $start;
-                $zone->save();
-            }
+        $start = (int) Niveau::with('zones')->findOrFail($niveau)->zones->count();
+        $fin = $start + $nombre;
+        while ($start < $fin) {
+            $start++;
+            $zone = new Zone();
+            $zone->niveau_id = $niveau;
+            $zone->nom = 'zone ' . $start;
+            $zone->code = (string) $start;
+            $zone->save();
         }
     }
 
@@ -66,7 +44,7 @@ class ZonesController extends Controller implements StandardControllerInterface
     {
         if ($request->automatiq) {
             $request->validate(Zone::MIDDLE_RULES);
-            self::pusher($request->niveaux, $request->nombre);
+            self::pusher($request->niveau_id, $request->nombre);
         } else {
             $request->validate(Zone::RULES);
             $zone = new Zone($request->all());
@@ -75,14 +53,6 @@ class ZonesController extends Controller implements StandardControllerInterface
         }
         $message = "La zone $request->nom a été crée avec succès.";
         return response()->json(['message' => $message]);
-    }
-
-    public function push(Request $request): JsonResponse
-    {
-        $request->validate(Zone::PUSH_RULES);
-        self::pusher($request->niveaux, $request->nombre);
-        $message = "$request->nombre zones ont été crée avec succès.";
-        return response()->json(['message' => $message, 'zones' => self::getMany($request->niveaux)]);
     }
 
     public function update(int $id, Request $request): JsonResponse

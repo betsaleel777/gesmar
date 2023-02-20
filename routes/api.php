@@ -106,7 +106,6 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');
-        Route::post('/push', 'push');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
@@ -116,7 +115,6 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
-        Route::post('/push', 'push');
         Route::get('{id}', 'show');
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
@@ -128,7 +126,6 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::get('{id}', 'show');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');
-        Route::post('/push', 'push');
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');

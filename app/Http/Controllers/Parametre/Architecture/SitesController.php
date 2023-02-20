@@ -128,40 +128,44 @@ class SitesController extends Controller implements StandardControllerInterface
             return new Collection([
                 'name' => $site->nom,
                 'value' => (int) $site->pavillons_count,
-                'children' => $site->pavillons->map(function ($pavillon) {
-                    return new Collection([
-                        'name' => $pavillon->nom,
-                        'value' => (int) $pavillon->niveaux_count,
-                        'children' => $pavillon->niveaux->map(function ($niveau) {
-                                return new Collection([
-                                    'name' => $niveau->nom,
-                                    'value' => (int) $niveau->zones_count,
-                                    'children' => $niveau->zones->map(function ($zone) {
-                                                    if ((int) $zone->emplacements_count === 0) {
-                                                        return new Collection([
-                                                            'name' => $zone->nom,
-                                                            'value' => 1,
-                                                        ]);
-                                                    } else {
-                                                        return new Collection([
-                                                            'name' => $zone->nom,
-                                                            'value' => (int) $zone->emplacements_count,
-                                                            'children' => $zone->emplacements->map(function ($emplacement) {
-                                                                                            return new Collection([
-                                                                                                'name' => $emplacement->code,
-                                                                                                'value' => 1,
-                                                                                            ]);
-                                                                                        }
-                                                            ),
-                                                        ]);
-                                                    }
+                'children' => $site->pavillons->map(
+                    function ($pavillon) {
+                        return new Collection([
+                            'name' => $pavillon->nom,
+                            'value' => (int) $pavillon->niveaux_count,
+                            'children' => $pavillon->niveaux->map(
+                                function ($niveau) {
+                                    return new Collection([
+                                        'name' => $niveau->nom,
+                                        'value' => (int) $niveau->zones_count,
+                                        'children' => $niveau->zones->map(
+                                            function ($zone) {
+                                                if ((int) $zone->emplacements_count === 0) {
+                                                    return new Collection([
+                                                        'name' => $zone->nom,
+                                                        'value' => 1,
+                                                    ]);
+                                                } else {
+                                                    return new Collection([
+                                                        'name' => $zone->nom,
+                                                        'value' => (int) $zone->emplacements_count,
+                                                        'children' => $zone->emplacements->map(
+                                                            function ($emplacement) {
+                                                                return new Collection([
+                                                                    'name' => $emplacement->code,
+                                                                    'value' => 1,
+                                                                ]);
+                                                            }
+                                                        ),
+                                                    ]);
                                                 }
-                                    ),
-                                ]);
-                            }
-                        ),
-                    ]);
-                }
+                                            }
+                                        ),
+                                    ]);
+                                }
+                            ),
+                        ]);
+                    }
                 ),
             ]);
         });
