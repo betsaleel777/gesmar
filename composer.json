@@ -8,11 +8,11 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.1.0",
+        "php": "^8.2",
         "asantibanez/laravel-eloquent-state-machines": "^5.1",
         "elibyy/tcpdf-laravel": "^9.0",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^9.2",
+        "laravel/framework": "^9.43",
         "laravel/sanctum": "^2.14",
         "laravel/telescope": "^4.9",
         "laravel/tinker": "^2.7",
