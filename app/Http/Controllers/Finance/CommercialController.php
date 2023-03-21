@@ -11,7 +11,7 @@ class CommercialController extends Controller
 {
     public function all(): JsonResponse
     {
-        $commerciaux = Commercial::with(['attributions.emplacement', 'bordereaux'])->get();
+        $commerciaux = Commercial::with(['attributions', 'bordereaux'])->get();
         return response()->json(['commerciaux' => $commerciaux]);
     }
 
