@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Traits;
 
 use App\Enums\StatusBordereau;
@@ -20,13 +21,11 @@ trait HasCashStatus
 
     public function cashed(): bool
     {
-        return $this->status === StatusBordereau::ENCAISSE->value;
+        return $this->appends[0] === StatusBordereau::ENCAISSE->value;
     }
 
     public function uncashed(): bool
     {
-        return $this->status === StatusBordereau::PAS_ENCAISSE->value;
+        return $this->appends[0] === StatusBordereau::PAS_ENCAISSE->value;
     }
 }
-
-?>

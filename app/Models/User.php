@@ -62,11 +62,6 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return void
-     */
     public function disconnect(): void
     {
         $this->attributes['connected'] = false;

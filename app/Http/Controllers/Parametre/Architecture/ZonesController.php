@@ -16,8 +16,6 @@ class ZonesController extends Controller implements StandardControllerInterface
     /**
      * Undocumented function
      *
-     * @param  array<int>  $niveaux
-     * @param  int  $nombre
      * @return void
      */
     private static function pusher(int $niveau, int $nombre): void

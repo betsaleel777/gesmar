@@ -30,6 +30,7 @@ class Collecte extends Model
     protected $casts = [
         'nombre' => 'integer',
         'montant' => 'integer',
+        'attribution_id' => 'integer',
     ];
 
     /**

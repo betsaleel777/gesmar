@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
+ * @method abonnement()
+ * @method liaison()
  * @mixin IdeHelperEquipement
  */
 class Equipement extends Model
@@ -79,7 +81,7 @@ class Equipement extends Model
     protected function alias(): Attribute
     {
         return Attribute::make(
-            get:fn() => $this->attributes['code'] . ' ' . $this->type->nom,
+            get: fn () => $this->attributes['code'] . ' ' . $this->type->nom,
         );
     }
 

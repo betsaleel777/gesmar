@@ -5,6 +5,9 @@ namespace App\Models\Caisse;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperBanque
+ */
 class Banque extends Model
 {
     use HasSites;

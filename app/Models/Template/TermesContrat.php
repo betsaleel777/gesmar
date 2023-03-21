@@ -2,10 +2,9 @@
 
 namespace App\Models\Template;
 
+use App\Enums\StatusTermeContrat;
 use App\Models\User;
 use App\Traits\HasSites;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,28 +16,9 @@ class TermesContrat extends Model
 {
     use SoftDeletes, HasSites;
 
-    protected $fillable = ['code', 'user_id', 'site_id', 'contenu', 'date_using', 'type'];
-
-    /**
-     *
-     * @var array<int, string>
-     */
-    protected $appends = ['status'];
+    protected $fillable = ['code', 'user_id', 'site_id', 'contenu', 'type', 'status'];
 
     const RULES = ['site_id' => 'required', 'contenu' => 'required'];
-
-    private const USING = 'en utilisation';
-
-    /**
-     *
-     *@return Attribute<string, never>
-     */
-    protected function status(): Attribute
-    {
-        return Attribute::make(
-            get:fn() => !empty($this->atrributes['date_using']) ? self::USING : null
-        );
-    }
 
     /**
      * Undocumented function
@@ -48,17 +28,6 @@ class TermesContrat extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-    }
-
-    public function generate(string $prefixe): void
-    {
-        $rang = $this->count() + 1;
-        $this->attributes['code'] = $prefixe . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
-    }
-
-    public function using(): void
-    {
-        $this->attributes['date_using'] = Carbon::now();
     }
 
     /**

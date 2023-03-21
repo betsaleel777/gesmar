@@ -9,6 +9,7 @@ use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -54,20 +55,20 @@ class Commercial extends Model
     /**
      * Obtenir les emplacements attribués à un commercial
      *
-     * @return HasMany<Attribution>
+     * @return BelongsToMany<Attribution>
      */
-    public function attributions(): HasMany
+    public function attributions(): BelongsToMany
     {
-        return $this->hasMany(Attribution::class);
+        return $this->belongsToMany(Attribution::class);
     }
 
     /**
      * Obtenir les bordereaux d'un commercial
      *
-     * @return HasMany<Bordereau>
+     * @return BelongsToMany<Bordereau>
      */
-    public function bordereaux(): HasMany
+    public function bordereaux(): BelongsToMany
     {
-        return $this->hasMany(Bordereau::class);
+        return $this->BelongsToMany(Bordereau::class);
     }
 }

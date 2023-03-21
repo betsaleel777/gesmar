@@ -55,7 +55,8 @@ class Facture extends Model
      */
     protected $casts = [
         'avance' => 'integer', 'caution' => 'integer', 'index_fin' => 'integer',
-        'pas_porte' => 'integer', 'index_depart' => 'integer'
+        'pas_porte' => 'integer', 'index_depart' => 'integer', 'contrat_id' => 'integer',
+        'equipement_id' => 'integer', 'annexe_id' => 'integer',
     ];
 
     public const RULES = [

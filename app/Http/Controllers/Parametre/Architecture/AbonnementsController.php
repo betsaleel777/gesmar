@@ -8,6 +8,7 @@ use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
 use App\Models\Exploitation\Contrat;
+use App\Models\Finance\Facture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,7 +49,7 @@ class AbonnementsController extends Controller
     public function insert(Request $request): JsonResponse
     {
         $request->validate(['equipement_id' => 'required', 'index_depart' => 'required', 'index_autre' => 'required']);
-        $equipement = Equipement::with('type')->findOrFail($request->equipement_id);
+        $equipement = Equipement::with('type')->findOrFail((int)$request->equipement_id);
         $abonnement = new Abonnement($request->all());
         $abonnement->site_id = $equipement->site_id;
         $abonnement->code = self::codeGenerate($equipement->site_id);
@@ -102,7 +103,7 @@ class AbonnementsController extends Controller
         $requete = Abonnement::with(['equipement', 'emplacement.contratActuel' => ['personne', 'facturesEquipements']])->progressing()
             ->whereHas('emplacement.contratActuel', fn (Builder $query) => $query->where('auto_valid', false));
         $abonnements = $requete->whereDoesntHave($nestedRelation, fn (Builder $query) => $query->where('periode', $date))->get();
-        $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn (Builder $query) => $query->where('periode', $date)->isUnpaid())->get();
+        $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn (Facture $query) => $query->where('periode', $date)->isUnpaid())->get();
         $abonnements->merge($abonnementsFactureUnpaid)->filter();
         return response()->json(['abonnements' => $abonnements]);
     }

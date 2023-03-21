@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Traits;
 
 use App\Models\Architecture\Emplacement;
@@ -9,6 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 trait HasEmplacement
 {
+    /**
+     *
+     * @return BelongsTo<Emplacement, self>
+     */
     public function emplacement(): BelongsTo
     {
         return $this->belongsTo(Emplacement::class);

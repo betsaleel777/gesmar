@@ -13,8 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('type_equipements', function (Blueprint $table) {
-            $table->unsignedTinyInteger('periode')->default(2);
+        Schema::create('societes', function (Blueprint $table) {
+            $table->id();
+            $table->string('nom');
+            $table->string('siege');
+            $table->unsignedInteger('capital');
+            $table->string('logo')->nullable();
+            $table->string('sigle')->unique();
+            $table->timestamps();
         });
     }
 
@@ -25,8 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('type_equipements', function (Blueprint $table) {
-            $table->unsignedTinyInteger('periode')->default(2);
-        });
+        Schema::dropIfExists('societes');
     }
 };

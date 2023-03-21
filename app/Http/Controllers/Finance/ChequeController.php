@@ -12,7 +12,6 @@ class ChequeController extends Controller
     public function all(): JsonResponse
     {
         $cheques = Cheque::get();
-
         return response()->json(['cheques' => $cheques]);
     }
 
@@ -22,7 +21,6 @@ class ChequeController extends Controller
         $cheque = new Cheque($request->all());
         $cheque->save();
         $message = "Le cheque $request->numero a été enrgistré avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
@@ -39,7 +37,6 @@ class ChequeController extends Controller
     public function show(int $id): JsonResponse
     {
         $cheque = Cheque::find($id);
-
         return response()->json(['cheque' => $cheque]);
     }
 }

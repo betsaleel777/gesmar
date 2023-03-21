@@ -2,6 +2,7 @@
 
 namespace App\Models\Template;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -26,7 +27,8 @@ class TermesContratAnnexe extends TermesContrat
 
     public function codeGenerate(): void
     {
-        parent::generate('ANEX');
+        $rang = $this->count() + 1;
+        $this->attributes['code'] = TEMPLATE_ANNEXE_PREFIXE . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
     }
 
     /**

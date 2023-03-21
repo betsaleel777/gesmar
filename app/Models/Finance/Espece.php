@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
+/**
+ * @mixin IdeHelperEspece
+ */
 class Espece extends Model
 {
     use HasFactory;
@@ -17,6 +20,11 @@ class Espece extends Model
         'versement' => 'required',
     ];
 
+    /**
+     * Undocumented function
+     *
+     * @return MorphOne<Encaissement>
+     */
     public function encaissement(): MorphOne
     {
         return $this->morphOne(Encaissement::class, 'payable');

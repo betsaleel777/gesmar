@@ -20,7 +20,6 @@ return new class extends Migration
             $table->longText('contenu');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
-            $table->dateTime('date_using')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "84d0876456f39571815738c1435d680f",
+    "content-hash": "d5e0f0efe81ad6c0aaeea88c24a522d3",
     "packages": [
         {
             "name": "asantibanez/laravel-eloquent-state-machines",
@@ -494,20 +494,20 @@
         },
         {
             "name": "elibyy/tcpdf-laravel",
-            "version": "9.3.0",
+            "version": "10.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/elibyy/tcpdf-laravel.git",
-                "reference": "e73d3ea1ab9bce664667c03c2437230b4e5b4ad9"
+                "reference": "6ce7af84163ec9ba0d32bd034e88061df647fb77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/elibyy/tcpdf-laravel/zipball/e73d3ea1ab9bce664667c03c2437230b4e5b4ad9",
-                "reference": "e73d3ea1ab9bce664667c03c2437230b4e5b4ad9",
+                "url": "https://api.github.com/repos/elibyy/tcpdf-laravel/zipball/6ce7af84163ec9ba0d32bd034e88061df647fb77",
+                "reference": "6ce7af84163ec9ba0d32bd034e88061df647fb77",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0",
                 "tecnickcom/tcpdf": "6.2.*|6.3.*|6.4.*|6.5.*|6.6.*|dev-main"
             },
             "type": "library",
@@ -544,9 +544,9 @@
             ],
             "support": {
                 "issues": "https://github.com/elibyy/tcpdf-laravel/issues",
-                "source": "https://github.com/elibyy/tcpdf-laravel/tree/9.3.0"
+                "source": "https://github.com/elibyy/tcpdf-laravel/tree/10.0.0"
             },
-            "time": "2022-12-15T18:54:08+00:00"
+            "time": "2023-02-08T21:12:41+00:00"
         },
         {
             "name": "fruitcake/php-cors",
@@ -2498,87 +2498,6 @@
                 }
             ],
             "time": "2023-02-08T01:06:31+00:00"
-        },
-        {
-            "name": "nwidart/laravel-modules",
-            "version": "v9.0.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nWidart/laravel-modules.git",
-                "reference": "a31b003b9e1dd100d2bcf7da7e036a758d33986d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nWidart/laravel-modules/zipball/a31b003b9e1dd100d2bcf7da7e036a758d33986d",
-                "reference": "a31b003b9e1dd100d2bcf7da7e036a758d33986d",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "php": ">=8.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.6",
-                "laravel/framework": "^9.21",
-                "mockery/mockery": "^1.4",
-                "orchestra/testbench": "^7.0",
-                "phpstan/phpstan": "^1.4",
-                "phpunit/phpunit": "^9.5",
-                "spatie/phpunit-snapshot-assertions": "^4.2"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Nwidart\\Modules\\LaravelModulesServiceProvider"
-                    ],
-                    "aliases": {
-                        "Module": "Nwidart\\Modules\\Facades\\Module"
-                    }
-                },
-                "branch-alias": {
-                    "dev-master": "9.0-dev"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/helpers.php"
-                ],
-                "psr-4": {
-                    "Nwidart\\Modules\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Widart",
-                    "email": "n.widart@gmail.com",
-                    "homepage": "https://nicolaswidart.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Laravel Module management",
-            "keywords": [
-                "laravel",
-                "module",
-                "modules",
-                "nwidart",
-                "rad"
-            ],
-            "support": {
-                "issues": "https://github.com/nWidart/laravel-modules/issues",
-                "source": "https://github.com/nWidart/laravel-modules/tree/v9.0.6"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/nwidart",
-                    "type": "github"
-                }
-            ],
-            "time": "2022-10-28T11:50:28+00:00"
         },
         {
             "name": "phpoption/phpoption",

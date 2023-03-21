@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\ModelStatus\HasStatuses;
 
+/**
+ * @mixin IdeHelperOuverture
+ */
 class Ouverture extends Model
 {
     use HasStatuses, RecentOrder, \Staudenmeir\EloquentHasManyDeep\HasRelationships;

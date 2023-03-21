@@ -58,9 +58,9 @@ class CommercialController extends Controller
     {
         $request->validate(Commercial::ATTRIBUTION_RULES);
 
-        $commercial = Commercial::findOrFail($request->commercial);
+        $commercial = Commercial::findOrFail((int)$request->commercial);
         foreach ($request->emplacements as $emplacement) {
-            $commercial->emplacements()->attach($emplacement['id'], ['jour' => $request->jour]);
+            $commercial->attributions()->attach($emplacement['id'], ['jour' => $request->jour]);
         }
         $message = "Emplacement(s) attribué(s) avec succès.";
         return response()->json(['message' => $message]);

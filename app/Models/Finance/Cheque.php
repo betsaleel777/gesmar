@@ -2,6 +2,8 @@
 
 namespace App\Models\Finance;
 
+use App\Models\Caisse\Banque;
+use App\Models\Caisse\Encaissement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,11 +26,21 @@ class Cheque extends Model
         'valeur' => 'required|same:montant',
     ];
 
+    /**
+     * Undocumented function
+     *
+     * @return MorphOne<Encaissement>
+     */
     public function encaissement(): MorphOne
     {
         return $this->morphOne(Encaissement::class, 'payable');
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return BelongsTo<Banque, Cheque>
+     */
     public function banque(): BelongsTo
     {
         return $this->belongsTo(Banque::class);

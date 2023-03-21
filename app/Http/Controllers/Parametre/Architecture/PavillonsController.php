@@ -39,7 +39,7 @@ class PavillonsController extends Controller implements StandardControllerInterf
         } else {
             $request->validate(Pavillon::RULES);
             $pavillon = new Pavillon($request->all());
-            $pavillon->code = (string) (Site::with('pavillons')->findOrFail($request->site_id)->pavillons->count() + 1);
+            $pavillon->code = (string) (Site::with('pavillons')->findOrFail((int)$request->site_id)->pavillons->count() + 1);
             $pavillon->save();
         }
         $message = "Le pavillon $request->nom a été crée avec succès.";

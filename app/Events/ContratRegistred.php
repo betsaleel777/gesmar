@@ -26,8 +26,6 @@ class ContratRegistred
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel
      */
     public function broadcastOn(): Channel
     {

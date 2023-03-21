@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
-use App\Models\Finance\Facture;
+use App\Models\Exploitation\Contrat;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -142,7 +142,7 @@ class EmplacementsController extends Controller implements StandardControllerInt
      */
     public function getByMarcheWithGearsAndContracts(int $id): JsonResponse
     {
-        $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn (Builder $query) => $query->notAborted())
+        $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn (Contrat $query) => $query->notAborted())
             ->whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }

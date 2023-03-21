@@ -164,6 +164,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
+        Elibyy\TCPDF\ServiceProvider::class,
         /*
          * Package Service Providers...
          */
@@ -192,7 +193,7 @@ return [
      */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // ...
+        'PDF' => Elibyy\TCPDF\Facades\TCPDF::class,
     ])->toArray(),
 
 ];

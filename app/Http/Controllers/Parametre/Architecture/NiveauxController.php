@@ -15,7 +15,6 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     /**
      * Undocumented function
      *
-     * @param  array<int>  $pavillons
      * @param  int  $nombre
      * @return void
      */
@@ -47,7 +46,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         } else {
             $request->validate(Niveau::RULES);
             $niveau = new Niveau($request->all());
-            $pavillon = Pavillon::with('niveaux')->findOrFail($request->pavillon_id);
+            $pavillon = Pavillon::with('niveaux')->findOrFail((int)$request->pavillon_id);
             $niveau->code = (string) ($pavillon->niveaux->count() + 1);
             $niveau->save();
         }

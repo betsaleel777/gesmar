@@ -11,7 +11,7 @@ class TermesContratsAnnexesController extends TermesContratsController
 {
     public function all(): JsonResponse
     {
-        $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'date_using', 'type', 'created_at')
+        $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'type', 'created_at')
             ->with('site', 'user')->isAnnexe()->get();
         return response()->json(['termes' => $termes]);
     }
@@ -37,7 +37,7 @@ class TermesContratsAnnexesController extends TermesContratsController
 
     public function trashed(): JsonResponse
     {
-        $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'date_using', 'type', 'created_at')
+        $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'type', 'created_at')
             ->with('site', 'user')->onlyTrashed()->isAnnexe()->get();
         return response()->json(['termes' => $termes]);
     }
@@ -48,12 +48,12 @@ class TermesContratsAnnexesController extends TermesContratsController
         $filename = 'exampleContratAnnexe.pdf';
         $html = $terme->contenu;
         TCPDF::SetTitle('Example de Contrat');
-        TCPDF::setCellHeightRatio(0.7);
-        TCPDF::AddPage();
-        TCPDF::writeHTML($html, true, false, true, false, '');
+        PDF::setCellHeightRatio(1.10);
+        PDF::AddPage();
+        PDF::writeHTML($html, true, false, true, false, '');
         $pathStorage = public_path() . '/storage/user-' . $terme->user->id . '/' . $filename;
         $pathDisplay = 'user-' . $terme->user->id . '/' . $filename;
-        TCPDF::Output($pathStorage, 'F');
+        PDF::Output($pathStorage, 'F');
         return response()->json(['path' => $pathDisplay]);
     }
 }

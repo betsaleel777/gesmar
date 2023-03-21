@@ -2,6 +2,7 @@
 
 namespace App\Models\Template;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class TermesContratEmplacement extends TermesContrat
 {
+
     protected $table = 'termes_contrats';
 
     private const TYPE = 'contrat de bail';
@@ -26,7 +28,8 @@ class TermesContratEmplacement extends TermesContrat
 
     public function codeGenerate(): void
     {
-        parent::generate('EMPL');
+        $rang = $this->count() + 1;
+        $this->attributes['code'] = TEMPLATE_BAIL_PREFIXE . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
     }
 
     /**

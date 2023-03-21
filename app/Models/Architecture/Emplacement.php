@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 
 /**
+ * @method disponibilite()
+ * @method liaison()
  * @mixin IdeHelperEmplacement
  */
 class Emplacement extends Model

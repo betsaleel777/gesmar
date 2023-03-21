@@ -8,6 +8,9 @@ use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @mixin IdeHelperEncaissement
+ */
 class Encaissement extends Model
 {
     use RecentOrder;

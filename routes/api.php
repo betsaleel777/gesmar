@@ -42,6 +42,7 @@ use App\Http\Controllers\Parametre\RolesController;
 use App\Http\Controllers\Parametre\Template\TermesContratsAnnexesController;
 use App\Http\Controllers\Parametre\Template\TermesContratsEmplacementsController;
 use App\Http\Controllers\Parametre\UtilisateursController;
+use App\Http\Controllers\Parametre\SocieteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -199,6 +200,12 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function () {
         Route::delete('{id}', 'trash');
         Route::put('{id}', 'update');
         Route::patch('/restore/{id}', 'restore');
+    });
+    Route::controller(SocieteController::class)->prefix('societes')->group(function () {
+        Route::get('/', 'all');
+        Route::post('/store', 'store');
+        Route::put('{id}', 'update');
+        Route::get('{id}', 'show');
     });
     Route::prefix('termes')->group(function () {
         Route::controller(TermesContratsAnnexesController::class)->prefix('annexes')->group(function () {

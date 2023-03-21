@@ -42,7 +42,7 @@ class FactureEquipementController extends Controller
             $facture->save();
             $facture->facturable();
         }
-        $message = "La facture d'équipement $facture->code a été crée avec succès.";
+        $message = "Les factures d'équipement ont été crée avec succès.";
         return response()->json(['message' => $message]);
     }
 }

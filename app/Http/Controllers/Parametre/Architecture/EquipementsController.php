@@ -94,9 +94,6 @@ class EquipementsController extends Controller implements StandardControllerInte
     /**
      * Récupère les équipements non abonnés et non liés selon le marché et conserve l'équipement déjà lié de l'emplacement
      *
-     * @param integer $id
-     * @param integer $emplacement
-     * @return JsonResponse
      */
     public function getGearsForContratView(int $id, int $emplacement, int $site): JsonResponse
     {

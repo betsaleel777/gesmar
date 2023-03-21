@@ -17,7 +17,7 @@ class CollecteSubscriber
             $attribution->encaisser();
         }
         // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
-        $bordereau = Bordereau::with('attributions')->findOrFail($attribution->bordereau?->id);
+        $bordereau = Bordereau::with('attributions')->findOrFail((int)$attribution->bordereau?->id);
         $bordereau->attributions->contains('status', StatusBordereau::PAS_ENCAISSE->value) ?: $bordereau->encaisser();
     }
 
@@ -26,7 +26,7 @@ class CollecteSubscriber
         $attribution = Attribution::with('bordereau')->findOrFail($event->collecte->attribution_id);
         $attribution->pasEncaisser();
         // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
-        $bordereau = Bordereau::with('attributions')->findOrFail($attribution->bordereau?->id);
+        $bordereau = Bordereau::with('attributions')->findOrFail((int)$attribution->bordereau?->id);
         $bordereau->attributions->contains('status', StatusBordereau::PAS_ENCAISSE->value) ?: $bordereau->encaisser();
     }
 
@@ -34,7 +34,7 @@ class CollecteSubscriber
      * Register the listeners for the subscriber.
      *
      * @param  \Illuminate\Events\Dispatcher  $events
-     * @return array
+     * @return array<class-name, string>
      */
     public function subscribe($events): array
     {

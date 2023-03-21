@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Traits;
 
 use App\Models\Architecture\Site;
@@ -9,6 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 trait HasSites
 {
+    /**
+     * Undocumented function
+     *
+     * @return BelongsTo<Site, self>
+     */
     public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class);

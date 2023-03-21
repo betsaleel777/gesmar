@@ -99,7 +99,7 @@ class UtilisateursController extends Controller
 
     public function autoriserDirect(Request $request): JsonResponse
     {
-        $user = User::with('roles')->findOrFail($request->id);
+        $user = User::with('roles')->findOrFail((int)$request->id);
         $rolePermissions = $user->getPermissionsViaRoles()->all();
         $message = '';
         // attribuer des permissions directes
@@ -128,7 +128,7 @@ class UtilisateursController extends Controller
     public function autoriserByRole(Request $request): JsonResponse
     {
         $this->validate($request, ['role' => 'required']);
-        $user = User::with('roles')->findOrFail($request->id);
+        $user = User::with('roles')->findOrFail((int)$request->id);
         $newRole = Role::findOrFail($request->role);
         if (count($user->roles->all()) > 0) {
             $user->removeRole($user->roles->first());
