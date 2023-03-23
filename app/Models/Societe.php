@@ -32,7 +32,7 @@ class Societe extends Model
     {
         return [
             'nom' => 'required',
-            'logo' => 'nullable|image',
+            'image' => 'nullable|image',
             'siege' => 'required',
             'capital' => 'required|numeric',
             'sigle' => 'required|unique:societes,sigle,' . $id,

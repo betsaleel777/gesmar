@@ -103,7 +103,8 @@ class AbonnementsController extends Controller
         $requete = Abonnement::with(['equipement', 'emplacement.contratActuel' => ['personne', 'facturesEquipements']])->progressing()
             ->whereHas('emplacement.contratActuel', fn (Builder $query) => $query->where('auto_valid', false));
         $abonnements = $requete->whereDoesntHave($nestedRelation, fn (Builder $query) => $query->where('periode', $date))->get();
-        $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn (Facture $query) => $query->where('periode', $date)->isUnpaid())->get();
+        // à revoir
+        $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn (Builder $query) => $query->where('periode', $date)->isUnpaid())->get();
         $abonnements->merge($abonnementsFactureUnpaid)->filter();
         return response()->json(['abonnements' => $abonnements]);
     }

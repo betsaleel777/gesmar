@@ -56,7 +56,7 @@ class UtilisateursController extends Controller
             $user->adresse = $request->adresse;
             $user->description = $request->description;
             if ($request->hasFile('image') and !empty($user->avatar)) {
-                unlink(public_path() . '/storage/' . $user->avatar);
+                unlink(public_path() . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . $user->avatar);
                 $path = substr($request->file('image')->store('public/user-' . $request->id), 7);
                 $user->avatar = $path;
             } else if ($request->hasFile('image') and empty($user->avatar)) {

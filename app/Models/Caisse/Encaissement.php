@@ -4,7 +4,6 @@ namespace App\Models\Caisse;
 
 use App\Events\EncaissementRegistred;
 use App\Models\Exploitation\Ordonnancement;
-use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -13,8 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Encaissement extends Model
 {
-    use RecentOrder;
-
     protected $fillable = ['ordonnancement_id', 'payable_id', 'caissier_id'];
 
     const RULES = [

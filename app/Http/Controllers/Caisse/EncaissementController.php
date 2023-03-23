@@ -35,7 +35,7 @@ class EncaissementController extends Controller
 
     public function all(): JsonResponse
     {
-        $encaissements = Encaissement::with('payable', 'caissier', 'ordonnancement')->get();
+        $encaissements = Encaissement::with('payable', 'caissier', 'ordonnancement')->orderByDesc('created_at')->get();
         return response()->json(['encaissements' => $encaissements]);
     }
 
