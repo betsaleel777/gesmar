@@ -8,11 +8,11 @@ use Illuminate\Http\JsonResponse;
 
 class FactureController extends Controller
 {
-    const RELATIONS = ['contrat.personne', 'contrat.site'];
+    const RELATIONS = ['contrat' => ['personne', 'site', 'emplacement']];
 
     public function all(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->get();
+        $factures = Facture::with(self::RELATIONS)->orderByDesc('created_at')->get();
         return response()->json(['factures' => $factures]);
     }
 
