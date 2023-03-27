@@ -21,7 +21,8 @@ class SocieteResource extends JsonResource
             'siege' => $this->siege,
             'capital' => $this->capital,
             'sigle' => $this->sigle,
-            'logo' => asset('storage/' . $this->logo),
+            'logo' => $this->whenLoaded('logo')->getUrl(),
+            'created_at' => $this->created_at,
         ];
     }
 }

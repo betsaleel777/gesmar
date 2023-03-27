@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('nom');
             $table->string('siege');
             $table->unsignedInteger('capital');
-            $table->string('logo')->nullable();
             $table->string('sigle')->unique();
             $table->timestamps();
         });
