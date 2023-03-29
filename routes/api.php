@@ -320,6 +320,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function () {
             });
             Route::controller(ContratsEmplacementsController::class)->prefix('emplacements')->group(function () {
                 Route::get('/', 'all');
+                Route::get('/print/{id}', 'print');
                 Route::get('/valides', 'valides');
                 Route::get('/trashed', 'trashed');
                 Route::post('/store', 'store');

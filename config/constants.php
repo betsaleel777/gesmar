@@ -16,3 +16,7 @@ define('OUVERTURE_CODE_PREFIXE', 'OUV');
 define('MONTANT_TIMBRE', 100);
 define('TEMPLATE_ANNEXE_PREFIXE', 'ANEX');
 define('TEMPLATE_BAIL_PREFIXE', 'EMPL');
+define('COLLECTION_MEDIA_LOGO', 'logo');
+define('COLLECTION_MEDIA_CONTRAT_BAIL', 'bailgabari');
+define('COLLECTION_MEDIA_CONTRAT_ANNEXE', 'annexegabari');
+define('COLLECTION_MEDIA_CONTRAT', 'contrat');

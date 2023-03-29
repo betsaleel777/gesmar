@@ -3,8 +3,8 @@
 namespace App\Models\Architecture;
 
 use App\Models\Exploitation\Contrat;
+use App\Models\Scopes\RecentScope;
 use App\Traits\HasSites;
-use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class TypeEquipement extends Model
 {
-    use HasFactory, SoftDeletes, HasSites, RecentOrder;
+    use HasFactory, SoftDeletes, HasSites;
 
     protected $fillable = ['nom', 'site_id', 'frais_penalite', 'caution_abonnement'];
 
@@ -27,6 +27,11 @@ class TypeEquipement extends Model
         'frais_penalite' => 'required|min:1|max:100',
         'caution_abonnement' => 'required|numeric',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
 
     /**
      * Obtenir les équipement de ce type

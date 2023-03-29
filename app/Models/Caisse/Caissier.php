@@ -2,8 +2,8 @@
 
 namespace App\Models\Caisse;
 
+use App\Models\Scopes\RecentScope;
 use App\Models\User;
-use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Caissier extends Model
 {
-    use HasFactory, RecentOrder;
+    use HasFactory;
 
     protected $fillable = ['code', 'user_id'];
     /**
@@ -30,6 +30,11 @@ class Caissier extends Model
         'dates' => 'required',
         'guichet_id' => 'required|numeric',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
 
     public function codeGenerate(): void
     {

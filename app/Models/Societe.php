@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Image\Manipulations;
 
 /**
  * @mixin IdeHelperSociete
@@ -20,7 +20,7 @@ class Societe extends Model implements HasMedia
     protected $fillable = ['nom', 'sigle', 'siege', 'capital'];
 
     protected $casts = ['capital' => 'integer'];
-    protected $with = ['logo'];
+    protected $with = [COLLECTION_MEDIA_LOGO];
 
     const RULES = [
         'nom' => 'required',
@@ -52,11 +52,11 @@ class Societe extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('logo')->singleFile();
+        $this->addMediaCollection(COLLECTION_MEDIA_LOGO)->singleFile();
     }
 
     public function logo(): MorphOne
     {
-        return $this->morphOne(Media::class, 'model')->where('collection_name', '=', 'logo');
+        return $this->morphOne(Media::class, 'model')->where('collection_name', '=', COLLECTION_MEDIA_LOGO);
     }
 }

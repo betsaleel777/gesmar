@@ -6,8 +6,8 @@ use App\Enums\StatusFacture;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Paiement;
+use App\Models\Scopes\RecentScope;
 use App\Traits\HasEquipement;
-use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +23,6 @@ class Facture extends Model
 {
     use HasFactory;
     use HasStatuses;
-    use RecentOrder;
     use HasEquipement;
 
     protected $fillable = [
@@ -65,6 +64,8 @@ class Facture extends Model
 
     protected static function booted()
     {
+        static::addGlobalScope(new RecentScope);
+
         static::deleted(function (Facture $facture) {
             Contrat::findOrFail($facture->contrat_id)->delete();
         });

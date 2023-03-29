@@ -2,14 +2,18 @@
 
 namespace App\Models\Template;
 
+use App\Events\TermeContratBailRegistred;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * @mixin IdeHelperTermesContratEmplacement
  */
-class TermesContratEmplacement extends TermesContrat
+class TermesContratEmplacement extends TermesContrat implements HasMedia
 {
+    use InteractsWithMedia;
 
     protected $table = 'termes_contrats';
 
@@ -26,20 +30,25 @@ class TermesContratEmplacement extends TermesContrat
         $this->type = self::TYPE;
     }
 
+    protected static function booted()
+    {
+        $type = self::TYPE;
+        static::addGlobalScope('bail', function (Builder $builder) use ($type) {
+            $builder->where('type', $type);
+        });
+        static::saved(function (TermesContratEmplacement $terme) {
+            TermeContratBailRegistred::dispatch($terme);
+        });
+    }
+
     public function codeGenerate(): void
     {
         $rang = $this->count() + 1;
         $this->attributes['code'] = TEMPLATE_BAIL_PREFIXE . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param  Builder<TermesContratEmplacement>  $query
-     * @return Builder<TermesContratEmplacement>
-     */
-    public function scopeIsEmplacement(Builder $query): Builder
+    public function registerMediaCollections(): void
     {
-        return $query->where('type', self::TYPE);
+        $this->addMediaCollection(COLLECTION_MEDIA_CONTRAT_BAIL)->singleFile();
     }
 }

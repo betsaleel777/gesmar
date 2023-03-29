@@ -12,7 +12,7 @@ class FactureController extends Controller
 
     public function all(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->orderByDesc('created_at')->get();
+        $factures = Facture::with(self::RELATIONS)->get();
         return response()->json(['factures' => $factures]);
     }
 

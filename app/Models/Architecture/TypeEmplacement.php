@@ -2,8 +2,8 @@
 
 namespace App\Models\Architecture;
 
+use App\Models\Scopes\RecentScope;
 use App\Traits\HasSites;
-use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class TypeEmplacement extends Model
 {
-    use HasFactory, HasSites, SoftDeletes, RecentOrder;
+    use HasFactory, HasSites, SoftDeletes;
 
     protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'equipable'];
 
@@ -39,6 +39,11 @@ class TypeEmplacement extends Model
         'prefix' => 'required|max:5|min:2|alpha',
     ];
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
+
     /**
      *
      * @return Attribute<string, never>
@@ -46,7 +51,7 @@ class TypeEmplacement extends Model
     protected function code(): Attribute
     {
         return Attribute::make(
-            get:fn() => $this->attributes['prefix'] . str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
+            get: fn () => $this->attributes['prefix'] . str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
         );
     }
 

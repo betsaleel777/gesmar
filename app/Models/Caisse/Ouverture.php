@@ -2,7 +2,7 @@
 
 namespace App\Models\Caisse;
 
-use App\Traits\RecentOrder;
+use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\ModelStatus\HasStatuses;
@@ -12,7 +12,7 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Ouverture extends Model
 {
-    use HasStatuses, RecentOrder, \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use HasStatuses, \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     protected $fillable = ['guichet_id', 'caissier_id', 'date', 'code'];
     /**
      *
@@ -27,6 +27,11 @@ class Ouverture extends Model
         'date' => 'required|date',
     ];
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
+
     public function codeGenerate(): void
     {
         $rang = $this->count() + 1;
@@ -35,7 +40,7 @@ class Ouverture extends Model
 
     public function caissier(): BelongsTo
     {
-        return $this->belongsTo(Caissier::class, );
+        return $this->belongsTo(Caissier::class,);
     }
 
     public function guichet(): BelongsTo

@@ -33,10 +33,9 @@ class CollecteSubscriber
     /**
      * Register the listeners for the subscriber.
      *
-     * @param  \Illuminate\Events\Dispatcher  $events
      * @return array<class-name, string>
      */
-    public function subscribe($events): array
+    public function subscribe(): array
     {
         return [
             CollecteRegistred::class => 'updateDependenciesAfterCreate',

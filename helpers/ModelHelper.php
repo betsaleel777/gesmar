@@ -682,6 +682,8 @@ namespace App\Models\Exploitation{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Finance\Facture> $facturesLoyers
  * @property-read int|null $factures_loyers_count
  * @property-read string $status
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
  * @property-read \App\Models\Exploitation\Personne $personne
  * @property-read \App\Models\Architecture\Site $site
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\ModelStatus\Status> $statuses
@@ -793,7 +795,7 @@ namespace App\Models\Exploitation{
  * @property string $code
  * @property string $adresse
  * @property string $contact
- * @property string $email
+ * @property string|null $email
  * @property string $ville
  * @property int $site_id
  * @property int|null $type_personne_id
@@ -1153,10 +1155,27 @@ namespace App\Models{
 /**
  * App\Models\Societe
  *
+ * @property int $id
+ * @property string $nom
+ * @property string $siege
+ * @property int $capital
+ * @property string $sigle
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $logo
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
  * @property-read \App\Models\Architecture\Site $site
  * @method static \Illuminate\Database\Eloquent\Builder|Societe newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Societe newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Societe query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Societe whereCapital($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Societe whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Societe whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Societe whereNom($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Societe whereSiege($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Societe whereSigle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Societe whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 	class IdeHelperSociete {}
@@ -1202,8 +1221,15 @@ namespace App\Models\Template{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $status
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Asantibanez\LaravelEloquentStateMachines\Models\PendingTransition> $pendingTransitions
+ * @property-read int|null $pending_transitions_count
  * @property-read \App\Models\Architecture\Site $site
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Asantibanez\LaravelEloquentStateMachines\Models\StateHistory> $stateHistory
+ * @property-read int|null $state_history_count
  * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat isNotUsed()
+ * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat isUsed()
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat onlyTrashed()
@@ -1214,6 +1240,7 @@ namespace App\Models\Template{
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat whereSiteId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat whereUserId($value)
@@ -1237,9 +1264,17 @@ namespace App\Models\Template{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $status
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Asantibanez\LaravelEloquentStateMachines\Models\PendingTransition> $pendingTransitions
+ * @property-read int|null $pending_transitions_count
  * @property-read \App\Models\Architecture\Site $site
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Asantibanez\LaravelEloquentStateMachines\Models\StateHistory> $stateHistory
+ * @property-read int|null $state_history_count
  * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe isAnnexe()
+ * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat isNotUsed()
+ * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat isUsed()
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe onlyTrashed()
@@ -1250,6 +1285,7 @@ namespace App\Models\Template{
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe whereSiteId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratAnnexe whereUserId($value)
@@ -1273,9 +1309,17 @@ namespace App\Models\Template{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $status
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Asantibanez\LaravelEloquentStateMachines\Models\PendingTransition> $pendingTransitions
+ * @property-read int|null $pending_transitions_count
  * @property-read \App\Models\Architecture\Site $site
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Asantibanez\LaravelEloquentStateMachines\Models\StateHistory> $stateHistory
+ * @property-read int|null $state_history_count
  * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement isEmplacement()
+ * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat isNotUsed()
+ * @method static \Illuminate\Database\Eloquent\Builder|TermesContrat isUsed()
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement onlyTrashed()
@@ -1286,6 +1330,7 @@ namespace App\Models\Template{
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement whereSiteId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TermesContratEmplacement whereUserId($value)

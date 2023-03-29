@@ -6,6 +6,7 @@ use App\Events\EquipementRegistred;
 use App\Events\EquipementRemoved;
 use App\Models\Architecture\Emplacement;
 use App\Models\Finance\Facture;
+use Illuminate\Events\Dispatcher;
 
 class EquipementSubscriber
 {
@@ -24,23 +25,23 @@ class EquipementSubscriber
         }
     }
 
-    public function updateDependenciesAfterDelete(EquipementRemoved $event)
+    public function updateDependenciesAfterDelete(EquipementRemoved $event): void
     {
         Emplacement::findOrFail($event->equipement->emplacement_id)->delier();
-        Facture::whereHas('equipement', fn($query) => $query->where('equipement_id', $event->equipement->id))->get()->all()->map->delete();
+        Facture::whereHas('equipement', fn ($query) => $query->where('equipement_id', $event->equipement->id))->get()->all()->map->delete();
     }
 
     /**
      * Register the listeners for the subscriber.
-     *
-     * @param  \Illuminate\Events\Dispatcher  $events
-     * @return void
+     *@return array<class-name, string>
      */
-    public function subscribe($events): void
+    public function subscribe(Dispatcher $events): void
     {
         $events->listen(
-            EquipementRegistred::class, [EquipementSubscriber::class, 'updateDependenciesAfterCreate'],
-            EquipementRemoved::class, [EquipementSubscriber::class, 'updateDependenciesAfterDelete']
+            EquipementRegistred::class,
+            [EquipementSubscriber::class, 'updateDependenciesAfterCreate'],
+            EquipementRemoved::class,
+            [EquipementSubscriber::class, 'updateDependenciesAfterDelete']
         );
     }
 }

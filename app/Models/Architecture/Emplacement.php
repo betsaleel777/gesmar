@@ -4,10 +4,10 @@ namespace App\Models\Architecture;
 
 use App\Enums\StatusEmplacement;
 use App\Models\Exploitation\Contrat;
+use App\Models\Scopes\RecentScope;
 use App\States\Emplacement\StatusDisponibiliteState;
 use App\States\Emplacement\StatusLiaisonsState;
 use App\Traits\HasContrats;
-use App\Traits\RecentOrder;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -28,7 +28,6 @@ class Emplacement extends Model
     use SoftDeletes;
     use HasStateMachines;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
-    use RecentOrder;
     use HasContrats;
 
     /**
@@ -76,6 +75,11 @@ class Emplacement extends Model
         'type_emplacement_id' => 'required',
         'nombre' => 'required|numeric',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
 
     /**
      * @return Attribute<string, never>

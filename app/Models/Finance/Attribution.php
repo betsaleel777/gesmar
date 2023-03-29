@@ -2,10 +2,9 @@
 
 namespace App\Models\Finance;
 
-use App\Models\Architecture\Emplacement;
+use App\Models\Scopes\RecentScope;
 use App\Traits\HasCashStatus;
 use App\Traits\HasEmplacement;
-use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -16,7 +15,7 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Attribution extends Model
 {
-    use HasStatuses, RecentOrder, HasEmplacement, HasCashStatus;
+    use HasStatuses, HasEmplacement, HasCashStatus;
 
     protected $fillable = ['commercial_id', 'emplacement_id', 'bordereau_id', 'jour'];
     protected $table = 'attribution_emplacements';
@@ -30,10 +29,16 @@ class Attribution extends Model
         'jour' => 'required',
         'zones' => 'required',
     ];
+
     const TRANSFERT_RULES = [
         'commercial_id' => 'required',
         'date' => 'required',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
 
     /**
      * Obtenir les commerciaux d'une attribution d'emplacement

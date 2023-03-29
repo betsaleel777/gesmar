@@ -3,8 +3,8 @@
 namespace App\Models\Caisse;
 
 use App\Enums\StatusGuichet;
+use App\Models\Scopes\RecentScope;
 use App\Traits\HasSites;
-use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +15,7 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Guichet extends Model
 {
-    use HasStatuses, HasSites, RecentOrder, SoftDeletes;
+    use HasStatuses, HasSites, SoftDeletes;
 
     protected $fillable = ['nom', 'code', 'site_id'];
     /**
@@ -28,6 +28,11 @@ class Guichet extends Model
         'nom' => 'required|max:255',
         'site_id' => 'required|numeric',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
 
     public function codeGenerate(): void
     {

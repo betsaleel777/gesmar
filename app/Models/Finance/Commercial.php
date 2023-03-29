@@ -3,9 +3,9 @@
 namespace App\Models\Finance;
 
 use App\Models\Finance\Attribution;
+use App\Models\Scopes\RecentScope;
 use App\Models\User;
 use App\Traits\HasSites;
-use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Commercial extends Model
 {
-    use HasFactory, RecentOrder, HasSites, SoftDeletes;
+    use HasFactory, HasSites, SoftDeletes;
 
     protected $fillable = ['code', 'user_id', 'site_id'];
     /**
@@ -34,6 +34,11 @@ class Commercial extends Model
         'jour' => 'required',
         'zones' => 'required',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
 
     public function codeGenerate(): void
     {

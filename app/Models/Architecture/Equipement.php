@@ -4,11 +4,11 @@ namespace App\Models\Architecture;
 
 use App\Enums\StatusEquipement;
 use App\Events\EquipementRemoved;
+use App\Models\Scopes\RecentScope;
 use App\States\Equipement\StatusAbonnementState;
 use App\States\Equipement\StatusLiaisonsState;
 use App\Traits\HasEmplacement;
 use App\Traits\HasSites;
-use App\Traits\RecentOrder;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Equipement extends Model
 {
-    use HasFactory, SoftDeletes, HasStateMachines, HasSites, HasEmplacement, RecentOrder;
+    use HasFactory, SoftDeletes, HasStateMachines, HasSites, HasEmplacement;
 
     /**
      *
@@ -70,6 +70,8 @@ class Equipement extends Model
 
     protected static function booted(): void
     {
+        static::addGlobalScope(new RecentScope);
+
         static::deleted(function (Equipement $equipement): void {
             EquipementRemoved::dispatch($equipement);
         });

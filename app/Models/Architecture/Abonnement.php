@@ -5,10 +5,10 @@ namespace App\Models\Architecture;
 use App\Enums\StatusAbonnement;
 use App\Events\AbonnementRegistred;
 use App\Events\AbonnementResilied;
+use App\Models\Scopes\RecentScope;
 use App\Traits\HasEmplacement;
 use App\Traits\HasEquipement;
 use App\Traits\HasSites;
-use App\Traits\RecentOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +19,7 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Abonnement extends Model
 {
-    use HasStatuses, HasSites, HasEquipement, HasEmplacement, RecentOrder;
+    use HasStatuses, HasSites, HasEquipement, HasEmplacement;
 
     protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'site_id'];
 
@@ -47,6 +47,8 @@ class Abonnement extends Model
      */
     protected static function booted()
     {
+        static::addGlobalScope(new RecentScope);
+
         static::deleted(function (Abonnement $abonnement) {
             AbonnementResilied::dispatch($abonnement);
         });

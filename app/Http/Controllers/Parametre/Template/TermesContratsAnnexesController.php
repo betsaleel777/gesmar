@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Parametre\Template;
 
 use App\Models\Template\TermesContratAnnexe;
-use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -12,7 +11,7 @@ class TermesContratsAnnexesController extends TermesContratsController
     public function all(): JsonResponse
     {
         $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'type', 'created_at')
-            ->with('site', 'user')->isAnnexe()->get();
+            ->with('site', 'user')->get();
         return response()->json(['termes' => $termes]);
     }
 
@@ -38,22 +37,13 @@ class TermesContratsAnnexesController extends TermesContratsController
     public function trashed(): JsonResponse
     {
         $termes = TermesContratAnnexe::select('id', 'code', 'user_id', 'site_id', 'type', 'created_at')
-            ->with('site', 'user')->onlyTrashed()->isAnnexe()->get();
+            ->with('site', 'user')->onlyTrashed()->get();
         return response()->json(['termes' => $termes]);
     }
 
     public function pdf(int $id)
     {
-        $terme = TermesContratAnnexe::with(['site', 'user'])->findOrFail($id);
-        $filename = 'exampleContratAnnexe.pdf';
-        $html = $terme->contenu;
-        TCPDF::SetTitle('Example de Contrat');
-        PDF::setCellHeightRatio(1.10);
-        PDF::AddPage();
-        PDF::writeHTML($html, true, false, true, false, '');
-        $pathStorage = public_path() . '/storage/user-' . $terme->user->id . '/' . $filename;
-        $pathDisplay = 'user-' . $terme->user->id . '/' . $filename;
-        PDF::Output($pathStorage, 'F');
-        return response()->json(['path' => $pathDisplay]);
+        $terme = TermesContratAnnexe::findOrFail($id);
+        return response()->json(['path' => $terme->getFirstMedia(COLLECTION_MEDIA_CONTRAT_ANNEXE)->getUrl()]);
     }
 }
