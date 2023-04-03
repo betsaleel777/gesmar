@@ -20,3 +20,8 @@ define('COLLECTION_MEDIA_LOGO', 'logo');
 define('COLLECTION_MEDIA_CONTRAT_BAIL', 'bailgabari');
 define('COLLECTION_MEDIA_CONTRAT_ANNEXE', 'annexegabari');
 define('COLLECTION_MEDIA_CONTRAT', 'contrat');
+define('COLLECTION_MEDIA_IDENTITE', 'identite');
+define('COLLECTION_MEDIA_PHOTOCOPIE', 'photocopie');
+define('SITUATION_MARIAGE', 'marier');
+define('SITUATION_CONCUBINAGE', 'concubinage');
+define('SITUATION_CELIBAT', 'celibataire');

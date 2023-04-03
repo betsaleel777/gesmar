@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Personne;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class SocieteCollection extends ResourceCollection
+class PersonneCollection extends ResourceCollection
 {
-    public static $wrap = 'societes';
+    public static $wrap = 'personnes';
     /**
      * Transform the resource collection into an array.
      *

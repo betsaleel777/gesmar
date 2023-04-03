@@ -5,9 +5,9 @@ namespace App\Http\Resources;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class SocieteCollection extends ResourceCollection
+class TypePersonneCollection extends ResourceCollection
 {
-    public static $wrap = 'societes';
+    public static $wrap = 'types';
     /**
      * Transform the resource collection into an array.
      *

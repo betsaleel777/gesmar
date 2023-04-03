@@ -11,7 +11,6 @@ class SocieteResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
@@ -21,7 +20,7 @@ class SocieteResource extends JsonResource
             'siege' => $this->siege,
             'capital' => $this->capital,
             'sigle' => $this->sigle,
-            'logo' => $this->whenLoaded('logo')->getUrl(),
+            'logo' => $this->whenLoaded(COLLECTION_MEDIA_LOGO)->getUrl(),
             'created_at' => $this->created_at,
         ];
     }
