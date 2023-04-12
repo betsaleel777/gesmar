@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Caisse;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Caisse\OuvertureListResource;
 use App\Models\Caisse\Ouverture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -13,7 +14,7 @@ class OuvertureController extends Controller
     public function all(): JsonResponse
     {
         $ouvertures = Ouverture::get();
-        return response()->json(['ouvertures' => $ouvertures]);
+        return response()->json(['ouvertures' => OuvertureListResource::collection($ouvertures)]);
     }
 
     public function store(Request $request): JsonResponse
@@ -22,13 +23,16 @@ class OuvertureController extends Controller
         $ouverture = new Ouverture($request->all());
         $ouverture->codeGenerate();
         $ouverture->save();
+        $ouverture->setUsing();
         $message = "L'ouverture $ouverture->code a été crée avec succès";
         return response()->json(['message' => $message]);
     }
 
     public function getByMarche(int $id): JsonResponse
     {
-        $ouvertures = Ouverture::whereHas('site', fn(Builder $query) =>
+        $ouvertures = Ouverture::whereHas(
+            'site',
+            fn (Builder $query) =>
             $query->where('id', $id)
         )->get();
         return response()->json(['ouverture' => $ouvertures]);

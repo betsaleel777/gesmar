@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Http\Resources\Caisse\EncaissementListeResource;
+use App\Http\Resources\Caisse\FermetureListResource;
+use App\Http\Resources\Caisse\OuvertureListResource;
+use App\Http\Resources\Facture\FactureInitialeResource;
+use App\Http\Resources\Facture\FactureLoyerResource;
+use App\Http\Resources\Ordonnancement\OrdonnancementResource;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,6 +31,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        FactureInitialeResource::withoutWrapping();
+        FactureLoyerResource::withoutWrapping();
+        OrdonnancementResource::withoutWrapping();
+        FermetureListResource::withoutWrapping();
+        OuvertureListResource::withoutWrapping();
+        EncaissementListeResource::withoutWrapping();
     }
 }

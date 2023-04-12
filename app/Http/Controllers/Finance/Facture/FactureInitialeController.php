@@ -3,38 +3,36 @@
 namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Facture\FactureInitialeResource;
 use App\Models\Finance\Facture;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FactureInitialeController extends Controller
 {
-    const RELATIONS = ['contrat.site', 'contrat.emplacement', 'contrat.personne'];
+    const RELATIONS = ['contrat' => ['site', 'emplacement', 'personne']];
 
     public function all(): JsonResponse
     {
         $factures = Facture::with(self::RELATIONS)->isSuperMarket()->isInitiale()->isFacture()->get();
-        return response()->json(['factures' => $factures]);
+        return response()->json(['factures' => FactureInitialeResource::collection($factures)]);
     }
 
     public function facturesValidees(): JsonResponse
     {
         $factures = Facture::with(self::RELATIONS)->isSuperMarket()->isPaid()->isInitiale()->get();
-
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
         $factures = Facture::with(self::RELATIONS)->isSuperMarket()->isUnpaid()->isInitiale()->get();
-
         return response()->json(['factures' => $factures]);
     }
 
     public function show(int $id): JsonResponse
     {
         $facture = Facture::with(self::RELATIONS)->isSuperMarket()->isInitiale()->find($id);
-
         return response()->json(['facture' => $facture]);
     }
 

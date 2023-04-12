@@ -2,7 +2,9 @@
 
 namespace App\Models\Caisse;
 
+use App\Enums\StatusOuverture;
 use App\Models\Scopes\RecentScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\ModelStatus\HasStatuses;
@@ -36,6 +38,26 @@ class Ouverture extends Model
     {
         $rang = $this->count() + 1;
         $this->attributes['code'] = OUVERTURE_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
+    }
+
+    public function setConfirmed(): void
+    {
+        $this->setStatus(StatusOuverture::CONFIRMED->value);
+    }
+
+    public function setUsing(): void
+    {
+        $this->setStatus(StatusOuverture::USING->value);
+    }
+
+    public function scopeConfirmed(Builder $query): Builder
+    {
+        return $query->currentStatus(StatusOuverture::CONFIRMED->value);
+    }
+
+    public function scopeUsing(Builder $query): Builder
+    {
+        return $query->currentStatus(StatusOuverture::USING->value);
     }
 
     public function caissier(): BelongsTo
