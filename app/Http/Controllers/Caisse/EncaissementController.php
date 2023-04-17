@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Caisse;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Caisse\EncaissementListeResource;
+use App\Http\Resources\Caisse\EncaissementResource;
 use App\Models\Caisse\Encaissement;
 use App\Models\Finance\Cheque;
 use App\Models\Finance\Espece;
@@ -38,6 +39,12 @@ class EncaissementController extends Controller
     {
         $encaissements = Encaissement::with('payable', 'caissier', 'ordonnancement')->get();
         return response()->json(['encaissements' => EncaissementListeResource::collection($encaissements)]);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        $encaissement = Encaissement::with('payable', 'caissier', 'ordonnancement')->find($id);
+        return response()->json(['encaissement' => EncaissementResource::make($encaissement)]);
     }
 
     public function store(Request $request): JsonResponse

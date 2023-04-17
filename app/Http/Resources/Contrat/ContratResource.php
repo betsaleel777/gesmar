@@ -10,7 +10,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ContratResource extends JsonResource
 {
-    public static $wrap = 'contrat';
     /**
      * Transform the resource into an array.
      *

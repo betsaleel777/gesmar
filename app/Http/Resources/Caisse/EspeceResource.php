@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Caisse;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TypePersonneResource extends JsonResource
+class EspeceResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,9 +15,8 @@ class TypePersonneResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nom' => $this->nom,
-            'site_id' => $this->site_id,
-            'site' => SiteResource::make($this->whenLoaded('site')),
+            'montant' => $this->montant,
+            'versement' => $this->versement,
         ];
     }
 }

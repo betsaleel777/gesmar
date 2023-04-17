@@ -28,7 +28,7 @@ class FermetureController extends Controller
         $query = Encaissement::opened();
         if ($query->exists()) {
             $encaissements = $query->get();
-            $this->fermeture->make($request->all());
+            $this->fermeture->make();
             $this->fermeture->codeGenerate();
             $this->fermeture->save();
             foreach ($encaissements->all() as $encaissement) {

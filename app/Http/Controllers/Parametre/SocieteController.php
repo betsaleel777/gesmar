@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Parametre;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\SocieteCollection;
 use App\Http\Resources\SocieteResource;
 use App\Models\Societe;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SocieteController extends Controller
 {
-    public function all(): SocieteCollection
+    public function all(): JsonResponse
     {
-        return new SocieteCollection(Societe::all());
+        return response()->json(['societes' => SocieteResource::collection(Societe::all())]);
     }
 
     public function store(Request $request)
@@ -33,8 +33,8 @@ class SocieteController extends Controller
         return response()->json(['message' => "La société a été modifiée avec succès."]);
     }
 
-    public function show(int $id): SocieteResource
+    public function show(int $id): JsonResponse
     {
-        return new SocieteResource(Societe::find($id));
+        return response()->json(['societe' => SocieteResource::make(Societe::find($id))]);
     }
 }

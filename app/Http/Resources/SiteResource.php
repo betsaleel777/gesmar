@@ -6,7 +6,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class SiteResource extends JsonResource
 {
-    public static $wrap = 'site';
     /**
      * Transform the resource into an array.
      *

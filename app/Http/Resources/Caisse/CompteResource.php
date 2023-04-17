@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Personne;
+namespace App\Http\Resources\Caisse;
 
+use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProspectResource extends JsonResource
+class CompteResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +17,8 @@ class ProspectResource extends JsonResource
         return [
             'id' => $this->id,
             'nom' => $this->nom,
-            'prenom' => $this->prenom,
-            'ville' => $this->ville,
-            'contact' => $this->contact,
-            'site' => $this->whenLoaded('site', fn () => $this->site->nom),
+            'site_id' => $this->site_id,
+            'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }
 }
