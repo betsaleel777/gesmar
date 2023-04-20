@@ -4,9 +4,8 @@ namespace App\Http\Resources\Contrat;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class DemandeBailResource extends JsonResource
+class ContratListResource extends JsonResource
 {
-    public static $wrap = 'contrat';
     /**
      * Transform the resource into an array.
      *
@@ -20,6 +19,7 @@ class DemandeBailResource extends JsonResource
             'created_at' => $this->created_at,
             'status' => $this->whenAppended('status'),
             'emplacement' => $this->whenLoaded('emplacement', fn () => $this->emplacement->code),
+            'annexe' => $this->whenLoaded('annexe', fn () => $this->annexe->code),
             'personne' => $this->whenLoaded('personne', fn () => $this->personne->alias),
             'equipements' => EquipementResource::collection($this->whenLoaded('equipements')),
         ];

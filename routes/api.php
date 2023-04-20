@@ -306,6 +306,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(static functio
         });
         Route::prefix('contrats')->group(static function (): void {
             Route::get('/', [ContratController::class, 'all']);
+            Route::get('/{id}', [ContratController::class, 'show']);
             Route::get('/scheduling', [ContratController::class, 'schedulableContrats']);
             Route::get('/personne/{id}', [ContratController::class, 'contratByPerson']);
             Route::controller(ContratsAnnexesController::class)->prefix('annexes')->group(static function (): void {

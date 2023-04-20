@@ -36,7 +36,7 @@ class ContratResource extends JsonResource
             'personne' => PersonneResource::make($this->whenLoaded('personne')),
             'annexe' => ServiceAnnexeResource::make($this->whenLoaded('annexe')),
             'emplacement' => EmplacementResource::make($this->whenLoaded('emplacement')),
-            'equipements' => EquipementCollection::make($this->whenLoaded('equipements')),
+            'equipements' => EquipementResource::collection($this->whenLoaded('equipements')),
         ];
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
 use App\Models\Exploitation\Contrat;
@@ -12,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class EmplacementsController extends Controller implements StandardControllerInterface
+class EmplacementsController extends Controller
 {
     /**
      * Génerer le code de l'emplacement
