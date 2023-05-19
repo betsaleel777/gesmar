@@ -19,8 +19,11 @@ class SocieteResource extends JsonResource
             'siege' => $this->siege,
             'capital' => $this->capital,
             'sigle' => $this->sigle,
-            'logo' => $this->whenLoaded(COLLECTION_MEDIA_LOGO)->getUrl(),
+            'smartphone' => $this->smartphone,
+            'phone' => $this->phone,
+            'email' => $this->email,
             'created_at' => $this->created_at,
+            'logo' => $this->whenLoaded(COLLECTION_MEDIA_LOGO, fn () => $this->logo->getUrl()),
         ];
     }
 }

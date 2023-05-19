@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Parametre;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,20 +16,20 @@ class UtilisateursController extends Controller
     public function all(): JsonResponse
     {
         $users = User::get();
-        return response()->json(['users' => $users]);
+        return response()->json(['users' => UserResource::collection($users)]);
     }
 
     public function trashed(): JsonResponse
     {
         $users = User::onlyTrashed()->get();
-        return response()->json(['users' => $users]);
+        return response()->json(['users' => UserResource::collection($users)]);
     }
 
     public function show(int $id): JsonResponse
     {
         $user = User::with(['roles', 'permissions'])->withTrashed()->findOrFail($id);
         $permissions = $user->getAllPermissions();
-        return response()->json(['user' => $user, 'permissions' => $permissions]);
+        return response()->json(['user' => UserResource::make($user), 'permissions' => $permissions]);
     }
 
     public function store(Request $request): JsonResponse
@@ -38,9 +39,7 @@ class UtilisateursController extends Controller
         $user->password = Hash::make($request->password);
         $user->disconnect();
         $user->save();
-        $path = substr($request->file('avatar')->store('public/user-' . $user->id), 7);
-        $user->avatar = $path;
-        $user->save();
+        $user->addMediaFromRequest('avatar')->toMediaCollection('avatar');
         $message = "L'utilisateur $request->name a été crée avec succès.";
         return response()->json(['message' => $message]);
     }
@@ -55,17 +54,11 @@ class UtilisateursController extends Controller
             $user->name = $request->name;
             $user->adresse = $request->adresse;
             $user->description = $request->description;
-            if ($request->hasFile('image') and !empty($user->avatar)) {
-                unlink(public_path() . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . $user->avatar);
-                $path = substr($request->file('image')->store('public/user-' . $request->id), 7);
-                $user->avatar = $path;
-            } else if ($request->hasFile('image') and empty($user->avatar)) {
-                $path = substr($request->file('image')->store('public/user-' . $request->id), 7);
-                $user->avatar = $path;
-            }
             $user->save();
-            $message = "Utilisateur a été modifié avec succes. \n
-            Un rechargement de la page est nécessaire pour constater le rafraîchissement de l'image.";
+            if ($request->hasFile('image')) {
+                $user->addMediaFromRequest('image')->toMediaCollection('avatar');
+            }
+            $message = "Utilisateur a été modifié avec succes.";
             return response()->json(['message' => $message]);
         }
     }

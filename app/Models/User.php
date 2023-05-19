@@ -4,21 +4,24 @@ namespace App\Models;
 
 use App\Models\Caisse\Caissier;
 use App\Models\Finance\Commercial;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @mixin IdeHelperUser
  */
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, InteractsWithMedia, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -32,8 +35,9 @@ class User extends Authenticatable
         'description',
         'adresse',
         'password',
-        'avatar',
     ];
+
+    protected $with = ['avatar'];
 
     const RULES = [
         'name' => 'required|max:150|unique:users,name',
@@ -107,5 +111,15 @@ class User extends Authenticatable
     public function caissier(): HasOne
     {
         return $this->hasOne(Caissier::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')->singleFile();
+    }
+
+    public function avatar(): MorphOne
+    {
+        return $this->morphOne(Media::class, 'model')->where('collection_name', '=', 'avatar');
     }
 }

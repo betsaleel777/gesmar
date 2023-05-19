@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Parametre;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -53,5 +54,11 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+    }
+
+    public function me()
+    {
+        $user = User::find(Auth::user()->id);
+        return UserResource::make($user);
     }
 }

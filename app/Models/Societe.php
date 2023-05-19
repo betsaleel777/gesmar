@@ -17,7 +17,7 @@ class Societe extends Model implements HasMedia
 {
     use HasSites, InteractsWithMedia;
 
-    protected $fillable = ['nom', 'sigle', 'siege', 'capital'];
+    protected $fillable = ['nom', 'sigle', 'siege', 'capital', 'smartphone', 'email', 'phone'];
 
     protected $casts = ['capital' => 'integer'];
     protected $with = [COLLECTION_MEDIA_LOGO];
@@ -27,23 +27,20 @@ class Societe extends Model implements HasMedia
         'logo' => 'nullable|image',
         'siege' => 'required',
         'capital' => 'required|numeric',
-        'sigle' => 'required|unique:societes,sigle',
+        'sigle' => 'required',
+        'smartphone' => 'required',
+        'phone' => 'required',
+        'email' => 'required|email',
     ];
-
-    /**
-     *
-     * @return array<string, string>
-     */
-    public static function editRules(int $id): array
-    {
-        return [
-            'nom' => 'required',
-            'image' => 'nullable|image',
-            'siege' => 'required',
-            'capital' => 'required|numeric',
-            'sigle' => 'required|unique:societes,sigle,' . $id,
-        ];
-    }
+    const EDIT_RULES = [
+        'nom' => 'required',
+        'siege' => 'required',
+        'capital' => 'required|numeric',
+        'sigle' => 'required',
+        'smartphone' => 'required',
+        'phone' => 'required',
+        'email' => 'required|email',
+    ];
 
     public function registerMediaConversions(Media $media = null): void
     {

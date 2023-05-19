@@ -43,7 +43,6 @@ use App\Http\Controllers\Parametre\Template\TermesContratsAnnexesController;
 use App\Http\Controllers\Parametre\Template\TermesContratsEmplacementsController;
 use App\Http\Controllers\Parametre\UtilisateursController;
 use App\Http\Controllers\Parametre\SocieteController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,7 +59,7 @@ use Illuminate\Support\Facades\Route;
 Route::controller(AuthController::class)->group(static function (): void {
     Route::post('login', 'login');
 });
-Route::middleware('auth:sanctum')->get('/user', fn (Request $request) => $request->user());
+Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
 Route::middleware('auth:sanctum')->controller(AuthController::class)->group(static function (): void {
     Route::post('deconnecter', 'deconnecter');
     Route::post('logout', 'logout');

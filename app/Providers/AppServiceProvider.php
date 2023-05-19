@@ -19,6 +19,7 @@ use App\Http\Resources\ServiceAnnexeResource;
 use App\Http\Resources\SiteResource;
 use App\Http\Resources\SocieteResource;
 use App\Http\Resources\TypePersonneResource;
+use App\Http\Resources\UserResource;
 use App\Models\Architecture\Equipement;
 use Illuminate\Support\ServiceProvider;
 
@@ -58,5 +59,6 @@ class AppServiceProvider extends ServiceProvider
         ContratListResource::withoutWrapping();
         EquipementResource::withoutWrapping();
         ServiceAnnexeResource::withoutWrapping();
+        UserResource::withoutWrapping();
     }
 }
