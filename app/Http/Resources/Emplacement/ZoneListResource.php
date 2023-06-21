@@ -2,13 +2,11 @@
 
 namespace App\Http\Resources\Emplacement;
 
-use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
-class PavillonResource extends JsonResource
+class ZoneListResource extends JsonResource
 {
-    public static $wrap = 'pavillon';
     /**
      * Transform the resource into an array.
      *
@@ -18,12 +16,12 @@ class PavillonResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'site_id' => $this->site_id,
             'nom' => Str::lower($this->nom),
+            'niveau_id' => $this->niveau_id,
             'created_at' => $this->created_at->format('d-m-Y'),
-            'code' => $this->whenAppended('code'),
-            'marche' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
-            'site' => SiteResource::make($this->whenLoaded('site')),
+            'niveau' => $this->whenLoaded('niveau', fn () => Str::lower($this->niveau->nom)),
+            'pavillon' => $this->whenLoaded('pavillon', fn () => Str::lower($this->pavillon->nom)),
+            'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
         ];
     }
 }

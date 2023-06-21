@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\StandardControllerInterface;
+use App\Http\Resources\Emplacement\PavillonResource;
+use App\Http\Resources\Emplacement\PavillonSelectResource;
 use App\Models\Architecture\Pavillon;
 use App\Models\Architecture\Site;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class PavillonsController extends Controller implements StandardControllerInterface
+class PavillonsController extends Controller
 {
     private static function pusher(int $site, int $nombre): void
     {
@@ -28,7 +31,14 @@ class PavillonsController extends Controller implements StandardControllerInterf
     public function all(): JsonResponse
     {
         $pavillons = Pavillon::with('site')->get();
-        return response()->json(['pavillons' => $pavillons]);
+        return response()->json(['pavillons' => PavillonResource::collection($pavillons)]);
+    }
+
+    public function search(Request $request): JsonResource
+    {
+        $pavillons = Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+            ->orWhereHas('site', fn (Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+        return PavillonSelectResource::collection($pavillons);
     }
 
     public function store(Request $request): JsonResponse
@@ -81,7 +91,7 @@ class PavillonsController extends Controller implements StandardControllerInterf
 
     public function show(int $id): JsonResponse
     {
-        $pavillon = Pavillon::withTrashed()->find($id);
+        $pavillon = Pavillon::with('site')->withTrashed()->find($id);
         return response()->json(['pavillon' => $pavillon]);
     }
 

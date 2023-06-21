@@ -19,7 +19,6 @@ class FactureInitialeResource extends JsonResource
             'code' => $this->code,
             'avance' => $this->avance,
             'caution' => $this->caution,
-            'created_at' => $this->created_at,
             'pas_porte' => $this->pas_porte,
             'status' => $this->whenAppended('status'),
             'contrat' => $this->whenLoaded('contrat', fn () => $this->contrat->code),

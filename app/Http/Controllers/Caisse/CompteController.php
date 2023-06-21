@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Caisse;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Caisse\CompteResource;
 use App\Models\Caisse\Compte;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class CompteController extends Controller
     public function all(): JsonResponse
     {
         $comptes = Compte::get();
-        return response()->json(['comptes' => $comptes]);
+        return response()->json(['comptes' => CompteResource::collection($comptes)]);
     }
 
     public function store(Request $request): JsonResponse

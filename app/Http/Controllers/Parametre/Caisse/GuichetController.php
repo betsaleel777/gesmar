@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Parametre\Caisse;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Caisse\GuichetResource;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Caisse\Guichet;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class GuichetController extends Controller implements StandardControllerInterfac
     public function all(): JsonResponse
     {
         $guichets = Guichet::get();
-        return response()->json(['guichets' => $guichets]);
+        return response()->json(['guichets' => GuichetResource::collection($guichets)]);
     }
 
     public function store(Request $request): JsonResponse

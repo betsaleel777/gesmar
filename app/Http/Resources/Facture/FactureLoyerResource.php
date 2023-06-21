@@ -17,7 +17,6 @@ class FactureLoyerResource extends JsonResource
         return [
             'id' => $this->id,
             'code' => $this->code,
-            'created_at' => $this->created_at,
             'status' => $this->whenAppended('status'),
             'contrat' => $this->whenLoaded('contrat', fn () => $this->contrat->code),
             'personne' => $this->when(

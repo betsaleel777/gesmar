@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
 
 /**
  * @method disponibilite()
@@ -56,8 +57,7 @@ class Emplacement extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'superficie' => 'integer', 'loyer' => 'integer',
-        'pas_porte' => 'integer', 'caution' => 'integer'
+        'superficie' => 'integer', 'loyer' => 'integer', 'pas_porte' => 'integer', 'caution' => 'integer'
     ];
 
     public const RULES = [
@@ -180,14 +180,33 @@ class Emplacement extends Model
         return $this->belongsTo(Zone::class);
     }
 
+    public function niveau(): HasOneDeep
+    {
+        return $this->hasOneDeep(
+            Niveau::class,
+            [Zone::class],
+            ['id', 'id'],
+            ['zone_id', 'niveau_id'],
+        );
+    }
+
+    public function pavillon(): HasOneDeep
+    {
+        return $this->hasOneDeep(
+            Pavillon::class,
+            [Zone::class, Niveau::class],
+            ['id', 'id', 'id'],
+            ['zone_id', 'niveau_id', 'pavillon_id'],
+        );
+    }
     /**
      * Obtenir le marche de l'emplacement
      *
-     * @return HasManyDeep<Site>
+     * @return HasOneDeep
      */
-    public function site(): HasManyDeep
+    public function site(): HasOneDeep
     {
-        return $this->hasManyDeep(
+        return $this->hasOneDeep(
             Site::class,
             [Zone::class, Niveau::class, Pavillon::class],
             ['id', 'id', 'id', 'id'],

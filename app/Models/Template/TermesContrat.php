@@ -31,16 +31,6 @@ class TermesContrat extends Model
         'status' => StatusTermeStateMachine::class,
     ];
 
-    /**
-     * Undocumented function
-     *
-     * @param  array<string, mixed>  $attributes
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-    }
-
     public function used(): void
     {
         $this->status()->transitionTo(StatusTermeContrat::USING->value);
@@ -53,12 +43,12 @@ class TermesContrat extends Model
 
     public function scopeIsUsed(Builder $query): Builder
     {
-        return $query->whereHasStatus(fn (Builder $query) => $query->transitionedTo(StatusTermeContrat::USING->value));
+        return $query->where('status', StatusTermeContrat::USING->value);
     }
 
     public function scopeIsNotUsed(Builder $query): Builder
     {
-        return $query->whereHasStatus(fn (Builder $query) => $query->transitionedTo(StatusTermeContrat::NOTUSING->value));
+        return $query->where('status', StatusTermeContrat::NOTUSING->value);
     }
 
     /**

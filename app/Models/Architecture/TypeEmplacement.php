@@ -19,6 +19,7 @@ class TypeEmplacement extends Model
     use HasFactory, HasSites, SoftDeletes;
 
     protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'equipable'];
+    protected $dates = ['created_at'];
 
     /**
      * les propriétés qui doivent être caster.

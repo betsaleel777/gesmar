@@ -103,6 +103,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(static function (
     });
     Route::controller(PavillonsController::class)->prefix('pavillons')->group(static function (): void {
         Route::get('/', 'all');
+        Route::get('/select', 'search');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');
@@ -113,6 +114,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(static function (
     });
     Route::controller(NiveauxController::class)->prefix('niveaux')->group(static function (): void {
         Route::get('/', 'all');
+        Route::get('/select', 'search');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
@@ -122,6 +124,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(static function (
     });
     Route::controller(ZonesController::class)->prefix('zones')->group(static function (): void {
         Route::get('/', 'all');
+        Route::get('/select', 'search');
         Route::get('/trashed', 'trashed');
         Route::get('{id}', 'show');
         Route::get('/marche/{id}', 'getByMarche');

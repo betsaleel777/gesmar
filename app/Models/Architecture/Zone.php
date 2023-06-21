@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
 
 /**
  * @mixin IdeHelperZone
@@ -14,8 +15,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Zone extends Model
 {
     use SoftDeletes;
+    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
     protected $fillable = ['nom', 'code', 'niveau_id'];
+    protected $dates = ['created_at'];
 
     const RULES = [
         'nom' => 'required|max:150',
@@ -25,7 +28,7 @@ class Zone extends Model
      *
      * @var array<int, string>
      */
-    protected $with = ['niveau.pavillon.site'];
+    protected $with = ['niveau', 'pavillon', 'site'];
     /**
      *
      * @var array<int, string>
@@ -70,5 +73,25 @@ class Zone extends Model
     public function emplacements(): HasMany
     {
         return $this->hasMany(Emplacement::class);
+    }
+
+    public function pavillon(): HasOneDeep
+    {
+        return $this->hasOneDeep(
+            Pavillon::class,
+            [Niveau::class],
+            ['id', 'id'],
+            ['niveau_id', 'pavillon_id'],
+        );
+    }
+
+    public function site(): HasOneDeep
+    {
+        return $this->hasOneDeep(
+            Site::class,
+            [Niveau::class, Pavillon::class],
+            ['id', 'id', 'id'],
+            ['niveau_id', 'pavillon_id', 'site_id'],
+        );
     }
 }

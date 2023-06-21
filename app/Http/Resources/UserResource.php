@@ -20,6 +20,7 @@ class UserResource extends JsonResource
             'connected' => $this->connected,
             'description' => $this->description,
             'adresse' => $this->adresse,
+            'created_at' => $this->created_at->format('d-m-Y'),
             'avatar' => $this->whenLoaded('avatar', fn () => $this->avatar->getUrl()),
         ];
     }

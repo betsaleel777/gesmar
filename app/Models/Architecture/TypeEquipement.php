@@ -20,6 +20,7 @@ class TypeEquipement extends Model
     use HasFactory, SoftDeletes, HasSites;
 
     protected $fillable = ['nom', 'site_id', 'frais_penalite', 'caution_abonnement'];
+    protected $dates = ['created_at'];
 
     const RULES = [
         'nom' => 'required|max:150',

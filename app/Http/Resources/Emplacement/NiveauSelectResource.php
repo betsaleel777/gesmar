@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Emplacement;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
-class SiteResource extends JsonResource
+class NiveauSelectResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,11 +16,8 @@ class SiteResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nom' => Str::lower($this->nom),
-            'pays' => $this->pays,
-            'ville' => $this->ville,
-            'commune' => $this->commune,
-            'postale' => $this->postale,
+            'texte' => $this->nom . ' ' . $this->whenLoaded('pavillon', fn () => Str::lower($this->pavillon->nom)) . ' ' .
+                $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
         ];
     }
 }

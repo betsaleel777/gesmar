@@ -18,6 +18,7 @@ class Guichet extends Model
     use HasStatuses, HasSites, SoftDeletes;
 
     protected $fillable = ['nom', 'code', 'site_id'];
+    protected $dates = ['created_at'];
     /**
      *
      * @var array<int, string>

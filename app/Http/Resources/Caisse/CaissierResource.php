@@ -2,10 +2,10 @@
 
 namespace App\Http\Resources\Caisse;
 
-use App\Http\Resources\SiteResource;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CompteResource extends JsonResource
+class CaissierResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,11 +16,7 @@ class CompteResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
-            'nom' => $this->nom,
-            'site_id' => $this->site_id,
-            'created_at' => $this->created_at->format('d-m-Y'),
-            'site' => SiteResource::make($this->whenLoaded('site')),
+            'user' => UserResource::make($this->whenLoaded('user')),
         ];
     }
 }

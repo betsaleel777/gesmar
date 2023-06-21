@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Emplacement\ZoneListResource;
+use App\Http\Resources\Emplacement\ZoneSelectResource;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Niveau;
 use App\Models\Architecture\Site;
 use App\Models\Architecture\Zone;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class ZonesController extends Controller implements StandardControllerInterface
 {
@@ -35,7 +38,16 @@ class ZonesController extends Controller implements StandardControllerInterface
     public function all(): JsonResponse
     {
         $zones = Zone::all();
-        return response()->json(['zones' => $zones]);
+        return response()->json(['zones' => ZoneListResource::collection($zones)]);
+    }
+
+    public function search(Request $request): JsonResource
+    {
+        $zones = Zone::with('site', 'pavillon', 'niveau')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+            ->orWhereHas('site', fn (Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
+            ->orWhereHas('pavillon', fn (Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))
+            ->orWhereHas('niveau', fn (Builder $query) => $query->where('niveaux.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+        return ZoneSelectResource::collection($zones);
     }
 
     public function store(Request $request): JsonResponse

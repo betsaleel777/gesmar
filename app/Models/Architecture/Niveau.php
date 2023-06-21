@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
 
 /**
  * @mixin IdeHelperNiveau
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Niveau extends Model
 {
     use SoftDeletes;
+    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
     protected $fillable = ['nom', 'code', 'pavillon_id'];
 
@@ -38,6 +40,16 @@ class Niveau extends Model
     public function pavillon(): BelongsTo
     {
         return $this->belongsTo(Pavillon::class);
+    }
+
+    public function site(): HasOneDeep
+    {
+        return $this->hasOneDeep(
+            Site::class,
+            [Pavillon::class],
+            ['id', 'id'],
+            ['pavillon_id', 'site_id'],
+        );
     }
 
     /**

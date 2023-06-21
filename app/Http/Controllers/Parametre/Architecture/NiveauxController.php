@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Emplacement\NiveauListResource;
+use App\Http\Resources\Emplacement\NiveauSelectResource;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Niveau;
 use App\Models\Architecture\Pavillon;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class NiveauxController extends Controller implements StandardControllerInterface
 {
@@ -34,8 +37,16 @@ class NiveauxController extends Controller implements StandardControllerInterfac
 
     public function all(): JsonResponse
     {
-        $niveaux = Niveau::with('pavillon.site')->get();
-        return response()->json(['niveaux' => $niveaux]);
+        $niveaux = Niveau::with('pavillon', 'site')->get();
+        return response()->json(['niveaux' => NiveauListResource::collection($niveaux)]);
+    }
+
+    public function search(Request $request): JsonResource
+    {
+        $niveaux = Niveau::with('site', 'pavillon')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+            ->orWhereHas('site', fn (Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
+            ->orWhereHas('pavillon', fn (Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+        return NiveauSelectResource::collection($niveaux);
     }
 
     public function store(Request $request): JsonResponse
@@ -90,7 +101,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
 
     public function show(int $id): JsonResponse
     {
-        $niveau = Niveau::withTrashed()->find($id);
+        $niveau = Niveau::with('pavillon', 'site')->withTrashed()->find($id);
         return response()->json(['niveau' => $niveau]);
     }
 

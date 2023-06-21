@@ -46,6 +46,7 @@ class Equipement extends Model
         'site_id',
         'emplacement_id',
     ];
+    protected $dates = ['created_at'];
 
     /**
      *

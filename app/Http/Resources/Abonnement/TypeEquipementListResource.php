@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Resources\Emplacement;
+namespace App\Http\Resources\Abonnement;
 
-use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
-class NiveauResource extends JsonResource
+class TypeEquipementListResource extends JsonResource
 {
-    public static $wrap = 'niveau';
     /**
      * Transform the resource into an array.
      *
@@ -18,11 +17,10 @@ class NiveauResource extends JsonResource
         return [
             'id' => $this->id,
             'nom' => $this->nom,
-            'code' => $this->code,
-            'pavillon_id' => $this->pavillon_id,
+            'frais_penalite' => $this->frais_penalite,
+            'caution_abonnement' => $this->caution_abonnement,
             'created_at' => $this->created_at->format('d-m-Y'),
-            'pavillon' => PavillonResource::make($this->whenLoaded('pavillon')),
-            'site' => SiteResource::make($this->whenLoaded('site')),
+            'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
         ];
     }
 }

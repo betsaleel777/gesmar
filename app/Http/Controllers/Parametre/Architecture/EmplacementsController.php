@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Emplacement\EmplacementListResource;
+use App\Http\Resources\Emplacement\EmplacementSelectResource;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
 use App\Models\Exploitation\Contrat;
@@ -30,13 +32,19 @@ class EmplacementsController extends Controller
 
     public function all(): JsonResponse
     {
-        $emplacements = Emplacement::with('zone.niveau.pavillon.site')->get();
-        return response()->json(['emplacements' => $emplacements]);
+        $emplacements = Emplacement::get();
+        return response()->json(['emplacements' => EmplacementListResource::collection($emplacements)]);
+    }
+
+    public function select(): JsonResponse
+    {
+        $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->get();
+        return response()->json(['emplacements' => EmplacementSelectResource::collection($emplacements)]);
     }
 
     public function allAuto(): JsonResponse
     {
-        $emplacements = Emplacement::with('zone.niveau.pavillon.site')->withoutSchedule()->get();
+        $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->withoutSchedule()->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 

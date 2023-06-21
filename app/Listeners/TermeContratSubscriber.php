@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Enums\StatusTermeContrat;
 use App\Events\TermeContratAnnexeRegistred;
 use App\Events\TermeContratBailRegistred;
 use App\Models\Template\TermesContratAnnexe;
@@ -11,8 +12,7 @@ class TermeContratSubscriber
 {
     public function afterGabariAnnexeRegistred(TermeContratBailRegistred $event): void
     {
-        $oldTermeUsed = TermesContratAnnexe::where('id', '!=', $event->terme->id)->isUsed()->first();
-        empty($oldTermeUsed) ?: $oldTermeUsed->notUsed();
+        TermesContratAnnexe::where('id', '!=', $event->terme->id)->get()->map->notUsed();
         $path = createPDF('exampleContratAnnexe.pdf', $event->terme->contenu);
         $event->terme->addMedia($path)->toMediaCollection(COLLECTION_MEDIA_CONTRAT_ANNEXE);
     }
@@ -20,8 +20,11 @@ class TermeContratSubscriber
 
     public function afterGabariBailRegistred(TermeContratBailRegistred $event): void
     {
-        $oldTermeUsed = TermesContratEmplacement::where('id', '!=', $event->terme->id)->isUsed()->first();
-        empty($oldTermeUsed) ?: $oldTermeUsed->notUsed();
+        $termes = TermesContratEmplacement::where('id', '!=', $event->terme->id)->get();
+        foreach ($termes as $terme) {
+            $terme->status = StatusTermeContrat::NOTUSING->value;
+            $terme->save();
+        }
         $path = createPDF('exampleContratBail.pdf', $event->terme->contenu);
         $event->terme->addMedia($path)->toMediaCollection(COLLECTION_MEDIA_CONTRAT_BAIL);
     }

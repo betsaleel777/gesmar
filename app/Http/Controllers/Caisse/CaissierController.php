@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Caisse;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Caisse\CaissierListResouce;
 use App\Models\Caisse\Caissier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class CaissierController extends Controller
     public function all(): JsonResponse
     {
         $caissiers = Caissier::get();
-        return response()->json(['caissiers' => $caissiers]);
+        return response()->json(['caissiers' => CaissierListResouce::collection($caissiers)]);
     }
 
     public function store(Request $request): JsonResponse

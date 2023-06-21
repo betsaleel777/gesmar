@@ -22,8 +22,9 @@ class Abonnement extends Model
     use HasStatuses, HasSites, HasEquipement, HasEmplacement;
 
     protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'site_id'];
-
     protected $table = 'abonnements';
+    protected $casts = ['index_depart' => 'integer', 'index_fin' => 'integer', 'index_autre' => 'integer'];
+    protected $dates = ['created_at'];
 
     /**
      *

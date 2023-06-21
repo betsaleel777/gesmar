@@ -21,6 +21,7 @@ use App\Http\Resources\SocieteResource;
 use App\Http\Resources\TypePersonneResource;
 use App\Http\Resources\UserResource;
 use App\Models\Architecture\Equipement;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -44,21 +45,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        FactureInitialeResource::withoutWrapping();
-        FactureLoyerResource::withoutWrapping();
-        OrdonnancementResource::withoutWrapping();
-        FermetureListResource::withoutWrapping();
-        OuvertureListResource::withoutWrapping();
-        EncaissementListeResource::withoutWrapping();
-        PersonneResource::withoutWrapping();
-        PersonneListResource::withoutWrapping();
-        SocieteResource::withoutWrapping();
-        SiteResource::withoutWrapping();
-        TypePersonneResource::withoutWrapping();
-        ContratResource::withoutWrapping();
-        ContratListResource::withoutWrapping();
-        EquipementResource::withoutWrapping();
-        ServiceAnnexeResource::withoutWrapping();
-        UserResource::withoutWrapping();
+        JsonResource::withoutWrapping();
     }
 }

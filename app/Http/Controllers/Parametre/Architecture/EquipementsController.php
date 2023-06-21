@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Events\EquipementRegistred;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Abonnement\EquipementListResource;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
@@ -27,7 +28,7 @@ class EquipementsController extends Controller implements StandardControllerInte
     public function all(): JsonResponse
     {
         $equipements = Equipement::with('site')->get();
-        return response()->json(['equipements' => $equipements]);
+        return response()->json(['equipements' => EquipementListResource::collection($equipements)]);
     }
 
     public function store(Request $request): JsonResponse

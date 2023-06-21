@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Abonnement\TypeEquipementListResource;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\TypeEquipement;
 use Illuminate\Http\JsonResponse;
@@ -13,8 +14,7 @@ class TypeEquipementsController extends Controller implements StandardController
     public function all(): JsonResponse
     {
         $types = TypeEquipement::with('site')->get();
-
-        return response()->json(['types' => $types]);
+        return response()->json(['types' => TypeEquipementListResource::collection($types)]);
     }
 
     public function store(Request $request): JsonResponse
@@ -58,14 +58,12 @@ class TypeEquipementsController extends Controller implements StandardController
     public function trashed(): JsonResponse
     {
         $types = TypeEquipement::with('site')->onlyTrashed()->get();
-
         return response()->json(['types' => $types]);
     }
 
     public function show(int $id): JsonResponse
     {
         $type = TypeEquipement::with('site')->withTrashed()->find($id);
-
         return response()->json(['type' => $type]);
     }
 }

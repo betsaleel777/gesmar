@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\StandardControllerInterface;
+use App\Http\Resources\SiteResource;
 use App\Models\Architecture\Site;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
-class SitesController extends Controller implements StandardControllerInterface
+class SitesController extends Controller
 {
     public function all(): JsonResponse
     {
         $marches = Site::get();
-        return response()->json(['marches' => $marches]);
+        return response()->json(['marches' => SiteResource::collection($marches)]);
     }
 
     public function store(Request $request): JsonResponse

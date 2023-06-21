@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Emplacement\TypeEmplacementListResource;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\TypeEmplacement as Type;
 use Illuminate\Http\JsonResponse;
@@ -13,7 +14,7 @@ class TypeEmplacementsController extends Controller implements StandardControlle
     public function all(): JsonResponse
     {
         $types = Type::with('site')->get();
-        return response()->json(['types' => $types]);
+        return response()->json(['types' => TypeEmplacementListResource::collection($types)]);
     }
 
     public function store(Request $request): JsonResponse

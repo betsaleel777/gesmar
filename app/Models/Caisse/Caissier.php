@@ -17,6 +17,7 @@ class Caissier extends Model
     use HasFactory;
 
     protected $fillable = ['code', 'user_id'];
+    protected $dates = ['created_at'];
     /**
      *
      * @var array<int, string>

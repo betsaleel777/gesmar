@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Events\AbonnementResilied;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Abonnement\AbonnementListResource;
+use App\Http\Resources\Abonnement\AbonnementSelectResource;
 use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
 use App\Models\Exploitation\Contrat;
-use App\Models\Finance\Facture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,8 +26,14 @@ class AbonnementsController extends Controller
 
     public function all(): JsonResponse
     {
-        $abonnements = Abonnement::with(['emplacement', 'equipement.type'])->get();
-        return response()->json(['abonnements' => $abonnements]);
+        $abonnements = Abonnement::with('emplacement', 'equipement')->get();
+        return response()->json(['abonnements' => AbonnementListResource::collection($abonnements)]);
+    }
+
+    public function select(): JsonResponse
+    {
+        $abonnements = Abonnement::with('emplacement', 'equipement.type')->get();
+        return response()->json(['abonnements' => AbonnementSelectResource::collection($abonnements)]);
     }
 
     public function store(Request $request): JsonResponse

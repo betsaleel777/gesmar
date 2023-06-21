@@ -10,16 +10,15 @@ class OrdonnancementListeResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             'id' => $this->id,
             'total' => $this->total,
             'code' => $this->code,
             'status' => $this->whenAppended('status'),
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->format('d-m-Y'),
             'personne' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
                 fn () => $this->contrat->personne->alias

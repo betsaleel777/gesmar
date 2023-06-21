@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Emplacement;
+namespace App\Http\Resources\Caisse;
 
-use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class NiveauResource extends JsonResource
+class CaissierListResouce extends JsonResource
 {
-    public static $wrap = 'niveau';
     /**
      * Transform the resource into an array.
      *
@@ -17,12 +15,9 @@ class NiveauResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nom' => $this->nom,
             'code' => $this->code,
-            'pavillon_id' => $this->pavillon_id,
+            'user' => $this->whenLoaded('user', fn () => $this->user->name),
             'created_at' => $this->created_at->format('d-m-Y'),
-            'pavillon' => PavillonResource::make($this->whenLoaded('pavillon')),
-            'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }
 }

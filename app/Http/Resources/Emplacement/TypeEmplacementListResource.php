@@ -2,12 +2,10 @@
 
 namespace App\Http\Resources\Emplacement;
 
-use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class NiveauResource extends JsonResource
+class TypeEmplacementListResource extends JsonResource
 {
-    public static $wrap = 'niveau';
     /**
      * Transform the resource into an array.
      *
@@ -18,11 +16,10 @@ class NiveauResource extends JsonResource
         return [
             'id' => $this->id,
             'nom' => $this->nom,
-            'code' => $this->code,
-            'pavillon_id' => $this->pavillon_id,
+            'equipable' => $this->equipable,
+            'auto_valid' => $this->auto_valid,
             'created_at' => $this->created_at->format('d-m-Y'),
-            'pavillon' => PavillonResource::make($this->whenLoaded('pavillon')),
-            'site' => SiteResource::make($this->whenLoaded('site')),
+            'site' => $this->whenLoaded('site', fn () => $this->site->nom),
         ];
     }
 }

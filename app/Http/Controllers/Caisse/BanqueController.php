@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Http\Controllers\Caisse;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Caisse\BanqueResource;
 use App\Models\Caisse\Banque;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,7 +13,7 @@ class BanqueController extends Controller
     public function all(): JsonResponse
     {
         $banques = Banque::get();
-        return response()->json(['banques' => $banques]);
+        return response()->json(['banques' => BanqueResource::collection($banques)]);
     }
 
     public function store(Request $request): JsonResponse

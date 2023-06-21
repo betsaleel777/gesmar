@@ -14,6 +14,7 @@ class Compte extends Model
     use HasFactory, HasSites;
 
     protected $fillable = ['code', 'nom', 'site_id'];
+    protected $dates = ['created_at'];
 
     /**
      *
