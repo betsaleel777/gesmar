@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('termes_contrats', function (Blueprint $table) {
-            $table->string('status', 50);
+            $table->dropColumn('status', 50);
         });
     }
 };

@@ -4,7 +4,7 @@ namespace App\Http\Resources\Caisse;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class OuvertureListResource extends JsonResource
+class OuvertureResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,15 +22,19 @@ class OuvertureListResource extends JsonResource
             'created_at' => $this->created_at->format('d-m-Y'),
             'montant' => $this->montant,
             'status' => $this->whenAppended('status'),
-            'site' => $this->when(
-                $this->relationLoaded('guichet') and $this->guichet->relationLoaded('site'),
-                fn () => $this->guichet->site->nom
+            'caissier' => $this->whenLoaded('caissier', fn () => $this->caissier),
+            'guichet' => $this->whenLoaded('guichet', GuichetResource::make($this->guichet)),
+            'total' => $this->when(
+                $this->relationLoaded('encaissements'),
+                function () {
+                    $total = 0;
+                    foreach ($this->encaissements as $encaissement) {
+                        $total += $encaissement->relationLoaded('ordonnancement') ? $encaissement->ordonnancement->total : 0;
+                    }
+                    return $total;
+                },
+                0
             ),
-            'caissier' => $this->when(
-                $this->relationLoaded('caissier') and $this->caissier->relationLoaded('user'),
-                fn () => $this->caissier->user->name
-            ),
-            'guichet' => $this->whenLoaded('guichet', fn () => $this->guichet->nom),
         ];
     }
 }

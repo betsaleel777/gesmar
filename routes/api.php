@@ -4,6 +4,7 @@ use App\Http\Controllers\Caisse\BanqueController;
 use App\Http\Controllers\Caisse\CaissierController;
 use App\Http\Controllers\Caisse\CompteController;
 use App\Http\Controllers\Caisse\EncaissementController;
+use App\Http\Controllers\Caisse\FermetureController;
 use App\Http\Controllers\Caisse\OuvertureController;
 use App\Http\Controllers\Exploitation\Reception\ClientsController;
 use App\Http\Controllers\Exploitation\Reception\ContratController;
@@ -459,10 +460,16 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
         Route::controller(OuvertureController::class)->prefix('ouvertures')->group(static function (): void {
             Route::get('/', 'all');
             Route::post('/store', 'store');
+            Route::get('/current/caissier/{id}', 'getCurrentByCaissier');
             Route::get('/marche/{id}', 'getByMarche');
             Route::get('/exists/{id}', 'exists');
             Route::get('{id}', 'show');
             Route::put('{id}', 'update');
+        });
+        Route::controller(FermetureController::class)->prefix('fermetures')->group(static function (): void {
+            Route::get('/', 'index');
+            Route::post('/store', 'store');
+            Route::get('{id}', 'show');
         });
         Route::controller(EncaissementController::class)->prefix('encaissements')->group(static function (): void {
             Route::get('/', 'all');

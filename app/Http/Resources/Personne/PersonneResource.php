@@ -17,6 +17,7 @@ class PersonneResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'code' => $this->code,
             'nom' => $this->nom,
             'prenom' => $this->prenom,
             'adresse' => $this->adresse,

@@ -2,30 +2,40 @@
 
 namespace App\Models\Caisse;
 
+use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @mixin IdeHelperFermeture
  */
 class Fermeture extends Model
 {
-    protected $fillable = ['ouverture_id', 'code'];
+    protected $fillable = ['ouverture_id', 'total'];
+    protected $casts = ['total' => 'integer'];
+    protected $dates = ['created_at'];
 
-    public function codeGenerate(): void
+    const RULES = [
+        'caissier_id' => 'required',
+        'total' => 'required|gte:total_normal'
+    ];
+
+    protected static function booted(): void
     {
-        $rang = $this->count() + 1;
-        $this->attributes['code'] = FERMETURE_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
+        static::addGlobalScope(new RecentScope);
+
+        static::created(function (Fermeture $fermeture) {
+            $ouverture = Ouverture::with('encaissements')->find($fermeture->ouverture_id);
+            $ouverture->setConfirmed();
+            foreach ($ouverture->encaissements as $encaissement) {
+                $encaissement->setClose();
+            }
+            Guichet::find($ouverture->guichet_id)->setClose();
+        });
     }
 
     public function ouverture(): BelongsTo
     {
         return $this->belongsTo(Ouverture::class);
-    }
-
-    public function encaissements(): BelongsToMany
-    {
-        return $this->belongsToMany('encaissement_fermeture');
     }
 }

@@ -41,12 +41,12 @@ class Guichet extends Model
         $this->attributes['code'] = GUICHET_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
-    public function close(): void
+    public function setClose(): void
     {
         $this->setStatus(StatusGuichet::CLOSE->value);
     }
 
-    public function open(): void
+    public function setOpen(): void
     {
         $this->setStatus(StatusGuichet::OPEN->value);
     }

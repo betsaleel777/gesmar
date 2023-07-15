@@ -27,8 +27,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('cheques', function (Blueprint $table) {
-            $table->foreignId('compte_id')->constrained('comptes')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('banque_id')->constrained('banques')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->dropConstrainedForeignId('compte_id');
+            $table->dropConstrainedForeignId('banque_id');
         });
     }
 };

@@ -5,6 +5,7 @@ namespace App\Models\Caisse;
 use App\Enums\StatusEncaissement;
 use App\Events\EncaissementRegistred;
 use App\Models\Exploitation\Ordonnancement;
+use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,31 +17,30 @@ use Spatie\ModelStatus\HasStatuses;
 class Encaissement extends Model
 {
     use HasStatuses;
-    protected $fillable = ['ordonnancement_id', 'payable_id', 'caissier_id'];
-
+    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    protected $fillable = ['ordonnancement_id', 'payable_id', 'caissier_id', 'ouverture_id'];
+    protected $dates = ['created_at'];
     const RULES = [
         'ordonnancement_id' => 'required',
     ];
     protected $appends = ['status'];
-    /**
-     * The "booted" method of the model.
-     *
-     */
     protected static function booted(): void
     {
-        static::saved(function (Encaissement $encaissement) {
+        static::addGlobalScope(new RecentScope);
+
+        static::created(function (Encaissement $encaissement) {
             $ordonnancement = Ordonnancement::with(['paiements.facture'])->findOrFail($encaissement->ordonnancement_id);
-            $encaissement->setOpened();
+            $encaissement->setOpen();
             EncaissementRegistred::dispatch($ordonnancement);
         });
     }
 
-    public function setClosed(): void
+    public function setClose(): void
     {
         $this->setStatus(StatusEncaissement::CLOSED->value);
     }
 
-    public function setOpened(): void
+    public function setOpen(): void
     {
         $this->setStatus(StatusEncaissement::OPENED->value);
     }
@@ -55,6 +55,8 @@ class Encaissement extends Model
         return $query->currentStatus(StatusEncaissement::OPENED->value);
     }
 
+    // relations directes
+
     public function ordonnancement(): BelongsTo
     {
         return $this->belongsTo(Ordonnancement::class);
@@ -68,5 +70,10 @@ class Encaissement extends Model
     public function caissier(): BelongsTo
     {
         return $this->belongsTo(Caissier::class);
+    }
+
+    public function ouverture(): BelongsTo
+    {
+        return $this->belongsTo(Ouverture::class);
     }
 }

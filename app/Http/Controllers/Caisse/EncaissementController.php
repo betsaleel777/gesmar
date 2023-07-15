@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Caisse\EncaissementListeResource;
 use App\Http\Resources\Caisse\EncaissementResource;
 use App\Models\Caisse\Encaissement;
+use App\Models\Caisse\Ouverture;
 use App\Models\Finance\Cheque;
 use App\Models\Finance\Espece;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +20,8 @@ class EncaissementController extends Controller
         $espece = new Espece($request->all());
         $espece->save();
         $encaissement = new Encaissement($request->all());
+        $ouverture = Ouverture::without('guichet', 'caissier')->using()->where('caissier_id', $request->caissier_id)->first();
+        $encaissement->ouverture_id = $ouverture->id;
         $espece = Espece::findOrFail($espece->id);
         $encaissement->payable()->associate($espece);
         $encaissement->save();
@@ -30,6 +33,8 @@ class EncaissementController extends Controller
         $cheque = new Cheque($request->all());
         $cheque->save();
         $encaissement = new Encaissement($request->all());
+        $ouverture = Ouverture::without('guichet', 'caissier')->using()->where('caissier_id', $request->caissier_id)->first();
+        $encaissement->ouverture_id = $ouverture->id;
         $cheque = Cheque::findOrFail($cheque->id);
         $encaissement->payable()->associate($cheque);
         $encaissement->save();
@@ -37,13 +42,19 @@ class EncaissementController extends Controller
 
     public function all(): JsonResponse
     {
-        $encaissements = Encaissement::with('payable', 'caissier', 'ordonnancement')->get();
+        $encaissements = Encaissement::with('payable', 'caissier', 'ordonnancement')->opened()->get();
         return response()->json(['encaissements' => EncaissementListeResource::collection($encaissements)]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $encaissement = Encaissement::with('payable', 'caissier', 'ordonnancement')->find($id);
+        $encaissement = Encaissement::with(
+            'payable',
+            'caissier',
+            'ordonnancement.emplacement',
+            'ordonnancement.personne',
+            'ouverture.guichet'
+        )->find($id);
         return response()->json(['encaissement' => EncaissementResource::make($encaissement)]);
     }
 

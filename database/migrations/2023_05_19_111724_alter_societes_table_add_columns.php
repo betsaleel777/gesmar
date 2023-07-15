@@ -28,9 +28,9 @@ return new class extends Migration
     public function down()
     {
         Schema::table('societes', function (Blueprint $table) {
-            $table->string('smartphone', 20);
-            $table->string('phone', 20);
-            $table->string('email', 200);
+            $table->dropColumn('smartphone', 20);
+            $table->dropColumn('phone', 20);
+            $table->dropColumn('email', 200);
         });
     }
 };

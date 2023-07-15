@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Caisse;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class FermetureListResource extends JsonResource
 {
@@ -15,13 +16,22 @@ class FermetureListResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
-            'ordonnancement_id' => $this->ordonnancement_id,
-            'ordonnancement' => $this->whenLoaded('ordonnancement', fn () => $this->ordonnancement->code),
-            'encaissements' => $this->whenPivotLoaded('encaissement_fermeture', fn () => [
-                'encaissement_id' => $this->pivot->encaissement_id,
-                'fermeture_id' => $this->pivot->fermeture_id,
-            ]),
+            'created_at' => $this->created_at->format('d-m-Y'),
+            'guichet' => $this->whenLoaded('ouverture', Str::lower($this->ouverture->guichet->nom)),
+            'caissier' => $this->whenLoaded('ouverture', fn () => Str::lower($this->ouverture->caissier->user->name)),
+            'total' => $this->when(
+                $this->relationLoaded('ouverture'),
+                function () {
+                    $total = 0;
+                    if (!empty($this->ouverture->encaissements)) {
+                        foreach ($this->ouverture->encaissements as $encaissement) {
+                            $total += $encaissement->relationLoaded('ordonnancement') ? $encaissement->ordonnancement->total : 0;
+                        }
+                    }
+                    return $total;
+                },
+                0
+            ),
         ];
     }
 }

@@ -15,9 +15,8 @@ class EncaissementListeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
             'ordonnancement_id' => $this->ordonnancement_id,
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->format('d-m-Y'),
             'type' => str($this->payable_type)->explode('\\')[3],
             'payable_id' => $this->payable_id,
             'caissier_id' => $this->caissier_id,

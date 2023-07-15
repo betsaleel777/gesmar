@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('encaissements', function (Blueprint $table) {
-            $table->foreignId('caissier_id')->constrained('caissiers')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('ouverture_id')->nullable()->constrained('ouvertures')->cascadeOnDelete();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('encaissements', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('caissier_id');
+            $table->dropConstrainedForeignId('ouverture_id');
         });
     }
 };

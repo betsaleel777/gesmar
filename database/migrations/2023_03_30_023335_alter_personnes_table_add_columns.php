@@ -28,9 +28,9 @@ return new class extends Migration
     public function down()
     {
         Schema::table('personnes', function (Blueprint $table) {
-            $table->string('nom_complet_pere')->nullable();
-            $table->string('nom_complet_mere')->nullable();
-            $table->string('profession_conjoint')->nullable();
+            $table->dropColumn('nom_complet_pere')->nullable();
+            $table->dropColumn('nom_complet_mere')->nullable();
+            $table->dropColumn('profession_conjoint')->nullable();
         });
     }
 };

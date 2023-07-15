@@ -149,8 +149,8 @@ class EmplacementsController extends Controller
      */
     public function getByMarcheWithGearsAndContracts(int $id): JsonResponse
     {
-        $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn (Contrat $query) => $query->notAborted())
-            ->whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn (Builder $query) => $query->notAborted())
+            ->whereHas('site', fn (Builder $query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 

@@ -7,6 +7,7 @@ use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
@@ -15,11 +16,9 @@ use Spatie\ModelStatus\HasStatuses;
 class Ouverture extends Model
 {
     use HasStatuses, \Staudenmeir\EloquentHasManyDeep\HasRelationships;
-    protected $fillable = ['guichet_id', 'caissier_id', 'date', 'code'];
-    /**
-     *
-     * @var array<int, string>
-     */
+    protected $fillable = ['guichet_id', 'caissier_id', 'date', 'code', 'montant'];
+    protected $dates = ['created_at'];
+    protected $casts = ['date' => 'date'];
     protected $appends = ['status'];
     protected $with = ['guichet.site', 'caissier'];
 
@@ -32,6 +31,10 @@ class Ouverture extends Model
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
+
+        static::created(function (Ouverture $ouverture) {
+            Guichet::find($ouverture->guichet_id)->setOpen();
+        });
     }
 
     public function codeGenerate(): void
@@ -68,5 +71,10 @@ class Ouverture extends Model
     public function guichet(): BelongsTo
     {
         return $this->belongsTo(Guichet::class);
+    }
+
+    public function encaissements(): HasMany
+    {
+        return $this->hasMany(Encaissement::class);
     }
 }

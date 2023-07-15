@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Caisse;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Caisse\OuvertureListResource;
+use App\Http\Resources\Caisse\OuvertureResource;
 use App\Models\Caisse\Ouverture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -48,5 +49,12 @@ class OuvertureController extends Controller
     {
         $exists = Ouverture::where('caissier_id', $id)->where('date', date('Y-m-d'))->exists();
         return response()->json(['exists' => $exists]);
+    }
+
+    public function getCurrentByCaissier(int $id): JsonResponse
+    {
+        $ouverture = Ouverture::with('encaissements.ordonnancement')->where('caissier_id', $id)->using()->first();
+        return empty($ouverture) ? response()->json(['message' => "il n'y a aucune caisse ouverte actuellement pour cet utilisateur"])
+            : response()->json(['ouverture' => OuvertureResource::make($ouverture)]);
     }
 }

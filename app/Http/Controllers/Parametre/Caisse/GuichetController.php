@@ -8,6 +8,7 @@ use App\Interfaces\StandardControllerInterface;
 use App\Models\Caisse\Guichet;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class GuichetController extends Controller implements StandardControllerInterface
 {
