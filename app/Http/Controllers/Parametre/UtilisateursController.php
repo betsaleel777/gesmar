@@ -90,47 +90,6 @@ class UtilisateursController extends Controller
         }
     }
 
-    public function autoriserDirect(Request $request): JsonResponse
-    {
-        $user = User::with('roles')->findOrFail((int)$request->id);
-        $rolePermissions = $user->getPermissionsViaRoles()->all();
-        $message = '';
-        // attribuer des permissions directes
-        $directPermissions = [];
-        if (count($rolePermissions) > 0) {
-            $ids = array_column($rolePermissions, 'id');
-            $directPermissions = array_filter($request->permissions, function ($permission) use ($ids) {
-                return !in_array($permission['id'], $ids);
-            }, ARRAY_FILTER_USE_BOTH);
-            if (count($directPermissions) > 0) {
-                $permissions = array_column($directPermissions, 'id');
-                $user->givePermissionTo([$permissions]);
-                $message .= "Les permissions ont été accordées directement à l'utilisateur $user->name";
-            }
-        }
-
-        return response()->json(
-            [
-                'message' => $message,
-                'directs' => $directPermissions,
-                'requete' => $request->all(),
-            ]
-        );
-    }
-
-    public function autoriserByRole(Request $request): JsonResponse
-    {
-        $this->validate($request, ['role' => 'required']);
-        $user = User::with('roles')->findOrFail((int)$request->id);
-        $newRole = Role::findOrFail($request->role);
-        if (count($user->roles->all()) > 0) {
-            $user->removeRole($user->roles->first());
-        }
-        $user->assignRole($newRole);
-        $message = "Le role $newRole->name, a été attribué avec succès à l'utilisateur $user->name";
-        return response()->json(['message' => $message]);
-    }
-
     public function trash(int $id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -157,5 +116,14 @@ class UtilisateursController extends Controller
     {
         $users = User::doesntHave('caissier')->get();
         return response()->json(['users' => $users]);
+    }
+
+    public function attribuer(Request $request): JsonResponse
+    {
+        $request->validate(['role' => 'required|not_in:0']);
+        $user = User::find($request->user);
+        $role = Role::find($request->role);
+        $user->assignRole($role);
+        return response()->json(['message' => "Le rôle $role->name a été attribué à l'utilisateur $user->name"]);
     }
 }

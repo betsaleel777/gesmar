@@ -79,6 +79,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(static function (
         Route::get('{id}', 'show');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
+        Route::post('attribuer-role', 'attribuer');
     });
     Route::controller(RolesController::class)->prefix('roles')->group(static function (): void {
         Route::get('/', 'all');
@@ -88,6 +89,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(static function (
     });
     Route::prefix('permissions')->group(static function (): void {
         Route::get('/', [PermissionsController::class, 'all']);
+        Route::get('{id}', [PermissionsController::class, 'getByRole']);
         Route::get('/show/{id}', [PermissionsController::class, 'show']);
     });
     Route::controller(SitesController::class)->prefix('marches')->group(static function (): void {

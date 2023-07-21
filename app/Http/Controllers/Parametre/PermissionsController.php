@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Parametre;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionsController extends Controller
 {
@@ -18,5 +19,13 @@ class PermissionsController extends Controller
     {
         $permission = Permission::with('roles')->find($id);
         return response()->json(['permission' => $permission]);
+    }
+
+    public function getByRole(int $id): JsonResponse
+    {
+        $role = Role::with(['permissions' => function ($query) {
+            $query->select('id', 'name');
+        }])->find($id);
+        return response()->json(['permissions' => $role->permissions]);
     }
 }
