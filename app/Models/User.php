@@ -36,7 +36,6 @@ class User extends Authenticatable implements HasMedia
         'adresse',
         'password',
     ];
-
     protected $with = ['avatar'];
 
     const RULES = [
@@ -93,6 +92,7 @@ class User extends Authenticatable implements HasMedia
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'connected' => 'boolean'
     ];
 
     /**

@@ -165,6 +165,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
         Elibyy\TCPDF\ServiceProvider::class,
+        OwenIt\Auditing\AuditingServiceProvider::class,
         /*
          * Package Service Providers...
          */

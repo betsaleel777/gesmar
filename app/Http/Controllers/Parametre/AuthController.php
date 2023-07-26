@@ -58,7 +58,7 @@ class AuthController extends Controller
 
     public function me()
     {
-        $user = User::find(Auth::user()->id);
+        $user = User::with('roles')->find(Auth::user()->id);
         return UserResource::make($user);
     }
 }
