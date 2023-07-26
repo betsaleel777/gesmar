@@ -13,10 +13,12 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class PaiementLigne extends Model
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'paiement_lignes';
 
     protected $fillable = ['fournisseur', 'code', 'montant'];
+    protected $auditExclude = ['code'];
 
     const RULES = [
         'fournisseur' => 'required',

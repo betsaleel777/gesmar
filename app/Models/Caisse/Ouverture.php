@@ -8,15 +8,19 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperOuverture
  */
-class Ouverture extends Model
+class Ouverture extends Model implements Auditable
 {
     use HasStatuses, \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use \OwenIt\Auditing\Auditable;
+
     protected $fillable = ['guichet_id', 'caissier_id', 'date', 'code', 'montant'];
+    protected $auditExclude = ['code'];
     protected $dates = ['created_at'];
     protected $casts = ['date' => 'date'];
     protected $appends = ['status'];

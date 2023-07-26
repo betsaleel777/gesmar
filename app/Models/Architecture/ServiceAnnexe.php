@@ -8,16 +8,18 @@ use App\Traits\HasContrats;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperServiceAnnexe
  */
-class ServiceAnnexe extends Model
+class ServiceAnnexe extends Model implements Auditable
 {
     use SoftDeletes, HasSites, HasContrats;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['code', 'nom', 'site_id', 'prix', 'description', 'mode'];
-
+    protected $auditExclude = ['code', 'site_id'];
     public const RULES = [
         'nom' => 'required|max:250',
         'prix' => 'required',

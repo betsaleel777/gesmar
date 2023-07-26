@@ -7,16 +7,18 @@ use App\Traits\HasContrats;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 
 /**
  * @mixin IdeHelperSite
  */
-class Site extends Model
+class Site extends Model implements Auditable
 {
     use SoftDeletes;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use HasContrats;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'pays', 'ville', 'commune', 'postale'];
 

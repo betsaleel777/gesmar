@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use OwenIt\Auditing\Contracts\Auditable;
 use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
 
 /**
@@ -24,12 +24,13 @@ use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
  * @method liaison()
  * @mixin IdeHelperEmplacement
  */
-class Emplacement extends Model
+class Emplacement extends Model implements Auditable
 {
     use SoftDeletes;
     use HasStateMachines;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use HasContrats;
+    use \OwenIt\Auditing\Auditable;
 
     /**
      * Summary of stateMachines

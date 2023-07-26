@@ -5,12 +5,15 @@ namespace App\Models\Caisse;
 use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperFermeture
  */
-class Fermeture extends Model
+class Fermeture extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+
     protected $fillable = ['ouverture_id', 'total'];
     protected $casts = ['total' => 'integer'];
     protected $dates = ['created_at'];

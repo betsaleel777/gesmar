@@ -9,15 +9,18 @@ use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperEncaissement
  */
-class Encaissement extends Model
+class Encaissement extends Model implements Auditable
 {
     use HasStatuses;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use \OwenIt\Auditing\Auditable;
+
     protected $fillable = ['ordonnancement_id', 'payable_id', 'caissier_id', 'ouverture_id'];
     protected $dates = ['created_at'];
     const RULES = [

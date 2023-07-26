@@ -13,19 +13,21 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\ModelStatus\HasStatuses;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperAbonnement
  */
-class Abonnement extends Model
+class Abonnement extends Model implements Auditable
 {
     use HasStatuses, HasSites, HasEquipement, HasEmplacement;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'site_id'];
     protected $table = 'abonnements';
     protected $casts = ['index_depart' => 'integer', 'index_fin' => 'integer', 'index_autre' => 'integer'];
     protected $dates = ['created_at'];
-
+    protected $auditExclude = ['code', 'site_id'];
     /**
      *
      * @var array<int, string>

@@ -15,14 +15,15 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperUser
  */
-class User extends Authenticatable implements HasMedia
+class User extends Authenticatable implements HasMedia, Auditable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, InteractsWithMedia, SoftDeletes;
-
+    use \OwenIt\Auditing\Auditable;
     /**
      * The attributes that are mass assignable.
      *
@@ -37,7 +38,7 @@ class User extends Authenticatable implements HasMedia
         'password',
     ];
     protected $with = ['avatar'];
-
+    protected $auditExclude = ['connected'];
     const RULES = [
         'name' => 'required|max:150|unique:users,name',
         'email' => 'required|email|unique:users,email',

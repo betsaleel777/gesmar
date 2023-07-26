@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperCheque
  */
-class Cheque extends Model
+class Cheque extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['numero', 'banque_id', 'compte_id', 'valeur'];
 

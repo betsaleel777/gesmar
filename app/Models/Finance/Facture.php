@@ -14,16 +14,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperFacture
  */
-class Facture extends Model
+class Facture extends Model implements Auditable
 {
     use HasFactory;
     use HasStatuses;
     use HasEquipement;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'code',
@@ -37,6 +39,7 @@ class Facture extends Model
         'pas_porte',
         'periode',
     ];
+    protected $auditExclude = ['code'];
     /**
      *
      * @var array<int, string>

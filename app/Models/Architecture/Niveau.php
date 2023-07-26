@@ -6,18 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
 
 /**
  * @mixin IdeHelperNiveau
  */
-class Niveau extends Model
+class Niveau extends Model implements Auditable
 {
     use SoftDeletes;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'code', 'pavillon_id'];
-
     const RULES = [
         'nom' => 'required|max:150',
         'pavillon_id' => 'required',

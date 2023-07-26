@@ -16,9 +16,11 @@ use Spatie\ModelStatus\HasStatuses;
 class Guichet extends Model
 {
     use HasStatuses, HasSites, SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'code', 'site_id'];
     protected $dates = ['created_at'];
+    protected $auditExclude = ['code', 'site_id'];
     /**
      *
      * @var array<int, string>

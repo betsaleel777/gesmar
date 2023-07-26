@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperPavillon
  */
-class Pavillon extends Model
+class Pavillon extends Model implements Auditable
 {
     use SoftDeletes, HasSites;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'code', 'site_id'];
     protected $dates = ['created_at'];

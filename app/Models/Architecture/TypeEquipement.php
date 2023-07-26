@@ -18,10 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class TypeEquipement extends Model
 {
     use HasFactory, SoftDeletes, HasSites;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'site_id', 'frais_penalite', 'caution_abonnement'];
     protected $dates = ['created_at'];
-
     const RULES = [
         'nom' => 'required|max:150',
         'site_id' => 'required',

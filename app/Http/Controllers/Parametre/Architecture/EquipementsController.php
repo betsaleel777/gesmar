@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Parametre\Architecture;
 use App\Events\EquipementRegistred;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Abonnement\EquipementListResource;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class EquipementsController extends Controller implements StandardControllerInterface
+class EquipementsController extends Controller
 {
     /**
      * Undocumented function

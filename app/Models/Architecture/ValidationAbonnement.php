@@ -7,15 +7,17 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperValidationAbonnement
  */
-class ValidationAbonnement extends Model
+class ValidationAbonnement extends Model implements Auditable
 {
     use HasFactory;
     use HasStatuses;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['raison', 'abonnement_id'];
     /**

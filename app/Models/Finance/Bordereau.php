@@ -8,16 +8,19 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperBordereau
  */
-class Bordereau extends Model
+class Bordereau extends Model implements Auditable
 {
     use HasStatuses, HasCashStatus;
-    protected $fillable = ['code', 'commercial_id', 'date_attribution'];
+    use \OwenIt\Auditing\Auditable;
 
+    protected $fillable = ['code', 'commercial_id', 'date_attribution'];
+    protected $auditExclude = ['code'];
     /**
      *
      * @var array<int, string>

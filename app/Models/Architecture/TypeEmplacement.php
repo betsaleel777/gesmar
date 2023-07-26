@@ -10,16 +10,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperTypeEmplacement
  */
-class TypeEmplacement extends Model
+class TypeEmplacement extends Model implements Auditable
 {
     use HasFactory, HasSites, SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'equipable'];
     protected $dates = ['created_at'];
+    protected $auditExclude = ['code'];
 
     /**
      * les propriétés qui doivent être caster.

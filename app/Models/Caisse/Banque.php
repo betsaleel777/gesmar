@@ -4,15 +4,18 @@ namespace App\Models\Caisse;
 
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperBanque
  */
-class Banque extends Model
+class Banque extends Model implements Auditable
 {
     use HasSites;
-    protected $fillable = ['sigle', 'nom', 'site_id'];
+    use \OwenIt\Auditing\Auditable;
 
+    protected $fillable = ['sigle', 'nom', 'site_id'];
+    protected $auditExclude = ['site_id'];
     /**
      *
      * @var array<int, string>

@@ -11,15 +11,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperCommercial
  */
-class Commercial extends Model
+class Commercial extends Model implements Auditable
 {
     use HasFactory, HasSites, SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['code', 'user_id', 'site_id'];
+    protected $auditExclude = ['code'];
     /**
      *
      * @var array<int, string>

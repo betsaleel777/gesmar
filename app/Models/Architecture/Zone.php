@@ -7,15 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
 
 /**
  * @mixin IdeHelperZone
  */
-class Zone extends Model
+class Zone extends Model implements Auditable
 {
     use SoftDeletes;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'code', 'niveau_id'];
     protected $dates = ['created_at'];

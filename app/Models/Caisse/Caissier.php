@@ -8,16 +8,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperCaissier
  */
-class Caissier extends Model
+class Caissier extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['code', 'user_id'];
     protected $dates = ['created_at'];
+    protected $auditExclude = ['code'];
     /**
      *
      * @var array<int, string>

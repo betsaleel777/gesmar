@@ -6,13 +6,15 @@ use App\Models\Caisse\Encaissement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperEspece
  */
-class Espece extends Model
+class Espece extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
     protected $fillable = ['montant', 'versement'];
 
     const RULES = [

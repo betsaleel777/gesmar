@@ -8,14 +8,16 @@ use App\Traits\HasEmplacement;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperAttribution
  */
-class Attribution extends Model
+class Attribution extends Model implements Auditable
 {
     use HasStatuses, HasEmplacement, HasCashStatus;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['commercial_id', 'emplacement_id', 'bordereau_id', 'jour'];
     protected $table = 'attribution_emplacements';

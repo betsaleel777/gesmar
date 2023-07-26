@@ -16,16 +16,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @method abonnement()
  * @method liaison()
  * @mixin IdeHelperEquipement
  */
-class Equipement extends Model
+class Equipement extends Model implements Auditable
 {
     use HasFactory, SoftDeletes, HasStateMachines, HasSites, HasEmplacement;
-
+    use \OwenIt\Auditing\Auditable;
     /**
      *
      * @var array<string, class-string>
@@ -34,7 +35,7 @@ class Equipement extends Model
         'abonnement' => StatusAbonnementState::class,
         'liaison' => StatusLiaisonsState::class,
     ];
-
+    protected $auditExclude = ['site_id'];
     protected $fillable = [
         'nom',
         'code',

@@ -20,6 +20,7 @@ class EquipementResource extends JsonResource
             'id' => $this->id,
             'nom' => $this->nom,
             'code' => $this->code,
+            'alias' => $this->whenLoaded('type', fn () => $this->code . ' ' . $this->type->nom),
             'prix_unitaire' => $this->prix_unitaire,
             'prix_fixe' => $this->prix_fixe,
             'frais_facture' => $this->frais_facture,
