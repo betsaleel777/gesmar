@@ -52,6 +52,7 @@ class ZonesController extends Controller implements StandardControllerInterface
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Zone::class);
         if ($request->automatiq) {
             $request->validate(Zone::MIDDLE_RULES);
             self::pusher($request->niveau_id, $request->nombre);
@@ -67,8 +68,9 @@ class ZonesController extends Controller implements StandardControllerInterface
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $request->validate(Zone::RULES);
         $zone = Zone::findOrFail($id);
+        $this->authorize('update', $zone);
+        $request->validate(Zone::RULES);
         $zone->nom = $request->nom;
         $zone->niveau_id = $request->niveau_id;
         $zone->save();
@@ -79,6 +81,7 @@ class ZonesController extends Controller implements StandardControllerInterface
     public function trash(int $id): JsonResponse
     {
         $zone = Zone::findOrFail($id);
+        $this->authorize('delete', $zone);
         $zone->delete();
         $message = "La zone $zone->nom a été supprimé avec succès.";
         return response()->json(['message' => $message]);
@@ -87,6 +90,7 @@ class ZonesController extends Controller implements StandardControllerInterface
     public function restore(int $id): JsonResponse
     {
         $zone = Zone::withTrashed()->find($id);
+        $this->authorize('restore', $zone);
         $zone->restore();
         $message = "La zone $zone->nom a été restauré avec succès.";
         return response()->json(['message' => $message]);
@@ -101,6 +105,7 @@ class ZonesController extends Controller implements StandardControllerInterface
     public function show(int $id): JsonResponse
     {
         $zone = Zone::withTrashed()->find($id);
+        $this->authorize('view', $zone);
         return response()->json(['zone' => $zone]);
     }
 

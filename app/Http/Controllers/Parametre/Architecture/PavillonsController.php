@@ -43,6 +43,7 @@ class PavillonsController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Pavillon::class);
         if ($request->automatiq) {
             $request->validate(Pavillon::MIDDLE_RULES);
             self::pusher($request->site_id, $request->nombre);
@@ -58,8 +59,9 @@ class PavillonsController extends Controller
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $request->validate(Pavillon::RULES);
         $pavillon = Pavillon::findOrFail($id);
+        $this->authorize('update', $pavillon);
+        $request->validate(Pavillon::RULES);
         $pavillon->nom = $request->nom;
         $pavillon->site_id = $request->site_id;
         $pavillon->save();
@@ -70,6 +72,7 @@ class PavillonsController extends Controller
     public function trash(int $id): JsonResponse
     {
         $pavillon = Pavillon::findOrFail($id);
+        $this->authorize('delete', $pavillon);
         $pavillon->delete();
         $message = "Le pavillon $pavillon->nom a été supprimé avec succès.";
         return response()->json(['message' => $message]);
@@ -78,6 +81,7 @@ class PavillonsController extends Controller
     public function restore(int $id): JsonResponse
     {
         $pavillon = Pavillon::withTrashed()->find($id);
+        $this->authorize('restore', $pavillon);
         $pavillon->restore();
         $message = "Le pavillon $pavillon->nom a été restauré avec succès.";
         return response()->json(['message' => $message]);
@@ -92,6 +96,7 @@ class PavillonsController extends Controller
     public function show(int $id): JsonResponse
     {
         $pavillon = Pavillon::with('site')->withTrashed()->find($id);
+        $this->authorize('view', $pavillon);
         return response()->json(['pavillon' => $pavillon]);
     }
 

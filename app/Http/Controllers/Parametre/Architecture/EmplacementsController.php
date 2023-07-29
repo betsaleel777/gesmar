@@ -62,11 +62,13 @@ class EmplacementsController extends Controller
     public function show(int $id): JsonResponse
     {
         $emplacement = Emplacement::with(['type', 'zone.niveau.pavillon.site'])->findOrFail($id);
+        $this->authorize('view', $emplacement);
         return response()->json(['emplacement' => $emplacement]);
     }
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Emplacement::class);
         $request->validate(Emplacement::RULES);
         $emplacement = new Emplacement($request->all());
         ['code' => $code] = self::codeGenerate($request->zone_id);
@@ -80,8 +82,9 @@ class EmplacementsController extends Controller
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $request->validate(Emplacement::RULES);
         $emplacement = Emplacement::findOrFail($id);
+        $this->authorize('update', $emplacement);
+        $request->validate(Emplacement::RULES);
         $emplacement->update($request->all());
         $message = "L'emplacement $request->nom a été modifié avec succès.";
         return response()->json(['message' => $message]);
@@ -90,6 +93,7 @@ class EmplacementsController extends Controller
     public function restore(int $id): JsonResponse
     {
         $emplacement = Emplacement::withTrashed()->find($id);
+        $this->authorize('restore', $emplacement);
         $emplacement->restore();
         $message = "L'emplacement $emplacement->nom a été restauré avec succès.";
         return response()->json(['message' => $message]);
@@ -110,6 +114,7 @@ class EmplacementsController extends Controller
     public function trash(int $id): JsonResponse
     {
         $emplacement = Emplacement::findOrFail($id);
+        $this->authorize('delete', $emplacement);
         $emplacement->delete();
         $message = "L'emplacement $emplacement->nom a été supprimé avec succès.";
         return response()->json(['message' => $message]);
@@ -121,6 +126,7 @@ class EmplacementsController extends Controller
      */
     public function push(Request $request): JsonResponse
     {
+        $this->authorize('create', Emplacement::class);
         $request->validate(Emplacement::PUSH_RULES);
         $compteur = $request->nombre;
         while ($compteur > 0) {

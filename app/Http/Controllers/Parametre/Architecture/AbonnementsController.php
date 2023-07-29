@@ -38,6 +38,7 @@ class AbonnementsController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Abonnement::class);
         $request->validate(Abonnement::RULES);
         $abonnement = new Abonnement;
         foreach ($request->equipements as $equipement) {
@@ -55,6 +56,7 @@ class AbonnementsController extends Controller
 
     public function insert(Request $request): JsonResponse
     {
+        $this->authorize('create', Abonnement::class);
         $request->validate(['equipement_id' => 'required', 'index_depart' => 'required', 'index_autre' => 'required']);
         $equipement = Equipement::with('type')->findOrFail((int)$request->equipement_id);
         $abonnement = new Abonnement($request->all());
@@ -69,8 +71,9 @@ class AbonnementsController extends Controller
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $request->validate(Abonnement::RULES);
         $abonnement = Abonnement::findOrFail($id);
+        $this->authorize('update', $abonnement);
+        $request->validate(Abonnement::RULES);
         $abonnement->update($request->all());
         $message = "L'abonnement $request->code a été modifié avec succès.";
         return response()->json(['message' => $message]);
@@ -79,6 +82,7 @@ class AbonnementsController extends Controller
     public function show(int $id): JsonResponse
     {
         $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->find($id);
+        $this->authorize('view', $abonnement);
         return response()->json(['abonnement' => $abonnement]);
     }
 

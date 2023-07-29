@@ -19,6 +19,7 @@ class SitesController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Site::class);
         $request->validate(Site::RULES);
         $marche = new Site($request->all());
         $marche->save();
@@ -28,8 +29,9 @@ class SitesController extends Controller
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $request->validate(Site::edit_rules($id));
         $marche = Site::findOrFail($id);
+        $this->authorize('update', $marche);
+        $request->validate(Site::edit_rules($id));
         $marche->nom = $request->nom;
         $marche->ville = $request->ville;
         $marche->pays = $request->pays;
@@ -42,6 +44,7 @@ class SitesController extends Controller
 
     public function push(Request $request): JsonResponse
     {
+        $this->authorize('create', Site::class);
         $request->validate(Site::RULES);
         $marche = new Site($request->all());
         $marche->save();
@@ -61,6 +64,7 @@ class SitesController extends Controller
     public function restore(int $id): JsonResponse
     {
         $marche = Site::withTrashed()->find($id);
+        $this->authorize('restore', $marche);
         $marche->restore();
         $message = "Le marché $marche->nom a été restauré avec succès.";
         return response()->json(['message' => $message]);
@@ -75,6 +79,7 @@ class SitesController extends Controller
     public function show(int $id): JsonResponse
     {
         $marche = Site::withTrashed()->find($id);
+        $this->authorize('view', $marche);
         return response()->json(['marche' => $marche]);
     }
 

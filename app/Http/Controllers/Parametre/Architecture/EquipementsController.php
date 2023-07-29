@@ -32,6 +32,7 @@ class EquipementsController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Equipement::class);
         $request->validate(Equipement::RULES);
         $equipement = new Equipement($request->all());
         ['code' => $code, 'rang' => $rang] = self::codeGenerate($request->site_id);
@@ -46,8 +47,9 @@ class EquipementsController extends Controller
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $request->validate(Equipement::RULES);
         $equipement = Equipement::findOrFail($id);
+        $this->authorize('update', $equipement);
+        $request->validate(Equipement::RULES);
         $ancienEmplacement = (int) $equipement->emplacement_id;
         $equipement->update($request->all());
         $eventCondition = $ancienEmplacement !== (int)$equipement->emplacement_id;
@@ -59,6 +61,7 @@ class EquipementsController extends Controller
     public function trash(int $id): JsonResponse
     {
         $equipement = Equipement::findOrFail($id);
+        $this->authorize('delete', $equipement);
         $equipement->delete();
         $message = "L'équipement $equipement->nom a été supprimé avec succès.";
         return response()->json(['message' => $message]);
@@ -74,6 +77,7 @@ class EquipementsController extends Controller
     public function restore(int $id): JsonResponse
     {
         $equipement = Equipement::withTrashed()->find($id);
+        $this->authorize('restore', $equipement);
         $equipement->restore();
         $message = "L'équipement $equipement->nom a été restauré avec succès.";
         return response()->json(['message' => $message]);
@@ -82,6 +86,7 @@ class EquipementsController extends Controller
     public function show(int $id): JsonResponse
     {
         $equipement = Equipement::with('emplacement')->withTrashed()->find($id);
+        $this->authorize('view', $equipement);
         return response()->json(['equipement' => $equipement]);
     }
 

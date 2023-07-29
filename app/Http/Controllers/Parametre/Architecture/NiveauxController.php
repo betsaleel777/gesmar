@@ -51,6 +51,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Niveau::class);
         if ($request->automatiq) {
             $request->validate(Niveau::MIDDLE_RULES);
             self::pusher($request->pavillon_id, $request->nombre);
@@ -62,14 +63,14 @@ class NiveauxController extends Controller implements StandardControllerInterfac
             $niveau->save();
         }
         $message = "Le niveau $request->nom a été crée avec succès.";
-
         return response()->json(['message' => $message]);
     }
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $request->validate(Niveau::RULES);
         $niveau = Niveau::findOrFail($id);
+        $this->authorize('update', $niveau);
+        $request->validate(Niveau::RULES);
         $niveau->nom = $request->nom;
         $niveau->pavillon_id = $request->pavillon_id;
         $niveau->save();
@@ -80,6 +81,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     public function trash(int $id): JsonResponse
     {
         $niveau = Niveau::findOrFail($id);
+        $this->authorize('delete', $niveau);
         $niveau->delete();
         $message = "Le niveau $niveau->nom a été supprimé avec succès.";
         return response()->json(['message' => $message]);
@@ -88,6 +90,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     public function restore(int $id): JsonResponse
     {
         $niveau = Niveau::withTrashed()->find($id);
+        $this->authorize('restore', $niveau);
         $niveau->restore();
         $message = "Le niveau $niveau->nom a été restauré avec succès.";
         return response()->json(['message' => $message]);
@@ -102,6 +105,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     public function show(int $id): JsonResponse
     {
         $niveau = Niveau::with('pavillon', 'site')->withTrashed()->find($id);
+        $this->authorize('view', $niveau);
         return response()->json(['niveau' => $niveau]);
     }
 
