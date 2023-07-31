@@ -24,6 +24,7 @@ class UserResource extends JsonResource
             'avatar' => $this->whenLoaded('avatar', fn () => $this->avatar->getUrl()),
             'role' => $this->whenLoaded('roles', fn () => $this->roles->first()),
             'permissions' => $this->whenLoaded('roles', fn () => $this->getPermissionsViaRoles()->pluck('name')),
+            'sites' => $this->whenLoaded('sites', fn () => SiteResource::collection($this->sites)),
         ];
     }
 }

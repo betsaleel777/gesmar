@@ -27,7 +27,7 @@ class UtilisateursController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $user = User::with(['roles', 'permissions'])->withTrashed()->findOrFail($id);
+        $user = User::with(['roles', 'permissions', 'sites'])->withTrashed()->findOrFail($id);
         $permissions = $user->getAllPermissions();
         return response()->json(['user' => UserResource::make($user), 'permissions' => $permissions]);
     }
@@ -39,6 +39,9 @@ class UtilisateursController extends Controller
         $user->password = Hash::make($request->password);
         $user->disconnect();
         $user->save();
+        $user->sites()->sync($request->sites);
+        $role = Role::find($request->role_id);
+        $user->assignRole($role);
         $user->addMediaFromRequest('avatar')->toMediaCollection('avatar');
         $message = "L'utilisateur $request->name a été crée avec succès.";
         return response()->json(['message' => $message]);
@@ -55,6 +58,7 @@ class UtilisateursController extends Controller
             $user->adresse = $request->adresse;
             $user->description = $request->description;
             $user->save();
+            $user->sites()->sync($request->sites);
             if ($request->hasFile('image')) {
                 $user->addMediaFromRequest('image')->toMediaCollection('avatar');
             }

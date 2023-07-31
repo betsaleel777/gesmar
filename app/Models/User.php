@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Architecture\Site;
 use App\Models\Caisse\Caissier;
 use App\Models\Finance\Commercial;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -45,6 +47,8 @@ class User extends Authenticatable implements HasMedia, Auditable
         'avatar' => 'required',
         'adresse' => 'required',
         'password' => 'required|min:6|confirmed',
+        'sites' => 'required',
+        'role_id' => 'required'
     ];
 
     const SECURITY_RULES = [
@@ -122,5 +126,10 @@ class User extends Authenticatable implements HasMedia, Auditable
     public function avatar(): MorphOne
     {
         return $this->morphOne(Media::class, 'model')->where('collection_name', '=', 'avatar');
+    }
+
+    public function sites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class, 'site_attributions', 'user_id', 'site_id');
     }
 }
