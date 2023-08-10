@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Exploitation\Personne;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class PersonnePolicy
 {
@@ -29,16 +30,10 @@ class PersonnePolicy
      */
     public function view(User $user, Personne $personne)
     {
-        if ($personne->checkProspect() and $user->can(config('gate.exploitation.reception.prospect.own'))) {
-            return $user->id == $personne->load('audits')->audits->first()->user_id;
-        }
-        if ($personne->checkClient() and $user->can(config('gate.exploitation.reception.client.own'))) {
-            return $user->id == $personne->load('audits')->audits->first()->user_id;
-        }
-        if ($personne->checkProspect() and $user->can(config('gate.exploitation.reception.prospect.global'))) {
+        if ($personne->checkProspect() and $user->can(config('gate.exploitation.reception.prospect.show'))) {
             return true;
         }
-        if ($personne->checkClient() and $user->can(config('gate.exploitation.reception.client.global'))) {
+        if ($personne->checkClient() and $user->can(config('gate.exploitation.reception.client.show'))) {
             return true;
         }
     }

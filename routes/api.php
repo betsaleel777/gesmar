@@ -289,6 +289,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(static functio
             Route::post('/store', 'store');
             Route::get('{id}', 'show');
             Route::patch('/restore/{id}', 'restore');
+            Route::patch('image-upload/{id}', 'updateImage');
             Route::put('{id}', 'update');
             Route::delete('{id}', 'trash');
         });
@@ -298,6 +299,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(static functio
             Route::post('/store', 'store');
             Route::get('{id}', 'show');
             Route::patch('/restore/{id}', 'restore');
+            Route::patch('image-upload/{id}', 'updateImage');
             Route::put('{id}', 'update');
             Route::delete('{id}', 'trash');
         });
@@ -332,6 +334,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(static functio
                 Route::get('/trashed', 'trashed');
                 Route::post('/store', 'store');
                 Route::get('{id}', 'show');
+                Route::get('personne/{id}', 'getByPersonne');
                 Route::get('/details/{id}', 'details');
                 Route::put('{id}', 'update');
                 Route::patch('/restore/{id}', 'restore');

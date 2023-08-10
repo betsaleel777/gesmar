@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @mixin IdeHelperPavillon
@@ -49,6 +50,15 @@ class Pavillon extends Model implements Auditable
         return Attribute::make(
             get: fn () => str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
         );
+    }
+
+    /**
+     * Obtenir les pavillons appartenant à la liste de site accéssible à l'utilisateur courant
+     *
+     */
+    public function scopeInside(Builder $query, array $sites): Builder
+    {
+        return $query->whereHas('sites', fn ($query) => $query->whereIn('sites.id', $sites));
     }
 
     /**

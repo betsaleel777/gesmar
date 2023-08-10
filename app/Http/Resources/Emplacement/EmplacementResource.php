@@ -25,6 +25,7 @@ class EmplacementResource extends JsonResource
             'caution' => $this->caution,
             'zone_id' => $this->zone_id,
             'type_emplacement_id' => $this->type_emplacement_id,
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'type' => TypeEmplacementResource::make($this->whenLoaded('type')),
             'zone' => ZoneResource::make($this->whenLoaded('zone')),
             'abonnements' => AbonnementResource::collection($this->whenLoaded('abonnements')),

@@ -15,12 +15,14 @@ class UtilisateursController extends Controller
 {
     public function all(): JsonResponse
     {
+        $this->authorize('viewAny', User::class);
         $users = User::get();
         return response()->json(['users' => UserResource::collection($users)]);
     }
 
     public function trashed(): JsonResponse
     {
+        $this->authorize('viewAny', User::class);
         $users = User::onlyTrashed()->get();
         return response()->json(['users' => UserResource::collection($users)]);
     }
@@ -28,12 +30,14 @@ class UtilisateursController extends Controller
     public function show(int $id): JsonResponse
     {
         $user = User::with(['roles', 'permissions', 'sites'])->withTrashed()->findOrFail($id);
+        $this->authorize('view', $user);
         $permissions = $user->getAllPermissions();
         return response()->json(['user' => UserResource::make($user), 'permissions' => $permissions]);
     }
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', User::class);
         $request->validate(User::RULES);
         $user = new User($request->all());
         $user->password = Hash::make($request->password);
@@ -49,8 +53,9 @@ class UtilisateursController extends Controller
 
     public function profile(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), User::infosRules($request->id));
         $user = User::findOrFail($request->id);
+        $this->authorize('update', $user);
+        $validator = Validator::make($request->all(), User::infosRules($request->id));
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         } else {
@@ -58,7 +63,9 @@ class UtilisateursController extends Controller
             $user->adresse = $request->adresse;
             $user->description = $request->description;
             $user->save();
-            $user->sites()->sync($request->sites);
+            if (!empty($request->sites)) {
+                $user->sites()->sync($request->sites);
+            }
             if ($request->hasFile('image')) {
                 $user->addMediaFromRequest('image')->toMediaCollection('avatar');
             }
@@ -75,8 +82,9 @@ class UtilisateursController extends Controller
 
     public function security(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), User::SECURITY_RULES);
         $user = User::findOrFail($request->id);
+        $this->authorize('update', $user);
+        $validator = Validator::make($request->all(), User::SECURITY_RULES);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         } else {
@@ -97,6 +105,7 @@ class UtilisateursController extends Controller
     public function trash(int $id): JsonResponse
     {
         $user = User::findOrFail($id);
+        $this->authorize('delete', $user);
         $user->delete();
         $message = "L'utilisateur $user->name a été supprimé avec succès.";
         return response()->json(['message' => $message]);
@@ -105,6 +114,7 @@ class UtilisateursController extends Controller
     public function restore(int $id): JsonResponse
     {
         $user = User::withTrashed()->find($id);
+        $this->authorize('restore', $user);
         $user->restore();
         $message = "L'utilisateur $user->name a été restauré avec succès.";
         return response()->json(['message' => $message]);

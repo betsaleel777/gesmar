@@ -8,12 +8,13 @@ use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperGuichet
  */
-class Guichet extends Model
+class Guichet extends Model implements Auditable
 {
     use HasStatuses, HasSites, SoftDeletes;
     use \OwenIt\Auditing\Auditable;

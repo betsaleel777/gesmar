@@ -11,13 +11,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperTermesContrat
  */
-class TermesContrat extends Model
+class TermesContrat extends Model implements Auditable
 {
     use SoftDeletes, HasStateMachines, HasSites;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['code', 'user_id', 'site_id', 'contenu', 'type', 'status'];
 

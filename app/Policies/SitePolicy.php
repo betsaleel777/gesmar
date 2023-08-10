@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Architecture\Site;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class SitePolicy
 {
@@ -18,7 +19,7 @@ class SitePolicy
      */
     public function viewAny(User $user)
     {
-        //
+        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
     }
 
     /**

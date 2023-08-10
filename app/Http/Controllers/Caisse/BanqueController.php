@@ -18,6 +18,7 @@ class BanqueController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Banque::class);
         $request->validate(Banque::RULES);
         $banque = new Banque($request->all());
         $banque->save();
@@ -28,13 +29,15 @@ class BanqueController extends Controller
     public function show(int $id): JsonResponse
     {
         $banque = Banque::findOrFail($id);
+        $this->authorize('view', $banque);
         return response()->json(['banque' => $banque]);
     }
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $request->validate(Banque::RULES);
         $banque = Banque::findOrFail($id);
+        $this->authorize('update', $banque);
+        $request->validate(Banque::RULES);
         $banque->update($request->all());
         $message = 'La banque a été modifié avec succès.';
         return response()->json(['message' => $message]);

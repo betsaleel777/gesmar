@@ -19,6 +19,7 @@ class ZoneListResource extends JsonResource
             'nom' => Str::lower($this->nom),
             'niveau_id' => $this->niveau_id,
             'created_at' => $this->created_at->format('d-m-Y'),
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'niveau' => $this->whenLoaded('niveau', fn () => Str::lower($this->niveau->nom)),
             'pavillon' => $this->whenLoaded('pavillon', fn () => Str::lower($this->pavillon->nom)),
             'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),

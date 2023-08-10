@@ -22,6 +22,7 @@ class EmplacementListResource extends JsonResource
             'pas_porte' => $this->pas_porte,
             'liaison' => $this->liaison,
             'disponibilite' => $this->disponibilite,
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'type' => $this->whenLoaded('type', fn () => Str::lower($this->type->nom)),
         ];
     }

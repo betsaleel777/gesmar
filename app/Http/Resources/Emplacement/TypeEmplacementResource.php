@@ -23,6 +23,7 @@ class TypeEmplacementResource extends JsonResource
             'equipable' => $this->equipable,
             'site_id' => $this->site_id,
             'code' => $this->whenAppended('code'),
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }

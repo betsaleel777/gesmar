@@ -20,6 +20,7 @@ class TypeEquipementListResource extends JsonResource
             'frais_penalite' => $this->frais_penalite,
             'caution_abonnement' => $this->caution_abonnement,
             'created_at' => $this->created_at->format('d-m-Y'),
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
         ];
     }

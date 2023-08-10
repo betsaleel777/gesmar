@@ -26,6 +26,7 @@ class AbonnementResource extends JsonResource
             'index_depart' => $this->index_depart,
             'index_fin' => $this->index_fin,
             'status' => $this->whenAppended('status'),
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'site' => SiteResource::make($this->whenLoaded('site')),
             'emplacement' => EmplacementResource::make($this->whenLoaded('emplacement')),
             'equipement' => EquipementResource::make($this->whenLoaded('equipement')),

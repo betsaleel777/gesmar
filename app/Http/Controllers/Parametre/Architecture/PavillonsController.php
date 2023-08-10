@@ -7,13 +7,21 @@ use App\Http\Resources\Emplacement\PavillonResource;
 use App\Http\Resources\Emplacement\PavillonSelectResource;
 use App\Models\Architecture\Pavillon;
 use App\Models\Architecture\Site;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 class PavillonsController extends Controller
 {
+    public function __construct(private User $user)
+    {
+        $user = Auth::user();
+    }
+
     private static function pusher(int $site, int $nombre): void
     {
         $start = (int) Site::with('pavillons')->findOrFail($site)->pavillons->count();
@@ -30,14 +38,31 @@ class PavillonsController extends Controller
 
     public function all(): JsonResponse
     {
-        $pavillons = Pavillon::with('site')->get();
+        $response = Gate::inspect('viewAny', Pavillon::class);
+        if ($response->allowed()) {
+            $pavillons = Pavillon::with('site')->get();
+        } else {
+            $sites = $this->user->sites->modelkeys();
+            Pavillon::with('site')->inside($sites)->get();
+        }
         return response()->json(['pavillons' => PavillonResource::collection($pavillons)]);
     }
 
     public function search(Request $request): JsonResource
     {
-        $pavillons = Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-            ->orWhereHas('site', fn (Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+        $response = Gate::inspect('viewAny', Pavillon::class);
+        if ($response->allowed()) {
+            $pavillons = Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+                ->orWhereHas('site', fn (Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+        } else {
+            $sites = $this->user->sites->modelkeys();
+            Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+                ->orWhereHas(
+                    'site',
+                    fn (Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%', true)
+                        ->whereIn('sites.id', $sites)
+                )->get();
+        }
         return PavillonSelectResource::collection($pavillons);
     }
 
@@ -89,7 +114,13 @@ class PavillonsController extends Controller
 
     public function trashed(): JsonResponse
     {
-        $pavillons = Pavillon::with('site')->onlyTrashed()->get();
+        $response = Gate::inspect('viewAny', Pavillon::class);
+        if ($response->allowed()) {
+            $pavillons = Pavillon::with('site')->onlyTrashed()->get();
+        } else {
+            $sites = $this->user->sites->modelkeys();
+            $pavillons =   Pavillon::with('site')->inside($sites)->onlyTrashed()->get();
+        }
         return response()->json(['pavillons' => $pavillons]);
     }
 

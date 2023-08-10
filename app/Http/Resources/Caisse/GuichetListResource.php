@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Resources\Emplacement;
+namespace App\Http\Resources\Caisse;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
-class NiveauListResource extends JsonResource
+class GuichetListResource extends JsonResource
 {
-    public static $wrap = 'niveaux';
     /**
      * Transform the resource into an array.
      *
@@ -17,11 +16,10 @@ class NiveauListResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'site_id' => $this->site_id,
             'nom' => Str::lower($this->nom),
             'created_at' => $this->created_at->format('d-m-Y'),
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
-            'pavillon' => $this->whenLoaded('pavillon', fn () => Str::lower($this->pavillon->nom)),
-            'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
+            'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom))
         ];
     }
 }

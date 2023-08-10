@@ -21,6 +21,7 @@ class NiveauResource extends JsonResource
             'code' => $this->code,
             'pavillon_id' => $this->pavillon_id,
             'created_at' => $this->created_at->format('d-m-Y'),
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'pavillon' => PavillonResource::make($this->whenLoaded('pavillon')),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];

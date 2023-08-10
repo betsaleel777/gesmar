@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Caisse;
 
+use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
@@ -16,9 +17,10 @@ class GuichetResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'site_id' => $this->site_id,
             'nom' => Str::lower($this->nom),
             'created_at' => $this->created_at->format('d-m-Y'),
-            'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom))
+            'site' => $this->whenLoaded('site', fn () => SiteResource::make($this->site))
         ];
     }
 }

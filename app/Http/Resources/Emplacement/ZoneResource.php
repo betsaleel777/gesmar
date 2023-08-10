@@ -19,6 +19,7 @@ class ZoneResource extends JsonResource
             'nom' => $this->nom,
             'niveau_id' => $this->niveau_id,
             'code' => $this->whenAppended('code'),
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'niveau' => NiveauResource::make($this->whenLoaded('niveau')),
         ];
     }

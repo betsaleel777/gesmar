@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Architecture\Abonnement;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class AbonnementPolicy
 {
@@ -18,7 +19,7 @@ class AbonnementPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
     }
 
     /**

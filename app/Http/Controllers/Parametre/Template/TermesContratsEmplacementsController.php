@@ -10,12 +10,14 @@ class TermesContratsEmplacementsController extends TermesContratsController
 {
     public function all(): JsonResponse
     {
+        $this->authorize('viewAny', TermesContratEmplacement::class);
         $termes = TermesContratEmplacement::with(['site', 'user'])->get();
         return response()->json(['termes' => $termes]);
     }
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', TermesContratEmplacement::class);
         $request->validate(TermesContratEmplacement::RULES);
         $terme = new TermesContratEmplacement($request->all());
         $terme->codeGenerate();
@@ -26,8 +28,9 @@ class TermesContratsEmplacementsController extends TermesContratsController
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $request->validate(TermesContratEmplacement::RULES);
         $terme = TermesContratEmplacement::findOrFail($id);
+        $this->authorize('update', $terme);
+        $request->validate(TermesContratEmplacement::RULES);
         $terme->update($request->all());
         $message = "Les termes $terme->code ont été modifiés avec succès.";
         return response()->json(['message' => $message]);
@@ -35,6 +38,7 @@ class TermesContratsEmplacementsController extends TermesContratsController
 
     public function trashed(): JsonResponse
     {
+        $this->authorize('viewAny', TermesContratEmplacement::class);
         $termes = TermesContratEmplacement::with(['site', 'user'])->onlyTrashed()->get();
         return response()->json(['termes' => $termes]);
     }

@@ -18,6 +18,7 @@ class EquipementListResource extends JsonResource
             'id' => $this->id,
             'nom' => $this->nom,
             'code' => $this->code,
+            'site_id' => $this->site_id,
             'prix_unitaire' => $this->prix_unitaire,
             'prix_fixe' => $this->prix_fixe,
             'abonnement' => $this->abonnement,

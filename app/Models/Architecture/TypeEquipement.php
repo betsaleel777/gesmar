@@ -11,11 +11,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperTypeEquipement
  */
-class TypeEquipement extends Model
+class TypeEquipement extends Model implements Auditable
 {
     use HasFactory, SoftDeletes, HasSites;
     use \OwenIt\Auditing\Auditable;

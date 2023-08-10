@@ -21,6 +21,7 @@ class AbonnementListResource extends JsonResource
             'index_lu' => $this->when(empty($this->index_depart), $this->index_autre, $this->index_depart),
             'created_at' => $this->created_at->format('d-m-Y'),
             'status' => $this->whenAppended('status'),
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'equipement' => $this->whenLoaded('equipement', fn () => Str::upper($this->equipement->code)),
             'emplacement' => $this->whenLoaded('emplacement', fn () => Str::upper($this->emplacement->code)),
         ];

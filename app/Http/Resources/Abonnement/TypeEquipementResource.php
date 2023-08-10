@@ -21,6 +21,7 @@ class TypeEquipementResource extends JsonResource
             'site_id' => $this->site_id,
             'frais_penalite' => $this->frais_penalite,
             'caution_abonnement' => $this->caution_abonnement,
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }

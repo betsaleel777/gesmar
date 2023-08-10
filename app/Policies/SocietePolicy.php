@@ -2,12 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Architecture\Zone;
+use App\Models\Societe;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Auth\Access\Response;
 
-class ZonePolicy
+class SocietePolicy
 {
     use HandlesAuthorization;
 
@@ -19,19 +18,21 @@ class ZonePolicy
      */
     public function viewAny(User $user)
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        if ($user->can(config('gate.parametre.acces.application'))) {
+            return true;
+        }
     }
 
     /**
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
+     * @param  \App\Models\Societe  $societe
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Zone $zone)
+    public function view(User $user, Societe $societe)
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
+        if ($user->can(config('gate.parametre.acces.application'))) {
             return true;
         }
     }
@@ -44,7 +45,7 @@ class ZonePolicy
      */
     public function create(User $user)
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
+        if ($user->can(config('gate.parametre.acces.application'))) {
             return true;
         }
     }
@@ -53,12 +54,12 @@ class ZonePolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
+     * @param  \App\Models\Societe  $societe
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Zone $zone)
+    public function update(User $user, Societe $societe)
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
+        if ($user->can(config('gate.parametre.acces.application'))) {
             return true;
         }
     }
@@ -67,38 +68,34 @@ class ZonePolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
+     * @param  \App\Models\Societe  $societe
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Zone $zone)
+    public function delete(User $user, Societe $societe)
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        //
     }
 
     /**
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
+     * @param  \App\Models\Societe  $societe
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Zone $zone)
+    public function restore(User $user, Societe $societe)
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        //
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
+     * @param  \App\Models\Societe  $societe
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Zone $zone)
+    public function forceDelete(User $user, Societe $societe)
     {
         //
     }

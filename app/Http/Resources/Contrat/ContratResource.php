@@ -19,7 +19,7 @@ class ContratResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
+            'code' => $this->code_contrat ?? $this->code,
             'debut' => $this->debut,
             'fin' => $this->fin,
             'site_id' => $this->site_id,
@@ -31,6 +31,7 @@ class ContratResource extends JsonResource
             'equipable' => $this->equipable,
             'auto_valid' => $this->auto_valid,
             'type' => $this->type,
+            'isDemande' => empty($this->code_contrat),
             'status' => $this->whenAppended('status'),
             'site' => SiteResource::make($this->whenLoaded('site')),
             'personne' => PersonneResource::make($this->whenLoaded('personne')),

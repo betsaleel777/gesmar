@@ -19,6 +19,7 @@ class TypeEmplacementListResource extends JsonResource
             'equipable' => $this->equipable,
             'auto_valid' => $this->auto_valid,
             'created_at' => $this->created_at->format('d-m-Y'),
+            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'site' => $this->whenLoaded('site', fn () => $this->site->nom),
         ];
     }

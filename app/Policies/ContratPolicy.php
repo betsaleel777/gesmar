@@ -31,10 +31,7 @@ class ContratPolicy
      */
     public function view(User $user, Contrat $contrat)
     {
-        if ($user->can(config('gate.exploitation.reception.demande.own'))) {
-            return $user->id == $contrat->load('audits')->audits->first()->user_id;
-        }
-        if ($user->can(config('gate.exploitation.reception.demande.global'))) {
+        if ($user->can(config('gate.exploitation.reception.demande.show'))) {
             return true;
         }
     }
@@ -62,17 +59,8 @@ class ContratPolicy
     public function update(User $user, Contrat $contrat)
     {
 
-        if (
-            $user->can(config('gate.exploitation.reception.demande.global')) and
-            $user->can(config('gate.exploitation.reception.demande.edit'))
-        ) {
+        if ($user->can(config('gate.exploitation.reception.demande.edit'))) {
             return true;
-        }
-        if (
-            $user->can(config('gate.exploitation.reception.demande.own')) and
-            $user->can(config('gate.exploitation.reception.demande.edit'))
-        ) {
-            return $user->id == $contrat->load('audits')->audits->first()->user_id;
         }
     }
 
