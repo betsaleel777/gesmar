@@ -13,6 +13,8 @@ use App\Models\Exploitation\Contrat;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 
 class AbonnementsController extends Controller
 {
@@ -26,13 +28,25 @@ class AbonnementsController extends Controller
 
     public function all(): JsonResponse
     {
-        $abonnements = Abonnement::with('emplacement', 'equipement')->get();
+        $response = Gate::inspect('viewAny', Abonnement::class);
+        if ($response->allowed()) {
+            $abonnements = Abonnement::with('emplacement', 'equipement')->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $abonnements = Abonnement::with('emplacement', 'equipement')->inside($sites)->get();
+        }
         return response()->json(['abonnements' => AbonnementListResource::collection($abonnements)]);
     }
 
     public function select(): JsonResponse
     {
-        $abonnements = Abonnement::with('emplacement', 'equipement.type')->get();
+        $response = Gate::inspect('viewAny', Abonnement::class);
+        if ($response->allowed()) {
+            $abonnements = Abonnement::with('emplacement', 'equipement.type')->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $abonnements = Abonnement::with('emplacement', 'equipement.type')->inside($sites)->get();
+        }
         return response()->json(['abonnements' => AbonnementSelectResource::collection($abonnements)]);
     }
 

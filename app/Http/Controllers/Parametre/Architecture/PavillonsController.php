@@ -7,7 +7,6 @@ use App\Http\Resources\Emplacement\PavillonResource;
 use App\Http\Resources\Emplacement\PavillonSelectResource;
 use App\Models\Architecture\Pavillon;
 use App\Models\Architecture\Site;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -17,10 +16,6 @@ use Illuminate\Support\Facades\Gate;
 
 class PavillonsController extends Controller
 {
-    public function __construct(private User $user)
-    {
-        $user = Auth::user();
-    }
 
     private static function pusher(int $site, int $nombre): void
     {
@@ -42,7 +37,7 @@ class PavillonsController extends Controller
         if ($response->allowed()) {
             $pavillons = Pavillon::with('site')->get();
         } else {
-            $sites = $this->user->sites->modelkeys();
+            $sites = Auth::user()->sites->modelkeys();
             Pavillon::with('site')->inside($sites)->get();
         }
         return response()->json(['pavillons' => PavillonResource::collection($pavillons)]);
@@ -55,7 +50,7 @@ class PavillonsController extends Controller
             $pavillons = Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
                 ->orWhereHas('site', fn (Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
         } else {
-            $sites = $this->user->sites->modelkeys();
+            $sites = Auth::user()->sites->modelkeys();
             Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
                 ->orWhereHas(
                     'site',
@@ -118,7 +113,7 @@ class PavillonsController extends Controller
         if ($response->allowed()) {
             $pavillons = Pavillon::with('site')->onlyTrashed()->get();
         } else {
-            $sites = $this->user->sites->modelkeys();
+            $sites = Auth::user()->sites->modelkeys();
             $pavillons =   Pavillon::with('site')->inside($sites)->onlyTrashed()->get();
         }
         return response()->json(['pavillons' => $pavillons]);

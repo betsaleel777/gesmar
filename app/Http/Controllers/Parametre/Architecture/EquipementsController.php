@@ -9,6 +9,8 @@ use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 
 class EquipementsController extends Controller
 {
@@ -26,7 +28,13 @@ class EquipementsController extends Controller
 
     public function all(): JsonResponse
     {
-        $equipements = Equipement::with('site')->get();
+        $response = Gate::inspect('viewAny', Equipement::class);
+        if ($response->allowed()) {
+            $equipements = Equipement::with('site')->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $equipements = Equipement::with('site')->inside($sites)->get();
+        }
         return response()->json(['equipements' => EquipementListResource::collection($equipements)]);
     }
 
@@ -69,8 +77,13 @@ class EquipementsController extends Controller
 
     public function trashed(): JsonResponse
     {
-        $equipements = Equipement::onlyTrashed()->get();
-
+        $response = Gate::inspect('viewAny', Equipement::class);
+        if ($response->allowed()) {
+            $equipements = Equipement::onlyTrashed()->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $equipements = Equipement::onlyTrashed()->inside($sites)->get();
+        }
         return response()->json(['equipements' => $equipements]);
     }
 
@@ -102,7 +115,6 @@ class EquipementsController extends Controller
      */
     public function getGearsForContratView(int $id, int $emplacement, int $site): JsonResponse
     {
-
         $equipementLinked = Equipement::where('type_equipement_id', $id)->where('emplacement_id', $emplacement)->first();
         $equipements = Equipement::where('site_id', $site)->where('type_equipement_id', $id)
             ->unlinked()->unsubscribed()->get();

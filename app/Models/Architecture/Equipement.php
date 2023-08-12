@@ -156,6 +156,15 @@ class Equipement extends Model implements Auditable
     }
 
     /**
+     * Obtenir les equipements appartenant à la liste de site
+     *
+     */
+    public function scopeInside(Builder $query, array $sites): Builder
+    {
+        return $query->whereIn('site_id', $sites);
+    }
+
+    /**
      * Undocumented function
      *
      * @return BelongsTo<TypeEquipement, Equipement>

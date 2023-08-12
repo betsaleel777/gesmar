@@ -11,7 +11,6 @@ class PermissionsController extends Controller
 {
     public function all(): JsonResponse
     {
-        $this->authorize('viewAny', Permission::class);
         $permissions = Permission::get();
         return response()->json(['permissions' => $permissions]);
     }

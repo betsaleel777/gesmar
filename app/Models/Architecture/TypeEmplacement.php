@@ -71,6 +71,15 @@ class TypeEmplacement extends Model implements Auditable
     }
 
     /**
+     * Obtenir les emplacements appartenant à la liste de site accéssible
+     *
+     */
+    public function scopeInside(Builder $query, array $sites): Builder
+    {
+        return $query->whereIn('site_id', $sites);
+    }
+
+    /**
      * Undocumented function
      *
      * @return HasMany<Emplacement>

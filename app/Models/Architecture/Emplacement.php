@@ -169,6 +169,15 @@ class Emplacement extends Model implements Auditable
         return $query->whereHas('type', fn (Builder $query) => $query->where('auto_valid', true));
     }
 
+    /**
+     * Obtenir les emplacements appartenant à la liste de site accéssible
+     *
+     */
+    public function scopeInside(Builder $query, array $sites): Builder
+    {
+        return $query->whereHas('sites', fn ($query) => $query->whereIn('sites.id', $sites));
+    }
+
     //relations
 
     /**

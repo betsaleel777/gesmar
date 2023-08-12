@@ -5,6 +5,7 @@ namespace App\Models\Architecture;
 use App\Models\Exploitation\Contrat;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasSites;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,6 +34,15 @@ class TypeEquipement extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
+    }
+
+    /**
+     * Obtenir les equipements appartenant à la liste de site accéssible
+     *
+     */
+    public function scopeInside(Builder $query, array $sites): Builder
+    {
+        return $query->whereIn('site_id', $sites);
     }
 
     /**

@@ -11,7 +11,6 @@ class RolesController extends Controller
 {
     public function all(): JsonResponse
     {
-        $this->authorize('viewAny', Role::class);
         $roles = Role::get();
         return response()->json(['roles' => $roles]);
     }

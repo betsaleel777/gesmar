@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 
 class NiveauxController extends Controller implements StandardControllerInterface
 {
@@ -37,15 +39,30 @@ class NiveauxController extends Controller implements StandardControllerInterfac
 
     public function all(): JsonResponse
     {
-        $niveaux = Niveau::with('pavillon', 'site')->get();
+        $response = Gate::inspect('viewAny', Niveau::class);
+        if ($response->allowed()) {
+            $niveaux = Niveau::with('pavillon', 'site')->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $niveaux = Niveau::with('pavillon', 'site')->inside($sites)->get();
+        }
         return response()->json(['niveaux' => NiveauListResource::collection($niveaux)]);
     }
 
     public function search(Request $request): JsonResource
     {
-        $niveaux = Niveau::with('site', 'pavillon')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-            ->orWhereHas('site', fn (Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
-            ->orWhereHas('pavillon', fn (Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+        $response = Gate::inspect('viewAny', Niveau::class);
+        if ($response->allowed()) {
+            $niveaux = Niveau::with('site', 'pavillon')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+                ->orWhereHas('site', fn (Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
+                ->orWhereHas('pavillon', fn (Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $niveaux = Niveau::with('site', 'pavillon')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+                ->orWhereHas('site', fn (Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%', true)
+                    ->whereIn('sites.id', $sites))
+                ->orWhereHas('pavillon', fn (Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+        }
         return NiveauSelectResource::collection($niveaux);
     }
 
@@ -98,7 +115,13 @@ class NiveauxController extends Controller implements StandardControllerInterfac
 
     public function trashed(): JsonResponse
     {
-        $niveaux = Niveau::with('pavillon')->onlyTrashed()->get();
+        $response = Gate::inspect('viewAny', Niveau::class);
+        if ($response->allowed()) {
+            $niveaux = Niveau::with('pavillon')->onlyTrashed()->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $niveaux = Niveau::with('pavillon')->inside($sites)->onlyTrashed()->get();
+        }
         return response()->json(['niveaux' => $niveaux]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models\Architecture;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,6 +33,15 @@ class Niveau extends Model implements Auditable
     const PUSH_RULES = [
         'nombre' => 'required|numeric|min:1',
     ];
+
+    /**
+     * Obtenir les niveau appartenant à la liste de site
+     *
+     */
+    public function scopeInside(Builder $query, array $sites): Builder
+    {
+        return $query->whereHas('sites', fn ($query) => $query->whereIn('sites.id', $sites));
+    }
 
     /**
      * Undocumented function

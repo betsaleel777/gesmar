@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Caisse\Caissier;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class CaissierPolicy
 {
@@ -18,9 +19,7 @@ class CaissierPolicy
      */
     public function viewAny(User $user)
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
+        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
     }
 
     /**

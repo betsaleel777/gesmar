@@ -7,11 +7,12 @@ use App\Http\Resources\Emplacement\EmplacementListResource;
 use App\Http\Resources\Emplacement\EmplacementSelectResource;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
-use App\Models\Exploitation\Contrat;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 
 class EmplacementsController extends Controller
 {
@@ -32,19 +33,37 @@ class EmplacementsController extends Controller
 
     public function all(): JsonResponse
     {
-        $emplacements = Emplacement::get();
+        $response = Gate::inspect('viewAny', Emplacement::class);
+        if ($response->allowed()) {
+            $emplacements = Emplacement::get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $emplacements = Emplacement::inside($sites)->get();
+        }
         return response()->json(['emplacements' => EmplacementListResource::collection($emplacements)]);
     }
 
     public function select(): JsonResponse
     {
-        $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->get();
+        $response = Gate::inspect('viewAny', Emplacement::class);
+        if ($response->allowed()) {
+            $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->inside($sites)->get();
+        }
         return response()->json(['emplacements' => EmplacementSelectResource::collection($emplacements)]);
     }
 
     public function allAuto(): JsonResponse
     {
-        $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->withoutSchedule()->get();
+        $response = Gate::inspect('viewAny', Emplacement::class);
+        if ($response->allowed()) {
+            $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->withoutSchedule()->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->withoutSchedule()->inside($sites)->get();
+        }
         return response()->json(['emplacements' => $emplacements]);
     }
 
@@ -104,7 +123,13 @@ class EmplacementsController extends Controller
      */
     public function trashed(): JsonResponse
     {
-        $emplacements = Emplacement::with('zone')->onlyTrashed()->get();
+        $response = Gate::inspect('viewAny', Emplacement::class);
+        if ($response->allowed()) {
+            $emplacements = Emplacement::with('zone')->onlyTrashed()->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $emplacements = Emplacement::with('zone')->inside($sites)->onlyTrashed()->get();
+        }
         return response()->json(['emplacements' => $emplacements]);
     }
 

@@ -12,7 +12,6 @@ class SocieteController extends Controller
 {
     public function all(): JsonResponse
     {
-        $this->authorize('viewAny', Societe::class);
         $societe = Societe::first();
         $retour = empty($societe) ?: SocieteResource::make($societe);
         return response()->json(['societe' => $retour]);

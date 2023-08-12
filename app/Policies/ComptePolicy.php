@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Caisse\Compte;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class ComptePolicy
 {
@@ -18,9 +19,7 @@ class ComptePolicy
      */
     public function viewAny(User $user)
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
+        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
     }
 
     /**

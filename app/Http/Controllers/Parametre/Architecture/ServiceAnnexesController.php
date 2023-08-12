@@ -3,16 +3,23 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\ServiceAnnexe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 
-class ServiceAnnexesController extends Controller implements StandardControllerInterface
+class ServiceAnnexesController extends Controller
 {
     public function all(): JsonResponse
     {
-        $annexes = ServiceAnnexe::with('site')->get();
+        $response = Gate::inspect('viewAny', ServiceAnnexe::class);
+        if ($response->allowed()) {
+            $annexes = ServiceAnnexe::with('site')->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $annexes = ServiceAnnexe::with('site')->inside($sites)->get();
+        }
         return response()->json(['annexes' => $annexes]);
     }
 
@@ -52,7 +59,13 @@ class ServiceAnnexesController extends Controller implements StandardControllerI
 
     public function trashed(): JsonResponse
     {
-        $annexes = ServiceAnnexe::with('site')->onlyTrashed()->get();
+        $response = Gate::inspect('viewAny', ServiceAnnexe::class);
+        if ($response->allowed()) {
+            $annexes = ServiceAnnexe::with('site')->onlyTrashed()->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $annexes = ServiceAnnexe::with('site')->inside($sites)->onlyTrashed()->get();
+        }
         return response()->json(['annexes' => $annexes]);
     }
 

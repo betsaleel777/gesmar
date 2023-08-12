@@ -121,6 +121,15 @@ class Abonnement extends Model implements Auditable
         return $query->otherCurrentStatus(StatusAbonnement::ERROR->value);
     }
 
+    /**
+     * Obtenir les pavillons appartenant à la liste de site accéssible à l'utilisateur courant
+     *
+     */
+    public function scopeInside(Builder $query, array $sites): Builder
+    {
+        return $query->whereIn('site_id', $sites);
+    }
+
     public function equipement(): BelongsTo
     {
         return $this->belongsTo(Equipement::class);
