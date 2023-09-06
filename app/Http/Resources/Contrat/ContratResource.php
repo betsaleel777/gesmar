@@ -19,7 +19,7 @@ class ContratResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code_contrat ?? $this->code,
+            'code' => $this->codification(),
             'debut' => $this->debut,
             'fin' => $this->fin,
             'site_id' => $this->site_id,
@@ -38,6 +38,11 @@ class ContratResource extends JsonResource
             'annexe' => ServiceAnnexeResource::make($this->whenLoaded('annexe')),
             'emplacement' => EmplacementResource::make($this->whenLoaded('emplacement')),
             'equipements' => EquipementResource::collection($this->whenLoaded('equipements')),
+            'alias' => match (true) {
+                !empty($this->annexe) and $this->relationLoaded('personne') =>  $this->codification() . '-' . $this->annexe->code . '-' . $this->personne->alias,
+                !empty($this->emplacement) and $this->relationLoaded('personne') => $this->codification() . '-' . $this->emplacement->code . '-' . $this->personne->alias,
+                default => ''
+            },
         ];
     }
 }

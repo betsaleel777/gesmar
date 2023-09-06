@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Facture\FactureInitialeResource;
+use App\Http\Resources\Facture\FactureInitialeListResource;
 use App\Models\Finance\Facture;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ class FactureInitialeController extends Controller
     public function all(): JsonResponse
     {
         $factures = Facture::with(self::RELATIONS)->isSuperMarket()->isInitiale()->isFacture()->get();
-        return response()->json(['factures' => FactureInitialeResource::collection($factures)]);
+        return response()->json(['factures' => FactureInitialeListResource::collection($factures)]);
     }
 
     public function facturesValidees(): JsonResponse
@@ -33,7 +33,7 @@ class FactureInitialeController extends Controller
     public function show(int $id): JsonResponse
     {
         $facture = Facture::with(self::RELATIONS)->isSuperMarket()->isInitiale()->find($id);
-        return response()->json(['facture' => $facture]);
+        return response()->json(['facture' => FactureInitialeListResource::make($facture)]);
     }
 
     public function store(Request $request): JsonResponse

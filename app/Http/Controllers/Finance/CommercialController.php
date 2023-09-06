@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Bordereau\CommercialListResource;
+use App\Http\Resources\Bordereau\CommercialResource;
 use App\Models\Finance\Commercial;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -11,8 +13,14 @@ class CommercialController extends Controller
 {
     public function all(): JsonResponse
     {
-        $commerciaux = Commercial::with(['attributions', 'bordereaux'])->get();
-        return response()->json(['commerciaux' => $commerciaux]);
+        $commerciaux = Commercial::get();
+        return response()->json(['commerciaux' => CommercialListResource::collection($commerciaux)]);
+    }
+
+    public function select(): JsonResponse
+    {
+        $commerciaux = Commercial::with(['attributions.emplacement', 'bordereaux'])->get();
+        return response()->json(['commerciaux' => CommercialResource::collection($commerciaux)]);
     }
 
     public function store(Request $request): JsonResponse
@@ -51,7 +59,7 @@ class CommercialController extends Controller
     public function show(int $id): JsonResponse
     {
         $commercial = Commercial::with(['attributions.emplacement', 'bordereaux'])->withTrashed()->findOrFail($id);
-        return response()->json(['commercial' => $commercial]);
+        return response()->json(['commercial' => CommercialResource::make($commercial)]);
     }
 
     public function attribuate(Request $request): JsonResponse

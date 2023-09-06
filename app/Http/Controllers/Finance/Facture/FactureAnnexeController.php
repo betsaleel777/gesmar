@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Finance\Facture;
 
-use App\Http\Resources\Facture\FactureAnnexeResource;
+use App\Http\Resources\Facture\FactureAnnexeListResource;
 use App\Models\Finance\Facture;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ class FactureAnnexeController extends FactureController
     public function all(): JsonResponse
     {
         $factures = Facture::with(self::RELATIONS)->isAnnexe()->isFacture()->get();
-        return response()->json(['factures' => FactureAnnexeResource::collection($factures)]);
+        return response()->json(['factures' => FactureAnnexeListResource::collection($factures)]);
     }
 
     public function facturesSoldees(): JsonResponse

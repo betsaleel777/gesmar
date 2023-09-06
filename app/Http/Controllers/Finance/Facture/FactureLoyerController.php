@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Facture\FactureLoyerResource;
+use App\Http\Resources\Facture\FactureLoyerListResource;
 use App\Models\Finance\Facture;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ class FactureLoyerController extends Controller
     public function all(): JsonResponse
     {
         $factures = Facture::with(self::RELATIONS)->isLoyer()->isFacture()->get();
-        return response()->json(['factures' => FactureLoyerResource::collection($factures)]);
+        return response()->json(['factures' => FactureLoyerListResource::collection($factures)]);
     }
 
     public function facturesValidees(): JsonResponse

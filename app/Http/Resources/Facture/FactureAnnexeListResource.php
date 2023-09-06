@@ -2,11 +2,9 @@
 
 namespace App\Http\Resources\Facture;
 
-use App\Http\Resources\Contrat\ContratResource;
-use App\Http\Resources\Ordonnancement\PaiementResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FactureAnnexeResource extends JsonResource
+class FactureAnnexeListResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,8 +18,12 @@ class FactureAnnexeResource extends JsonResource
             'code' => $this->code,
             'status' => $this->whenAppended('status'),
             'contrat_code' => $this->whenLoaded('contrat', fn () => $this->contrat->code),
-            'contrat' => ContratResource::make($this->whenLoaded('contrat')),
-            'paiements' => PaiementResource::make($this->whenLoaded('paiements')),
+            'personne' => $this->when(
+                $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
+                fn () => $this->contrat->personne->alias
+            ),
+            'annexe' => $this->whenLoaded('annexe', fn () => $this->annexe->nom),
+            'prix' => $this->whenLoaded('annexe', fn () => $this->annexe->prix),
         ];
     }
 }

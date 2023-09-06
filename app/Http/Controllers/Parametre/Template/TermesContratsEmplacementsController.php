@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Parametre\Template;
 
+use App\Events\TermeContratBailPrepare;
+use App\Events\TermeContratBailRegistred;
 use App\Models\Template\TermesContratEmplacement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,9 +21,11 @@ class TermesContratsEmplacementsController extends TermesContratsController
     {
         $this->authorize('create', TermesContratEmplacement::class);
         $request->validate(TermesContratEmplacement::RULES);
+        TermeContratBailPrepare::dispatch();
         $terme = new TermesContratEmplacement($request->all());
         $terme->codeGenerate();
         $terme->save();
+        TermeContratBailRegistred::dispatch($terme);
         $message = "Les termes $terme->code ont été crée avec succès.";
         return response()->json(['message' => $message, 'id' => $terme->id]);
     }

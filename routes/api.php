@@ -57,9 +57,7 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::controller(AuthController::class)->group(static function (): void {
-    Route::post('login', 'login');
-});
+Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
 Route::middleware('auth:sanctum')->controller(AuthController::class)->group(static function (): void {
     Route::post('deconnecter', 'deconnecter');
@@ -426,6 +424,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
     });
     Route::controller(CommercialController::class)->prefix('commerciaux')->group(static function (): void {
         Route::get('/', 'all');
+        Route::get('/select', 'select');
         Route::get('/users', 'user');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');

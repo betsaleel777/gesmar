@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Bordereau\BordereauListResource;
+use App\Http\Resources\Bordereau\BordereauResource;
 use App\Models\Finance\Bordereau;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -12,7 +14,7 @@ class BordereauController extends Controller
     public function all(): JsonResponse
     {
         $bordereaux = Bordereau::with('commercial')->get();
-        return response()->json(['bordereaux' => $bordereaux]);
+        return response()->json(['bordereaux' => BordereauListResource::collection($bordereaux)]);
     }
 
     public function store(Request $request): JsonResponse
@@ -29,6 +31,6 @@ class BordereauController extends Controller
     public function show(int $id): JsonResponse
     {
         $bordereau = Bordereau::with(['attributions.emplacement', 'attributions.collecte', 'commercial'])->findOrFail($id);
-        return response()->json(['bordereau' => $bordereau]);
+        return response()->json(['bordereau' => BordereauResource::make($bordereau)]);
     }
 }

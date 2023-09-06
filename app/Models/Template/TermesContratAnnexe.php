@@ -2,7 +2,6 @@
 
 namespace App\Models\Template;
 
-use App\Events\TermeContratAnnexeRegistred;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\HasMedia;
@@ -36,9 +35,6 @@ class TermesContratAnnexe extends TermesContrat implements HasMedia
         $type = self::TYPE;
         static::addGlobalScope('annexe', function (Builder $builder) use ($type) {
             $builder->where('type', $type);
-        });
-        static::saved(function (TermesContratAnnexe $terme) {
-            TermeContratAnnexeRegistred::dispatch($terme);
         });
     }
 

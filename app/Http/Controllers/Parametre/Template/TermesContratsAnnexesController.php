@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Parametre\Template;
 
+use App\Events\TermeContratAnnexePrepare;
+use App\Events\TermeContratAnnexeRegistred;
 use App\Models\Template\TermesContratAnnexe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,9 +22,11 @@ class TermesContratsAnnexesController extends TermesContratsController
     {
         $this->authorize('create', TermesContratAnnexe::class);
         $request->validate(TermesContratAnnexe::RULES);
+        TermeContratAnnexePrepare::dispatch();
         $terme = new TermesContratAnnexe($request->all());
         $terme->codeGenerate();
         $terme->save();
+        TermeContratAnnexeRegistred::dispatch($terme);
         $message = "Les termes $terme->code ont été crées avec succès.";
         return response()->json(['message' => $message, 'id' => $terme->id]);
     }

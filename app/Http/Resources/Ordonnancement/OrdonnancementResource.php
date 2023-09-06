@@ -18,9 +18,10 @@ class OrdonnancementResource extends JsonResource
             'id' => $this->id,
             'total' => $this->total,
             'code' => $this->code,
-            'status' => $this->whenAppended('status'),
             'created_at' => $this->created_at,
+            'status' => $this->whenAppended('status'),
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),
+            'paiements' => PaiementResource::collection($this->whenLoaded('paiements')),
         ];
     }
 }

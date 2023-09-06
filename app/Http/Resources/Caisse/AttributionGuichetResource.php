@@ -4,7 +4,7 @@ namespace App\Http\Resources\Caisse;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CaissierListResouce extends JsonResource
+class AttributionGuichetResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,11 @@ class CaissierListResouce extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->pivot->id,
             'code' => $this->code,
-            'created_at' => $this->created_at->format('d-m-Y'),
-            'user' => $this->whenLoaded('user', fn () => $this->user->name),
-            'user_id' => $this->whenLoaded('user', fn () => $this->user->id)
+            'caissier_id' => $this->pivot->caissier_id,
+            'guichet_id' => $this->pivot->guichet_id,
+            'date' => $this->pivot->date,
         ];
     }
 }

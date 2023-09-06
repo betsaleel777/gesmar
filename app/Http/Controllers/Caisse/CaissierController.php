@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Caisse;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Caisse\CaissierListResouce;
+use App\Http\Resources\Caisse\CaissierResource;
 use App\Models\Caisse\Caissier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,9 +40,9 @@ class CaissierController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $caissier = Caissier::with('attributions')->findOrFail($id);
+        $caissier = Caissier::with('attributionsGuichet')->findOrFail($id);
         $this->authorize('view', $caissier);
-        return response()->json(['caissier' => $caissier]);
+        return response()->json(['caissier' => CaissierResource::make($caissier)]);
     }
 
     public function attribuate(Request $request): JsonResponse
@@ -50,7 +51,7 @@ class CaissierController extends Controller
         $this->authorize('view', $caissier);
         $request->validate(Caissier::ATTRIBUTION_RULES);
         foreach ($request->dates as $dates) {
-            $caissier->attributions()->attach($request->guichet_id, ['date' => $dates]);
+            $caissier->attributionsGuichet()->attach($request->guichet_id, ['date' => $dates]);
         }
         $message = "Guichet attribué avec succès.";
         return response()->json(['message' => $message]);

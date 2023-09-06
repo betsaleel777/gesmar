@@ -3,6 +3,11 @@
 namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Facture\FactureAnnexeResource;
+use App\Http\Resources\Facture\FactureEquipementResource;
+use App\Http\Resources\Facture\FactureInitialeResource;
+use App\Http\Resources\Facture\FactureLoyerResource;
+use App\Http\Resources\Facture\FactureResource;
 use App\Models\Finance\Facture;
 use Illuminate\Http\JsonResponse;
 
@@ -13,7 +18,7 @@ class FactureController extends Controller
     public function all(): JsonResponse
     {
         $factures = Facture::with(self::RELATIONS)->get();
-        return response()->json(['factures' => $factures]);
+        return response()->json(['factures' => FactureResource::collection($factures)]);
     }
 
     public function facturesValidees(): JsonResponse
@@ -54,10 +59,10 @@ class FactureController extends Controller
         $facturesLoyers = Facture::with('contrat.emplacement')->where('contrat_id', $id)->isLoyer()->isFacture()->get();
         $facturesEquipements = Facture::with('contrat', 'equipement')->where('contrat_id', $id)->isEquipement()->isFacture()->get();
         return response()->json([
-            'facturesInitiales' => $facturesInitiales,
-            'facturesEquipements' => $facturesEquipements,
-            'facturesLoyers' => $facturesLoyers,
-            'facturesAnnexes' => $facturesAnnexes,
+            'facturesInitiales' => FactureInitialeResource::collection($facturesInitiales),
+            'facturesEquipements' => FactureEquipementResource::collection($facturesEquipements),
+            'facturesLoyers' => FactureLoyerResource::collection($facturesLoyers),
+            'facturesAnnexes' => FactureAnnexeResource::collection($facturesAnnexes),
         ]);
     }
 }

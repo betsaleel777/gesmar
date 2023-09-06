@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Emplacement\EmplacementListResource;
+use App\Http\Resources\Emplacement\EmplacementResource;
 use App\Http\Resources\Emplacement\EmplacementSelectResource;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
@@ -217,6 +218,6 @@ class EmplacementsController extends Controller
         $emplacements = Emplacement::with(['contratActuel.facturesLoyers', 'contratActuel.personne'])
             ->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false))
             ->whereDoesntHave('contratActuel.facturesLoyers', fn (Builder $query) => $query->where('periode', $date))->get();
-        return response()->json(['emplacements' => $emplacements]);
+        return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
     }
 }

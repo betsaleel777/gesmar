@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Resources\Facture;
+namespace App\Http\Resources\Bordereau;
 
-use App\Http\Resources\Contrat\ContratResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FactureLoyerResource extends JsonResource
+class BordereauResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,8 +16,11 @@ class FactureLoyerResource extends JsonResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'commercial_id' => $this->commercial_id,
+            'date_attribution' => $this->date_attribution,
             'status' => $this->whenAppended('status'),
-            'contrat' => ContratResource::make($this->whenLoaded('contrat')),
+            'commercial' => CommercialResource::make($this->whenLoaded('commercial')),
+            'attributions' => AttributionResource::collection($this->whenLoaded('attributions')),
         ];
     }
 }

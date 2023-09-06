@@ -2,7 +2,6 @@
 
 namespace App\Models\Template;
 
-use App\Events\TermeContratBailRegistred;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\HasMedia;
@@ -35,9 +34,6 @@ class TermesContratEmplacement extends TermesContrat implements HasMedia
         $type = self::TYPE;
         static::addGlobalScope('bail', function (Builder $builder) use ($type) {
             $builder->where('type', $type);
-        });
-        static::saved(function (TermesContratEmplacement $terme) {
-            TermeContratBailRegistred::dispatch($terme);
         });
     }
 

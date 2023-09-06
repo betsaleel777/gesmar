@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Facture;
 
+use App\Http\Resources\Abonnement\EquipementResource;
+use App\Http\Resources\Contrat\ContratResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class FactureEquipementResource extends JsonResource
@@ -15,22 +17,12 @@ class FactureEquipementResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'code' => $this->code,
             'index_depart' => $this->index_depart,
             'index_fin' => $this->index_fin,
             'status' => $this->whenAppended('status'),
-            'contrat_code' => $this->whenLoaded('contrat', fn () => $this->contrat->code),
-            'personne' => $this->when(
-                $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
-                fn () => $this->contrat->personne->alias
-            ),
-            'emplacement' => $this->when(
-                $this->relationLoaded('contrat') and $this->contrat->relationLoaded('emplacement'),
-                fn () => $this->contrat->emplacement->code
-            ),
-            'loyer' => $this->when(
-                $this->relationLoaded('contrat') and $this->contrat->relationLoaded('emplacement'),
-                fn () => $this->contrat->emplacement->loyer
-            ),
+            'contrat' => ContratResource::make($this->whenLoaded('contrat')),
+            'equipement' => EquipementResource::make($this->whenLoaded('equipement')),
         ];
     }
 }

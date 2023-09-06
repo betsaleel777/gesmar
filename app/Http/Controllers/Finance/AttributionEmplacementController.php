@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Bordereau\AttributionResource;
 use App\Models\Finance\Attribution;
 use App\Models\Finance\Bordereau;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,7 @@ class AttributionEmplacementController extends Controller
     public function allWithBordereau(): JsonResponse
     {
         $attributions = Attribution::has('bordereau')->with(['commercial', 'emplacement', 'bordereau'])->orderBy('jour', 'desc')->get();
-        return response()->json(['attributions' => $attributions]);
+        return response()->json(['attributions' => AttributionResource::collection($attributions)]);
     }
 
     public function allAttribuated(string $date, int $commercial): JsonResponse

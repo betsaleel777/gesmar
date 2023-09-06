@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Facture\FactureEquipementResource;
+use App\Http\Resources\Facture\FactureEquipementListResource;
 use App\Models\Finance\Facture;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ class FactureEquipementController extends Controller
     public function all(): JsonResponse
     {
         $factures = Facture::with(self::RELATIONS)->isEquipement()->isFacture()->get();
-        return response()->json(['factures' => FactureEquipementResource::collection($factures)]);
+        return response()->json(['factures' => FactureEquipementListResource::collection($factures)]);
     }
 
     public function facturesValidees(): JsonResponse

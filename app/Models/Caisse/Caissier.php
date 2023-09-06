@@ -61,7 +61,7 @@ class Caissier extends Model implements Auditable
      *
      * @return BelongsToMany<Guichet>
      */
-    public function attributions(): BelongsToMany
+    public function attributionsGuichet(): BelongsToMany
     {
         return $this->belongsToMany(Guichet::class, 'attribution_guichets', 'caissier_id', 'guichet_id')->withPivot('date', 'id')->withTimestamps();
     }
