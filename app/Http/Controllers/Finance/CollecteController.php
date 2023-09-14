@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Finance;
 
+use App\Events\CollecteRegistred;
 use App\Http\Controllers\Controller;
 use App\Models\Finance\Attribution;
 use App\Models\Finance\Collecte;
@@ -24,7 +25,6 @@ class CollecteController extends Controller
         $collecte = new Collecte($request->all());
         $message = "La somme a bien été collectée";
         if ($collecte->nombre > 1) {
-            // attribuer dans le futur
             $attribution = Attribution::findOrFail($request->attribution_id);
             $attribution->encaisser();
             $start = (new Carbon($attribution->jour))->addDay()->format('Y-m-d');
@@ -42,6 +42,7 @@ class CollecteController extends Controller
             }
         }
         $collecte->save();
+        CollecteRegistred::dispatch($collecte);
         return response()->json(['message' => $message]);
     }
 }

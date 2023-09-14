@@ -14,7 +14,6 @@ return [
     'exploitation' => [
         'acceder' => 'accès au menu exploitation',
         'reception' => [
-            'dashboard' => 'accès au dashboard de la réception',
             'acceder' => 'accès au menu réception',
             'demande' => [
                 'create' => 'création de demande',
@@ -54,7 +53,6 @@ return [
             ],
         ],
         'ordonnancements' => [
-            'dashboard' => 'accès au dashboard des ordonnancements',
             'acceder' => 'accès au menu ordonnancements',
             'ordonnancement' => [
                 'create' => "création d'ordonnancement",
@@ -62,7 +60,6 @@ return [
             ],
         ],
         'maintenance' => [
-            'dashboard' => 'accès au dashboard de la maintenance',
             'acceder' => 'accès au menu maintenance',
         ],
     ],
@@ -70,11 +67,9 @@ return [
         'acceder' => 'accès au menu finance et quittancement',
         'facturation' => [
             'acceder' => 'accès au menu facturation',
-            'dashboard' => 'accès au dashboard de la facturation',
         ],
         'bordereaux' => [
             'acceder' => 'accès au menu bordereaux',
-            'dashboard' => 'accès au dashboard des bordereaux',
             'commerciaux' => [
                 'acceder' => 'accès aux commerciaux',
                 'create' => 'création des commerciaux',
@@ -83,6 +78,7 @@ return [
                 'edit' => 'modifier un commercial',
                 'trash' => 'archiver un commercial',
                 'restore' => 'restorer un commercial',
+                'show' => "voir les détails d'un commercial",
             ],
             'bordereau' => [
                 'acceder' => 'accès à la liste des bordereau',
@@ -98,7 +94,6 @@ return [
             ],
         ],
         'caisse' => [
-            'dashboard' => 'accès au dashboard de la caisse',
             'ouverture' => [
                 'acceder' => "accès à l'ouverture de caisse",
                 'create' => "création d'ouverture de caisse",

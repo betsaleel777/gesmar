@@ -57,4 +57,10 @@ class OuvertureController extends Controller
         return empty($ouverture) ? response()->json(['message' => "il n'y a aucune caisse ouverte actuellement pour cet utilisateur"])
             : response()->json(['ouverture' => OuvertureResource::make($ouverture)]);
     }
+
+    public function getUsingByCaissier(int $id)
+    {
+        $exists = Ouverture::where('caissier_id', $id)->using()->exists();
+        return response()->json(['exists' => $exists]);
+    }
 }

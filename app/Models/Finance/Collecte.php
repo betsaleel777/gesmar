@@ -2,7 +2,6 @@
 
 namespace App\Models\Finance;
 
-use App\Events\CollecteRegistred;
 use App\Events\CollecteRemoved;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,10 +40,6 @@ class Collecte extends Model implements Auditable
      */
     protected static function booted(): void
     {
-        static::saved(function (Collecte $collecte) {
-            CollecteRegistred::dispatch($collecte);
-        });
-
         static::deleted(function (Collecte $collecte) {
             CollecteRemoved::dispatch($collecte);
         });

@@ -465,6 +465,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
             Route::get('/', 'all');
             Route::post('/store', 'store');
             Route::get('/current/caissier/{id}', 'getCurrentByCaissier');
+            Route::get('/using/caissier/{id}', 'getUsingByCaissier');
             Route::get('/marche/{id}', 'getByMarche');
             Route::get('/exists/{id}', 'exists');
             Route::get('{id}', 'show');
@@ -480,6 +481,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
             Route::post('/store', 'store');
             Route::get('/marche/{id}', 'getByMarche');
             Route::get('{id}', 'show');
+            Route::get('/print/{id}', 'print');
             Route::put('{id}', 'update');
         });
     });

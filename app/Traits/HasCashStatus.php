@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Enums\StatusBordereau;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * pour les models qui ont les status d'encaissements
@@ -19,13 +20,13 @@ trait HasCashStatus
         $this->setStatus(StatusBordereau::PAS_ENCAISSE->value);
     }
 
-    public function cashed(): bool
+    public function scopeCashed(Builder $query): Builder
     {
-        return $this->appends[0] === StatusBordereau::ENCAISSE->value;
+        return $query->currentStatus(StatusBordereau::ENCAISSE->value);
     }
 
-    public function uncashed(): bool
+    public function scopeUncashed(Builder $query): Builder
     {
-        return $this->appends[0] === StatusBordereau::PAS_ENCAISSE->value;
+        return $query->currentStatus(StatusBordereau::PAS_ENCAISSE->value);
     }
 }
