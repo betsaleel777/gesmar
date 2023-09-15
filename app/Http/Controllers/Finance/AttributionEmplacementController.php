@@ -19,13 +19,13 @@ class AttributionEmplacementController extends Controller
         return AttributionListResource::collection($attributions);
     }
 
-    public function getPaginate(Request $request): JsonResource
+    public function getPaginate(): JsonResource
     {
         $attributions = Attribution::with(['commercial.user', 'emplacement', 'bordereau'])->paginate(10);
         return AttributionListResource::collection($attributions);
     }
 
-    public function getSearch(Request $request, string $search): JsonResource
+    public function getSearch(string $search): JsonResource
     {
         $attributions = Attribution::with(['commercial.user', 'emplacement', 'bordereau'])
             ->whereHas('commercial.user', fn ($query) => $query->where('name', 'LIKE', "%$search%"))

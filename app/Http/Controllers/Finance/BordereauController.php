@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Bordereau\BordereauListResource;
 use App\Http\Resources\Bordereau\BordereauResource;
 use App\Models\Finance\Bordereau;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class BordereauController extends Controller
 {
@@ -15,6 +17,21 @@ class BordereauController extends Controller
     {
         $bordereaux = Bordereau::with('commercial')->get();
         return response()->json(['bordereaux' => BordereauListResource::collection($bordereaux)]);
+    }
+
+    public function getSearch(string $search): JsonResource
+    {
+        $bordereaux = Bordereau::with('commercial')->where('code', 'LIKE', "%$search%")
+            ->orWhere('date_attribution', 'LIKE', "%$search")
+            ->orWhereHas('commercial.user', fn (Builder $query) => $query->where('name', 'LIKE', "%$search%"))
+            ->paginate(10);
+        return BordereauListResource::collection($bordereaux);
+    }
+
+    public function getPaginate(): JsonResource
+    {
+        $bordereaux = Bordereau::with('commercial')->paginate(10);
+        return BordereauListResource::collection($bordereaux);
     }
 
     public function store(Request $request): JsonResponse

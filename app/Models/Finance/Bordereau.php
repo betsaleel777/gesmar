@@ -20,6 +20,8 @@ class Bordereau extends Model implements Auditable
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['code', 'commercial_id', 'date_attribution'];
+    protected $dates = ['created_at'];
+    protected $casts = ['date_attribution' => 'date'];
     protected $auditExclude = ['code'];
     /**
      *
