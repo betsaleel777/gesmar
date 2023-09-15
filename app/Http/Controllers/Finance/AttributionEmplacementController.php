@@ -3,25 +3,42 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Bordereau\AttributionResource;
+use App\Http\Resources\Bordereau\AttributionListResource;
 use App\Models\Finance\Attribution;
 use App\Models\Finance\Bordereau;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class AttributionEmplacementController extends Controller
 {
 
-    public function all(): JsonResponse
+    public function all(): JsonResource
     {
-        $attributions = Attribution::with(['commercial', 'emplacement', 'bordereau'])->orderBy('jour', 'desc')->get();
-        return response()->json(['attributions' => $attributions]);
+        $attributions = Attribution::with(['commercial', 'emplacement', 'bordereau'])->get();
+        return AttributionListResource::collection($attributions);
+    }
+
+    public function getPaginate(Request $request): JsonResource
+    {
+        $attributions = Attribution::with(['commercial.user', 'emplacement', 'bordereau'])->paginate(10);
+        return AttributionListResource::collection($attributions);
+    }
+
+    public function getSearch(Request $request, string $search): JsonResource
+    {
+        $attributions = Attribution::with(['commercial.user', 'emplacement', 'bordereau'])
+            ->whereHas('commercial.user', fn ($query) => $query->where('name', 'LIKE', "%$search%"))
+            ->orWhereHas('emplacement', fn ($query) => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('bordereau', fn ($query) => $query->where('bordereaus.code', 'LIKE', "%$search%"))
+            ->paginate(10);
+        return AttributionListResource::collection($attributions);
     }
 
     public function allWithBordereau(): JsonResponse
     {
-        $attributions = Attribution::has('bordereau')->with(['commercial', 'emplacement', 'bordereau'])->orderBy('jour', 'desc')->get();
-        return response()->json(['attributions' => AttributionResource::collection($attributions)]);
+        $attributions = Attribution::with(['commercial', 'emplacement', 'bordereau'])->get();
+        return response()->json(['attributions' => AttributionListResource::collection($attributions)]);
     }
 
     public function allAttribuated(string $date, int $commercial): JsonResponse

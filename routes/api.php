@@ -447,6 +447,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
     });
     Route::controller(AttributionEmplacementController::class)->prefix('attributions')->group(static function (): void {
         Route::get('/', 'all');
+        Route::get('/paginate', 'getPaginate');
+        Route::get('/search/{search}/paginate', 'getSearch');
         Route::get('/attribuated/{date}/{commercial}', 'allAttribuated');
         Route::get('/with-bordereau', 'allWithBordereau');
         Route::post('/store', 'store');
