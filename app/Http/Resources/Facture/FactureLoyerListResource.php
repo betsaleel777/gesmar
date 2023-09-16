@@ -21,15 +21,15 @@ class FactureLoyerListResource extends JsonResource
             'contrat' => $this->whenLoaded('contrat', fn () => $this->contrat->code),
             'personne' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
-                fn () => $this->contrat->personne->alias
+                $this->contrat->personne->nom . ' ' . $this->contrat->personne->prenom
             ),
             'emplacement' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('emplacement'),
-                fn () => $this->contrat->emplacement->code
+                $this->contrat->emplacement->code
             ),
             'loyer' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('emplacement'),
-                fn () => $this->contrat->emplacement->loyer
+                $this->contrat->emplacement->loyer
             ),
         ];
     }

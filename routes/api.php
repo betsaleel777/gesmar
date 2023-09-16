@@ -372,8 +372,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
         Route::controller(FactureLoyerController::class)->prefix('loyers')->group(
             static function (): void {
                 Route::get('/', 'all');
+                Route::get('/paginate', 'getPaginate');
                 Route::get('/search/{search}/paginate', 'getSearch');
-                Route::get('/trashed', 'trashed');
                 Route::get('/trashed', 'trashed');
                 Route::post('/store', 'store');
                 Route::get('/marche/{id}', 'getByMarche');

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Finance\Facture;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Facture\FactureEquipementListResource;
 use App\Models\Finance\Facture;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class FactureEquipementController extends Controller
 {
@@ -15,6 +17,23 @@ class FactureEquipementController extends Controller
     {
         $factures = Facture::with(self::RELATIONS)->isEquipement()->isFacture()->get();
         return response()->json(['factures' => FactureEquipementListResource::collection($factures)]);
+    }
+
+    public function getPaginate(): JsonResource
+    {
+        $factures = Facture::with(['contrat' => ['personne', 'emplacement']])->isEquipement()->isFacture()->paginate(10);
+        return FactureEquipementListResource::collection($factures);
+    }
+
+    public function getSearch(string $search): JsonResource
+    {
+        $factures = Facture::with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->isEquipement()->isFacture()->paginate(10);
+
+        return FactureEquipementListResource::collection($factures);
     }
 
     public function facturesValidees(): JsonResponse
