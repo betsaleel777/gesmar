@@ -20,6 +20,8 @@ class Attribution extends Model implements Auditable
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['commercial_id', 'emplacement_id', 'bordereau_id', 'jour'];
+    protected $dates = ['created_at'];
+    protected $casts = ['jour' => 'date'];
     protected $table = 'attribution_emplacements';
     /**
      *

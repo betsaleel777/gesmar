@@ -23,7 +23,7 @@ class FactureInitialeListResource extends JsonResource
             'contrat' => $this->whenLoaded('contrat', fn () => $this->contrat->code),
             'personne' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
-                fn () => $this->contrat->personne->alias
+                $this->contrat->personne->nom . ' ' . $this->contrat->personne->prenom
             ),
             'emplacement' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('emplacement'),

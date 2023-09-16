@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Resources\Facture\FactureAnnexeListResource;
 use App\Models\Finance\Facture;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class FactureAnnexeController extends FactureController
 {
@@ -15,6 +17,23 @@ class FactureAnnexeController extends FactureController
     {
         $factures = Facture::with(self::RELATIONS)->isAnnexe()->isFacture()->get();
         return response()->json(['factures' => FactureAnnexeListResource::collection($factures)]);
+    }
+
+    public function getPaginate(): JsonResource
+    {
+        $factures = Facture::with('contrat.personne', 'annexe')->isAnnexe()->isFacture()->paginate(10);
+        return FactureAnnexeListResource::collection($factures);
+    }
+
+    public function getSearch(string $search): JsonResource
+    {
+        $factures = Facture::with('contrat.personne', 'annexe')->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.annexe', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->isAnnexe()->isFacture()->paginate(10);
+
+        return FactureAnnexeListResource::collection($factures);
     }
 
     public function facturesSoldees(): JsonResponse

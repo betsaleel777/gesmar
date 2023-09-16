@@ -359,6 +359,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
         Route::controller(FactureAnnexeController::class)->prefix('annexes')->group(
             static function (): void {
                 Route::get('/', 'all');
+                Route::get('/paginate', 'getPaginate');
+                Route::get('/search/{search}/paginate', 'getSearch');
                 Route::post('/store', 'store');
                 Route::get('/marche/{id}', 'getByMarche');
                 Route::get('{id}', 'show');
@@ -370,6 +372,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
         Route::controller(FactureLoyerController::class)->prefix('loyers')->group(
             static function (): void {
                 Route::get('/', 'all');
+                Route::get('/search/{search}/paginate', 'getSearch');
+                Route::get('/trashed', 'trashed');
                 Route::get('/trashed', 'trashed');
                 Route::post('/store', 'store');
                 Route::get('/marche/{id}', 'getByMarche');
@@ -382,6 +386,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
         Route::controller(FactureInitialeController::class)->prefix('initiales')->group(
             static function (): void {
                 Route::get('/', 'all');
+                Route::get('/paginate', 'getPaginate');
+                Route::get('/search/{search}/paginate', 'getSearch');
                 Route::get('/trashed', 'trashed');
                 Route::post('/store', 'store');
                 Route::get('/marche/{id}', 'getByMarche');
@@ -394,6 +400,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
         Route::controller(FactureEquipementController::class)->prefix('equipements')->group(
             static function (): void {
                 Route::get('/', 'all');
+                Route::get('/paginate', 'getPaginate');
+                Route::get('/search/{search}/paginate', 'getSearch');
                 Route::get('/trashed', 'trashed');
                 Route::post('/store', 'store');
                 Route::get('/marche/{id}', 'getByMarche');
