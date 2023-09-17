@@ -9,6 +9,7 @@ use App\Models\Caisse\Ouverture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class OuvertureController extends Controller
 {
@@ -16,6 +17,20 @@ class OuvertureController extends Controller
     {
         $ouvertures = Ouverture::get();
         return response()->json(['ouvertures' => OuvertureListResource::collection($ouvertures)]);
+    }
+
+    public function getPaginate(): JsonResource
+    {
+        $ouvertures = Ouverture::paginate(10);
+        return OuvertureListResource::collection($ouvertures);
+    }
+
+    public function getSearch(string $search): JsonResource
+    {
+        $ouvertures = Ouverture::where('code', 'LIKE', "%$search%")->orWhere('created_at', 'LIKE', "%$search")
+            ->orWhereHas('caissier.user', fn (Builder $query): Builder => $query->where('name', 'LIKE', "%$search%"))
+            ->orWhereHas('guichet', fn (Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))->paginate(10);
+        return OuvertureListResource::collection($ouvertures);
     }
 
     public function store(Request $request): JsonResponse

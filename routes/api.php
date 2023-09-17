@@ -475,6 +475,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
     Route::prefix('caisses')->group(static function (): void {
         Route::controller(OuvertureController::class)->prefix('ouvertures')->group(static function (): void {
             Route::get('/', 'all');
+            Route::get('/paginate', 'getPaginate');
+            Route::get('/search/{search}/paginate', 'getSearch');
             Route::post('/store', 'store');
             Route::get('/current/caissier/{id}', 'getCurrentByCaissier');
             Route::get('/using/caissier/{id}', 'getUsingByCaissier');
