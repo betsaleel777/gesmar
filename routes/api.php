@@ -293,6 +293,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(static functio
         });
         Route::controller(ClientsController::class)->prefix('clients')->group(static function (): void {
             Route::get('/', 'all');
+            Route::get('/paginate', 'getPaginate');
+            Route::get('/search/{search}/paginate', 'getSearch');
             Route::get('/trashed', 'trashed');
             Route::post('/store', 'store');
             Route::get('{id}', 'show');
@@ -303,6 +305,8 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(static functio
         });
         Route::controller(OrdonnancementController::class)->prefix('ordonnancements')->group(static function (): void {
             Route::get('/', 'all');
+            Route::get('/paginate', 'getPaginate');
+            Route::get('/search/{search}/paginate', 'getSearch');
             Route::get('/unpaid', 'unpaids');
             Route::post('/store', 'store');
             Route::get('{id}', 'show');
@@ -487,6 +491,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
         });
         Route::controller(FermetureController::class)->prefix('fermetures')->group(static function (): void {
             Route::get('/', 'index');
+            Route::get('/paginate', 'getPaginate');
+            Route::get('/search/{search}/paginate', 'getSearch');
             Route::post('/store', 'store');
             Route::get('{id}', 'show');
         });
