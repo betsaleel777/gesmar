@@ -4,12 +4,11 @@ namespace App\Http\Resources\Bordereau;
 
 use App\Models\Finance\Bordereau;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
 /**
  * @property Bordereau $resource
  */
-class BordereauListResource extends JsonResource
+class BordereauVueEncaissementResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -21,15 +20,11 @@ class BordereauListResource extends JsonResource
         return [
             'id' => $this->resource->id,
             'code' => $this->resource->code,
-            'etat' => $this->collected,
-            'status' => $this->whenAppended('status'),
-            'commercial_id' => $this->resource->commercial_id,
-            'date_attribution' => $this->resource->date_attribution->format('d-m-Y'),
-            'created_at' => $this->resource->created_at->format('d-m-Y'),
             'commercial' => $this->when(
                 $this->resource->relationLoaded('commercial') and $this->resource->commercial->relationLoaded('user'),
-                Str::lower($this->commercial->user->name)
+                $this->resource->commercial->user->name
             ),
+            'total' => $this->whenLoaded('attributions', $this->resource->attributions->sum('collecte.montant')),
         ];
     }
 }

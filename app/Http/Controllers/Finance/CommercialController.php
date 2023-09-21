@@ -19,7 +19,7 @@ class CommercialController extends Controller
 
     public function select(): JsonResponse
     {
-        $commerciaux = Commercial::with(['attributions.emplacement', 'bordereaux'])->get();
+        $commerciaux = Commercial::with(['attributions.emplacement', 'bordereaux'])->without('user.avatar', 'site')->get();
         return response()->json(['commerciaux' => CommercialResource::collection($commerciaux)]);
     }
 

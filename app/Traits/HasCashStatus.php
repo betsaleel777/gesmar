@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\Enums\StatusBordereau;
+use App\Enums\StatusCollecte;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -12,21 +12,21 @@ trait HasCashStatus
 {
     public function encaisser(): void
     {
-        $this->setStatus(StatusBordereau::ENCAISSE->value);
+        $this->setStatus(StatusCollecte::COLLECTED->value);
     }
 
     public function pasEncaisser(): void
     {
-        $this->setStatus(StatusBordereau::PAS_ENCAISSE->value);
+        $this->setStatus(StatusCollecte::UNCOLLECTED->value);
     }
 
     public function scopeCashed(Builder $query): Builder
     {
-        return $query->currentStatus(StatusBordereau::ENCAISSE->value);
+        return $query->currentStatus(StatusCollecte::COLLECTED->value);
     }
 
     public function scopeUncashed(Builder $query): Builder
     {
-        return $query->currentStatus(StatusBordereau::PAS_ENCAISSE->value);
+        return $query->currentStatus(StatusCollecte::UNCOLLECTED->value);
     }
 }

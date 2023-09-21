@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Bordereau\BordereauListResource;
 use App\Http\Resources\Bordereau\BordereauResource;
+use App\Http\Resources\Bordereau\BordereauSelectResource;
+use App\Http\Resources\Bordereau\BordereauVueEncaissementResource;
 use App\Models\Finance\Bordereau;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -17,6 +19,12 @@ class BordereauController extends Controller
     {
         $bordereaux = Bordereau::with('commercial')->get();
         return response()->json(['bordereaux' => BordereauListResource::collection($bordereaux)]);
+    }
+
+    public function getCollected(): JsonResponse
+    {
+        $bordereaux = Bordereau::select('id', 'code')->isCollected()->get();
+        return response()->json(['bordereaux' => BordereauSelectResource::collection($bordereaux)]);
     }
 
     public function getSearch(string $search): JsonResource
@@ -49,5 +57,11 @@ class BordereauController extends Controller
     {
         $bordereau = Bordereau::with(['attributions.emplacement', 'attributions.collecte', 'commercial'])->findOrFail($id);
         return response()->json(['bordereau' => BordereauResource::make($bordereau)]);
+    }
+
+    public function getForEncaissement(int $id): JsonResponse
+    {
+        $bordereau = Bordereau::with('attributions.collecte', 'commercial.user')->find($id);
+        return response()->json(['bordereau' => BordereauVueEncaissementResource::make($bordereau)]);
     }
 }

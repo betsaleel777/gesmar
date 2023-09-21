@@ -13,10 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('encaissements', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('ordonnancement_id')->nullable()->constrained('ordonnancements')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->timestamps();
+        Schema::table('bordereaus', function (Blueprint $table) {
+            $table->string('collected', 20)->nullable();
         });
     }
 
@@ -27,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('encaissements');
+        Schema::table('bordereaus', function (Blueprint $table) {
+            $table->dropColumn('collected');
+        });
     }
 };

@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-use App\Enums\StatusBordereau;
 use App\Events\CollecteRegistred;
 use App\Events\CollecteRemoved;
 use App\Models\Finance\Attribution;
@@ -18,7 +17,7 @@ class CollecteSubscriber
         }
         // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
         $bordereau = Bordereau::find((int)$attribution->bordereau?->id);
-        $bordereau->attributions()->uncashed()->exists() ?: $bordereau->encaisser();
+        $bordereau->attributions()->uncashed()->exists() ?: $bordereau->setCollected();
     }
 
     public function updateDependenciesAfterDelete(CollecteRemoved $event): void
@@ -27,7 +26,7 @@ class CollecteSubscriber
         $attribution->pasEncaisser();
         // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
         $bordereau = Bordereau::find((int)$attribution->bordereau?->id);
-        $bordereau->attributions()->uncashed()->exists() ?: $bordereau->encaisser();
+        $bordereau->attributions()->uncashed()->exists() ?: $bordereau->setCollected();
     }
 
     /**

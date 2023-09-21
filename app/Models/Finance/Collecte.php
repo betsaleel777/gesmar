@@ -15,14 +15,14 @@ class Collecte extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
-    protected $fillable = ['nombre', 'montant', 'attribution_id'];
+    protected $fillable = ['nombre', 'montant', 'attribution_id', 'non_paye'];
+    protected $dates = ['created_at'];
 
     const RULES = [
         'commercial' => 'required',
         'bordereau' => 'required',
         'attribution_id' => 'required',
     ];
-
     /**
      * The attributes that should be cast.
      *
@@ -32,6 +32,7 @@ class Collecte extends Model implements Auditable
         'nombre' => 'integer',
         'montant' => 'integer',
         'attribution_id' => 'integer',
+        'non_paye' => 'boolean'
     ];
 
     /**

@@ -449,10 +449,12 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(static function ():
     });
     Route::controller(BordereauController::class)->prefix('bordereaux')->group(static function (): void {
         Route::get('/', 'all');
+        Route::get('/collected', 'getCollected');
         Route::get('/paginate', 'getPaginate');
         Route::get('/search/{search}/paginate', 'getSearch');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
+        Route::get('/vue-encaissement/{id}', 'getForEncaissement');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');

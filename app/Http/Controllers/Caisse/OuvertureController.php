@@ -62,7 +62,7 @@ class OuvertureController extends Controller
 
     public function exists(int $id): JsonResponse
     {
-        $exists = Ouverture::where('caissier_id', $id)->where('date', date('Y-m-d'))->exists();
+        $exists = Ouverture::where('caissier_id', $id)->exists();
         return response()->json(['exists' => $exists]);
     }
 

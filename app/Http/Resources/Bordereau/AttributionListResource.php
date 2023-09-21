@@ -23,6 +23,7 @@ class AttributionListResource extends JsonResource
         return [
             'id' => $this->resource->id,
             'jour' => $this->resource->jour->format('d-m-Y'),
+            'unpaid' => $this->whenLoaded('collecte', $this->resource->collecte?->non_paye),
             'created_at' => $this->resource->created_at->format('d-m-Y'),
             'status' => $this->whenAppended('status'),
             'bordereau' => $this->whenLoaded('bordereau', fn () => $this->resource->bordereau->code),

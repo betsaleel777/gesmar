@@ -16,6 +16,7 @@ class BordereauResource extends JsonResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'collected' => $this->collected,
             'commercial_id' => $this->commercial_id,
             'date_attribution' => $this->date_attribution,
             'status' => $this->whenAppended('status'),
