@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Caisse\FermetureListResource;
 use App\Http\Resources\Caisse\FermetureResource;
 use App\Models\Caisse\Fermeture;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class FermetureController extends Controller
 {
@@ -16,6 +18,22 @@ class FermetureController extends Controller
     {
         $fermetures = Fermeture::with('ouverture.encaissements.ordonnancement')->get();
         return response()->json(['fermetures' => FermetureListResource::collection($fermetures)]);
+    }
+
+    public function getPaginate(): JsonResource
+    {
+        $fermetures = Fermeture::with('ouverture.encaissements.ordonnancement')->paginate(10);
+        return FermetureListResource::collection($fermetures);
+    }
+
+    public function getSearch(string $search): JsonResource
+    {
+        $fermetures = Fermeture::with('ouverture.encaissements.ordonnancement')
+            ->where('created_at', 'LIKE', "%$search")
+            ->orWhereHas('ouverture.caissier.user', fn (Builder $query) => $query->where('name', 'LIKE', "%$search%"))
+            ->orWhereHas('ouverture.guichet', fn (Builder $query) => $query->where('nom', 'LIKE', "%$search%"))
+            ->paginate(10);
+        return FermetureListResource::collection($fermetures);
     }
 
     public function store(Request $request): JsonResponse

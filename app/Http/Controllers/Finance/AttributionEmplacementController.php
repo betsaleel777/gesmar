@@ -9,6 +9,7 @@ use App\Models\Finance\Bordereau;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class AttributionEmplacementController extends Controller
 {
@@ -52,7 +53,7 @@ class AttributionEmplacementController extends Controller
         $request->validate(Attribution::RULES);
         $id_bordereau = $request->input('bordereau');
         if (empty($id_bordereau)) {
-            $bordereau = new Bordereau(['date_attribution' => $request->jour, 'commercial_id' => $request->commercial]);
+            $bordereau = new Bordereau(['date_attribution' => $request->jour, 'commercial_id' => $request->commercial['id']]);
             $bordereau->codeGenerate();
             $bordereau->save();
             $bordereau->pasEncaisser();
@@ -60,12 +61,12 @@ class AttributionEmplacementController extends Controller
         }
         foreach ($request->emplacements as $emplacement) {
             $attribution = new Attribution();
-            $attribution->commercial_id = $request->commercial;
+            $attribution->commercial_id = $request->commercial['id'];
             $attribution->jour = $request->jour;
             $attribution->emplacement_id = $emplacement['id'];
             $attribution->bordereau_id = $id_bordereau;
             $attribution->save();
-            $attribution->pasEncaisser();
+            $attribution->pasCollecter();
         }
         $message = "Emplacement(s) attribué(s) avec succès.";
         return response()->json(['message' => $message]);

@@ -32,7 +32,7 @@ class Encaissement extends Model implements Auditable
         static::addGlobalScope(new RecentScope);
 
         static::created(function (Encaissement $encaissement) {
-            $ordonnancement = Ordonnancement::with(['paiements.facture'])->findOrFail($encaissement->ordonnancement_id);
+            $ordonnancement = Ordonnancement::find($encaissement->ordonnancement_id);
             $encaissement->setOpen();
             EncaissementRegistred::dispatch($ordonnancement);
         });

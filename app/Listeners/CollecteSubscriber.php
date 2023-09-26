@@ -13,7 +13,7 @@ class CollecteSubscriber
     {
         $attribution = Attribution::with('bordereau')->findOrFail($event->collecte->attribution_id);
         if ($event->collecte->nombre === 1) {
-            $attribution->encaisser();
+            $attribution->collecter();
         }
         // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
         $bordereau = Bordereau::find((int)$attribution->bordereau?->id);
@@ -23,7 +23,7 @@ class CollecteSubscriber
     public function updateDependenciesAfterDelete(CollecteRemoved $event): void
     {
         $attribution = Attribution::with('bordereau')->findOrFail($event->collecte->attribution_id);
-        $attribution->pasEncaisser();
+        $attribution->pasCollecter();
         // vérifier si toutes les attributions du bordereau sont encaissées en vue de changer le statut du bordereau
         $bordereau = Bordereau::find((int)$attribution->bordereau?->id);
         $bordereau->attributions()->uncashed()->exists() ?: $bordereau->setCollected();

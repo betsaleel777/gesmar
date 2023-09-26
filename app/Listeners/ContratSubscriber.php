@@ -38,6 +38,8 @@ class ContratSubscriber
     public function validerSansSigner(ContratScheduled $event): void
     {
         $event->contrat->validated();
+        $event->contrat->codeContratGenerate();
+        $event->contrat->save();
         $personne = Personne::findOrFail($event->contrat->personne_id);
         $personne->client();
         $event->emplacement->occuper();
@@ -52,7 +54,12 @@ class ContratSubscriber
 
     public function createFacture(ContratRegistred $event): void
     {
-        $event->contrat->isAnnexe() ? $this->createFactureAnnexe($event) : $this->createFactureInitiale($event);
+        if ($event->contrat->isAnnexe()) {
+            $this->createFactureAnnexe($event);
+        } else {
+            $event->contrat->load('emplacement.type');
+            $event->contrat->emplacement->type->auto_valid ?: $this->createFactureInitiale($event);
+        }
     }
 
     /**

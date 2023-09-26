@@ -19,7 +19,7 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Bordereau extends Model implements Auditable
 {
-    use HasStatuses, HasCashStatus, HasStateMachines;
+    use HasStatuses, HasStateMachines;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['code', 'commercial_id', 'date_attribution'];
@@ -42,6 +42,16 @@ class Bordereau extends Model implements Auditable
     {
         $rang = $this->count() + 1;
         $this->attributes['code'] = BORDEREAU_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
+    }
+
+    public function encaisser(): void
+    {
+        $this->setStatus(StatusBordereau::ENCAISSE->value);
+    }
+
+    public function pasEncaisser(): void
+    {
+        $this->setStatus(StatusBordereau::PAS_ENCAISSE->value);
     }
 
     public function setCollected(): void

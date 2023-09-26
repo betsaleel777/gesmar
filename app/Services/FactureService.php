@@ -12,7 +12,6 @@ class FactureService
 
     public function __construct(public Collection $paiements)
     {
-        $this->paiements = $paiements;
     }
 
     private static function checkForAnnexe(Paiement $paiement): bool
@@ -20,7 +19,7 @@ class FactureService
         return false;
     }
 
-    private function checkForBail(Collection $paiements): void
+    private static function checkForBail(Collection $paiements): void
     {
         if (!$paiements->isEmpty()) {
             $contrat = Contrat::with('emplacement')->findOrFail($paiements->first()->facture->contrat_id);
@@ -30,7 +29,7 @@ class FactureService
                 if ($facture->isInitiale()) {
                     $factureInitiale = Facture::with('paiements')->findOrFail($facture->id);
                     $total = $factureInitiale->paiements->sum('montant');
-                    $siFactureSoldee = $facture->pas_porte + $facture->caution * $emplacement->loyer === $total;
+                    $siFactureSoldee = $facture->pas_porte + ($facture->caution + $facture->avance) * $emplacement->loyer === $total;
                     $siFactureSoldee ? $facture->payer() : null;
                 } else {
                     $facture->payer();
@@ -46,6 +45,6 @@ class FactureService
         foreach ($this->paiements as $paiement) {
             $paiement->facture->isAnnexe() ? $paiementAnnexe = $paiement : $paiementsBails->push($paiement);
         }
-        !empty($paiementAnnexe) ? self::checkForAnnexe($paiementAnnexe) : $this->checkForBail($paiementsBails);
+        !empty($paiementAnnexe) ? self::checkForAnnexe($paiementAnnexe) : self::checkForBail($paiementsBails);
     }
 }

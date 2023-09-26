@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Builder;
  */
 trait HasCashStatus
 {
-    public function encaisser(): void
+    public function collecter(): void
     {
         $this->setStatus(StatusCollecte::COLLECTED->value);
     }
 
-    public function pasEncaisser(): void
+    public function pasCollecter(): void
     {
         $this->setStatus(StatusCollecte::UNCOLLECTED->value);
     }

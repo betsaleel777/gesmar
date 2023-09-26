@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Emplacement\EmplacementFactureLoyerResource;
 use App\Http\Resources\Emplacement\EmplacementListResource;
 use App\Http\Resources\Emplacement\EmplacementResource;
 use App\Http\Resources\Emplacement\EmplacementSelectResource;
@@ -215,9 +216,9 @@ class EmplacementsController extends Controller
 
     public function getRentalbyMonthLoyer(string $date): JsonResponse
     {
-        $emplacements = Emplacement::with(['contratActuel.facturesLoyers', 'contratActuel.personne'])
-            ->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false))
+        $emplacements = Emplacement::with(['contratActuel' => ['facturesLoyers', 'personne']])
+            ->without('type')->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false))
             ->whereDoesntHave('contratActuel.facturesLoyers', fn (Builder $query) => $query->where('periode', $date))->get();
-        return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
+        return response()->json(['emplacements' => EmplacementFactureLoyerResource::collection($emplacements)]);
     }
 }

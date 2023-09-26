@@ -18,7 +18,7 @@ class FactureLoyerListResource extends JsonResource
             'id' => $this->id,
             'code' => $this->code,
             'status' => $this->whenAppended('status'),
-            'contrat' => $this->whenLoaded('contrat', fn () => $this->contrat->code),
+            'contrat' => $this->whenLoaded('contrat', fn () => $this->contrat->code_contrat ?? $this->contrat->code),
             'personne' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
                 $this->contrat->personne->nom . ' ' . $this->contrat->personne->prenom

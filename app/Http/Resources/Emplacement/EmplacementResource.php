@@ -3,6 +3,8 @@
 namespace App\Http\Resources\Emplacement;
 
 use App\Http\Resources\Abonnement\AbonnementResource;
+use App\Http\Resources\Contrat\ContratResource;
+use App\Http\Resources\Personne\PersonneResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class EmplacementResource extends JsonResource
@@ -29,6 +31,10 @@ class EmplacementResource extends JsonResource
             'type' => TypeEmplacementResource::make($this->whenLoaded('type')),
             'zone' => ZoneResource::make($this->whenLoaded('zone')),
             'abonnements' => AbonnementResource::collection($this->whenLoaded('abonnements')),
+            'personne' => $this->when(
+                $this->relationLoaded('contratActuel') and $this->contratActuel->relationLoaded('personne'),
+                fn () => PersonneResource::make($this->contratActuel->personne)
+            ),
         ];
     }
 }

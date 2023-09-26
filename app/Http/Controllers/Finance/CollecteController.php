@@ -26,7 +26,7 @@ class CollecteController extends Controller
         $message = "La somme a bien été collectée";
         if ($collecte->nombre > 1) {
             $attribution = Attribution::findOrFail($request->attribution_id);
-            $attribution->encaisser();
+            $attribution->collecter();
             $start = (new Carbon($attribution->jour))->addDay()->format('Y-m-d');
             $fin = (new Carbon($attribution->jour))->addDays($request->nombre - 1)->format('Y-m-d');
             $period = CarbonPeriod::create($start, $fin);

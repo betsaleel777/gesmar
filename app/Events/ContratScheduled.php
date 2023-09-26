@@ -23,8 +23,6 @@ class ContratScheduled
      */
     public function __construct(public Contrat $contrat, public Emplacement $emplacement)
     {
-        $this->contrat = $contrat;
-        $this->emplacement = $emplacement;
     }
 
     /**
