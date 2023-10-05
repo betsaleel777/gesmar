@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('contrats', function (Blueprint $table) {
-            $table->boolean('auto_valid')->default(false);
+            $table->dropColumn('auto_valid')->default(false);
         });
     }
 };

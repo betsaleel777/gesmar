@@ -620,16 +620,18 @@ namespace App\Models\Caisse{
  * App\Models\Caisse\Fermeture
  *
  * @property int $id
+ * @property string $code
+ * @property int|null $ouverture_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int $total
- * @property int $ouverture_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
- * @property-read \App\Models\Caisse\Ouverture $ouverture
+ * @property-read \App\Models\Caisse\Ouverture|null $ouverture
  * @method static \Illuminate\Database\Eloquent\Builder|Fermeture newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Fermeture newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Fermeture query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Fermeture whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Fermeture whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Fermeture whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Fermeture whereOuvertureId($value)
@@ -725,7 +727,7 @@ namespace App\Models\Exploitation{
  * @property int $id
  * @property string $code
  * @property string $debut
- * @property string|null $fin
+ * @property string $fin
  * @property string|null $attachment
  * @property int $site_id
  * @property int $personne_id
@@ -870,7 +872,7 @@ namespace App\Models\Exploitation{
  * @property string $code
  * @property string $adresse
  * @property string $contact
- * @property string|null $email
+ * @property string $email
  * @property string $ville
  * @property int $site_id
  * @property int|null $type_personne_id
@@ -946,6 +948,43 @@ namespace App\Models\Exploitation{
  * @mixin \Eloquent
  */
 	class IdeHelperPersonne {}
+}
+
+namespace App\Models\Exploitation{
+/**
+ * App\Models\Exploitation\Reparation
+ *
+ * @property int $id
+ * @property string $code
+ * @property string $titre
+ * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $first
+ * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $second
+ * @property int $emplacement_id
+ * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $status
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read \App\Models\Architecture\Emplacement $emplacement
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereEmplacementId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereFirst($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereSecond($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereTitre($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Reparation whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	class IdeHelperReparation {}
 }
 
 namespace App\Models\Exploitation{
@@ -1049,7 +1088,6 @@ namespace App\Models\Finance{
  * @method static \Illuminate\Database\Eloquent\Builder|Bordereau otherCurrentStatus(...$names)
  * @method static \Illuminate\Database\Eloquent\Builder|Bordereau query()
  * @method static \Illuminate\Database\Eloquent\Builder|Bordereau unCollected()
- * @method static \Illuminate\Database\Eloquent\Builder|Bordereau uncashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereCollected($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Bordereau whereCommercialId($value)

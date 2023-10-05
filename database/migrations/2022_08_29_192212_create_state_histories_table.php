@@ -26,7 +26,6 @@ class CreateStateHistoriesTable extends Migration
             $table->nullableMorphs('responsible');
 
             $table->json('changed_attributes')->nullable();
-
             $table->timestamps();
         });
     }

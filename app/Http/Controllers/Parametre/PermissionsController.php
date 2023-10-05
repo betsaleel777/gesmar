@@ -24,9 +24,7 @@ class PermissionsController extends Controller
 
     public function getByRole(int $id): JsonResponse
     {
-        $role = Role::with(['permissions' => function ($query) {
-            $query->select('id', 'name');
-        }])->find($id);
+        $role = Role::with(['permissions' => fn ($query) => $query->select('id', 'name')])->find($id);
         return response()->json(['permissions' => $role->permissions]);
     }
 }

@@ -13,12 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('type_equipements', function (Blueprint $table) {
+        Schema::create('reparations', function (Blueprint $table) {
             $table->id();
-            $table->string('nom', 50);
-            $table->unsignedMediumInteger('frais_penalite');
+            $table->string('code', 10)->unique();
+            $table->string('titre', 50);
+            $table->string('first');
+            $table->string('second');
+            $table->foreignId('emplacement_id')->constrained('emplacements')->cascadeOnDelete();
             $table->softDeletes();
-            $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -30,8 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('type_equipements', function (Blueprint $table) {
-            Schema::dropIfExists('type_equipements');
-        });
+        Schema::dropIfExists('reparations');
     }
 };

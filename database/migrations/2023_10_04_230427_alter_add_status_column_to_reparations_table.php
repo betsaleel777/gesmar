@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('fermetures', function (Blueprint $table) {
-            $table->foreignId('ouverture_id')->constrained('ouvertures')->cascadeOnDelete();
+        Schema::table('reparations', function (Blueprint $table) {
+            $table->string('status', 20);
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('fermetures', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('ouverture_id');
+        Schema::table('reparations', function (Blueprint $table) {
+            $table->dropColumn('status');
         });
     }
 };

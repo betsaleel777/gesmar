@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('fermetures', function (Blueprint $table) {
             $table->id();
             $table->string('code', 10);
-            $table->foreignId('ouverture_id')->constrained('ouvertures')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('ouverture_id')->nullable()->constrained('ouvertures')->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }

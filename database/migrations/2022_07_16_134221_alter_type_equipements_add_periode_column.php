@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('type_equipements', function (Blueprint $table) {
-            $table->unsignedTinyInteger('periode')->default(2);
+            $table->dropColumn('periode');
         });
     }
 };
