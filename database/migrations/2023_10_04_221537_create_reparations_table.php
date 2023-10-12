@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('code', 10)->unique();
             $table->string('titre', 50);
-            $table->string('first');
-            $table->string('second');
+            $table->string('first')->nullable();
+            $table->string('second')->nullable();
             $table->foreignId('emplacement_id')->constrained('emplacements')->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();

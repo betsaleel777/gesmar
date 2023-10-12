@@ -25,6 +25,8 @@ class ReparationRequest extends FormRequest
         return [
             'titre' => 'required|max:50',
             'emplacement_id' => 'required|numeric',
+            'site_id' => 'required|numeric',
+            'description' => 'required',
         ];
     }
 }

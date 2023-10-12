@@ -93,6 +93,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     });
     Route::controller(SitesController::class)->prefix('marches')->group(function (): void {
         Route::get('/', 'all');
+        Route::get('/select', 'select');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
         Route::post('/push', 'push');
@@ -137,11 +138,14 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     });
     Route::controller(EmplacementsController::class)->prefix('emplacements')->group(function (): void {
         Route::get('/', 'all');
+        Route::get('/select', 'select');
+        Route::get('/simple-select', 'simpleSelect');
         Route::get('/autos', 'allAuto');
         Route::get('/equipables', 'equipables');
         Route::get('/trashed', 'trashed');
         Route::get('/rental/{date}', 'getRentalbyMonthLoyer');
         Route::get('/marche/{id}', 'getByMarche');
+        Route::get('/marche-select/{id}', 'getByMarcheSelect');
         Route::get('/marche/gears/{id}', 'getByMarcheWithGearsAndContracts');
         Route::get('/marche/unlinked/{id}', 'getUnlinkedByMarche');
         Route::get('/marche/free/{id}', 'getFreeByMarche');
@@ -356,15 +360,17 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
             Route::patch('/restore/{id}', 'restore');
         });
     });
-    Route::prefix('reparations')->controller(ReparationController::class)->group(function (): void {
-        Route::get('/', 'all');
-        Route::get('/paginate', 'getPaginate');
-        Route::get('/search/{search}/paginate', 'getSearch');
-        Route::post('/store', 'store');
-        Route::get('{id}', 'show');
-        Route::put('{id}', 'update');
-        Route::delete('{id}', 'trash');
-        Route::patch('/restore/{id}', 'restore');
+    Route::prefix('maintenances')->group(function (): void {
+        Route::controller(ReparationController::class)->prefix('reparations')->group(function (): void {
+            Route::get('/', 'index');
+            Route::get('/paginate', 'getPaginate');
+            Route::get('/search/{search}/paginate', 'getSearch');
+            Route::post('/store', 'store');
+            Route::get('{id}', 'show');
+            Route::put('{id}', 'update');
+            Route::delete('{id}', 'trash');
+            Route::patch('/restore/{id}', 'restore');
+        });
     });
 });
 Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {

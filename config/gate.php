@@ -4,12 +4,12 @@ return [
     'parametre' => [
         'acceder' => 'accès au menu parametre',
         'acces' => [
-            'configuration' =>  'accès à la configuration des sites',
-            'utilisateur' =>  'accès aux utilisateurs et permissions',
-            'gabaris' =>  'accès au gabaris de documents',
-            'caisse' =>  'accès aux parametres de la caisse',
-            'application' =>  'accès aux parametres de l\'application',
-        ]
+            'configuration' => 'accès à la configuration des sites',
+            'utilisateur' => 'accès aux utilisateurs et permissions',
+            'gabaris' => 'accès au gabaris de documents',
+            'caisse' => 'accès aux parametres de la caisse',
+            'application' => 'accès aux parametres de l\'application',
+        ],
     ],
     'exploitation' => [
         'acceder' => 'accès au menu exploitation',
@@ -24,7 +24,7 @@ return [
                 'global' => 'toutes les demandes sont visibles',
                 'own' => 'demandes visibles par leur créateur',
                 'validate' => "valider une demande",
-                'show' => "voir les détails d'une demande"
+                'show' => "voir les détails d'une demande",
             ],
             'prospect' => [
                 'create' => 'création de prospect',
@@ -34,7 +34,7 @@ return [
                 'restore' => 'restorer un prospect',
                 'global' => 'tout les prospects sont visibles',
                 'own' => 'prospect visibles par leur créateur',
-                'show' => "voir les détails d'un propspect"
+                'show' => "voir les détails d'un propspect",
             ],
             'client' => [
                 'acceder' => 'accès aux clients',
@@ -43,24 +43,40 @@ return [
                 'restore' => 'restorer un client',
                 'global' => 'tout les clients sont visibles',
                 'own' => 'client visibles par leur créateur',
-                'show' => "voir les détails d'un client"
+                'show' => "voir les détails d'un client",
             ],
             'contrat' => [
                 'acceder' => 'accès aux contrats',
                 'global' => 'tout les contrats sont visibles',
                 'own' => 'contrat visibles par leur créateur',
-                'show' => "voir les détails d'un contrat"
+                'show' => "voir les détails d'un contrat",
             ],
         ],
         'ordonnancements' => [
             'acceder' => 'accès au menu ordonnancements',
             'ordonnancement' => [
                 'create' => "création d'ordonnancement",
-                'show' => "voir les détails d'un ordonnancement"
+                'show' => "voir les détails d'un ordonnancement",
             ],
         ],
         'maintenance' => [
             'acceder' => 'accès au menu maintenance',
+        ],
+        'reparation' => [
+            'acceder' => 'accès au menu réparation',
+            'create' => 'créer une réparation',
+            'trash' => 'archiver une réparation',
+            'estimate' => 'attaché des dévis de réparation',
+            'show' => "voir les détails d'une réparation",
+            'validate' => 'valider une réparation',
+            'global' => 'toutes les réparations sont visibles',
+            'own' => 'réparations visibles par leur créateur',
+        ],
+        'ordre' => [
+            'acceder' => 'accès au menu ordre de réparation',
+            'validate' => 'valider un ordre de réparation',
+            'global' => 'tout les ordre de réparations sont visibles',
+            'own' => 'ordre de réparations visibles par leur créateur',
         ],
     ],
     'finance' => [
@@ -84,7 +100,7 @@ return [
                 'acceder' => 'accès à la liste des bordereau',
                 'global' => 'tout les bordereaux sont visibles',
                 'own' => 'bordereaux visible par leur créateur',
-                'show' => "voir les détails d'un bordereau"
+                'show' => "voir les détails d'un bordereau",
             ],
             'collecte' => [
                 'acceder' => 'accès à la collecte des emplacements',
@@ -111,7 +127,7 @@ return [
                 'closable' => 'fermer la caisse',
                 'global' => 'tout les encaissements sont visibles',
                 'own' => 'encaissements visibles par leur créateur',
-            ]
-        ]
-    ]
+            ],
+        ],
+    ],
 ];

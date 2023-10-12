@@ -4,6 +4,7 @@ namespace App\Http\Resources\Maintenance;
 
 use App\Models\Exploitation\Reparation;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Str;
 
 /**
  * @property Reparation $resource
@@ -23,7 +24,8 @@ class ReparationListResource extends JsonResource
             'status' => $this->resource->status,
             'titre' => $this->resource->titre,
             'created_at' => $this->resource->created_at->format('d-m-Y'),
-            'emplacement' => $this->whenLoaded('emplacement', $this->resource->emplacement->code),
+            'emplacement' => $this->whenLoaded('emplacement', Str::lower($this->resource->emplacement->code)),
+            'site' => $this->whenLoaded('site', Str::lower($this->resource->site->nom)),
         ];
     }
 }

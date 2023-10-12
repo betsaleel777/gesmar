@@ -5,16 +5,16 @@ namespace App\Http\Controllers\Parametre\Architecture;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Emplacement\EmplacementFactureLoyerResource;
 use App\Http\Resources\Emplacement\EmplacementListResource;
-use App\Http\Resources\Emplacement\EmplacementResource;
 use App\Http\Resources\Emplacement\EmplacementSelectResource;
+use App\Http\Resources\Emplacement\EmplacementSimpleSelectResource;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
 
 class EmplacementsController extends Controller
 {
@@ -55,6 +55,18 @@ class EmplacementsController extends Controller
             $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->inside($sites)->get();
         }
         return response()->json(['emplacements' => EmplacementSelectResource::collection($emplacements)]);
+    }
+
+    public function simpleSelect(): JsonResponse
+    {
+        $response = Gate::inspect('viewAny', Emplacement::class);
+        if ($response->allowed()) {
+            $emplacements = Emplacement::without('type')->get();
+        } else {
+            $sites = Auth::user()->sites->modelkeys();
+            $emplacements = Emplacement::without('type')->inside($sites)->get();
+        }
+        return response()->json(['emplacements' => EmplacementSimpleSelectResource::collection($emplacements)]);
     }
 
     public function allAuto(): JsonResponse
@@ -173,8 +185,15 @@ class EmplacementsController extends Controller
      */
     public function getByMarche(int $id): JsonResponse
     {
-        $emplacements = Emplacement::whereHas('site', fn (Builder $query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
+    }
+
+    public function getByMarcheSelect(int $id): JsonResponse
+    {
+        $emplacements = Emplacement::select('id', 'nom', 'code')
+            ->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
+        return response()->json(['emplacements' => EmplacementSimpleSelectResource::collection($emplacements)]);
     }
 
     /**
@@ -182,8 +201,8 @@ class EmplacementsController extends Controller
      */
     public function getByMarcheWithGearsAndContracts(int $id): JsonResponse
     {
-        $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn (Builder $query) => $query->notAborted())
-            ->whereHas('site', fn (Builder $query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn(Builder $query) => $query->notAborted())
+            ->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
@@ -192,7 +211,7 @@ class EmplacementsController extends Controller
      */
     public function getUnlinkedByMarche(int $id): JsonResponse
     {
-        $emplacements = Emplacement::isUnlinked()->whereHas('site', fn (Builder $query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::isUnlinked()->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
@@ -201,7 +220,7 @@ class EmplacementsController extends Controller
      */
     public function getFreeByMarche(int $id): JsonResponse
     {
-        $emplacements = Emplacement::isFree()->whereHas('site', fn (Builder $query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::isFree()->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
@@ -210,15 +229,15 @@ class EmplacementsController extends Controller
      */
     public function getBusyByMarche(int $id): JsonResponse
     {
-        $emplacements = Emplacement::isBusy()->whereHas('site', fn ($query) => $query->where('sites.id', $id))->get();
+        $emplacements = Emplacement::isBusy()->whereHas('site', fn($query) => $query->where('sites.id', $id))->get();
         return response()->json(['emplacements' => $emplacements]);
     }
 
     public function getRentalbyMonthLoyer(string $date): JsonResponse
     {
         $emplacements = Emplacement::with(['contratActuel' => ['facturesLoyers', 'personne']])
-            ->without('type')->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false))
-            ->whereDoesntHave('contratActuel.facturesLoyers', fn (Builder $query) => $query->where('periode', $date))->get();
+            ->without('type')->whereHas('contratActuel', fn(Builder $query) => $query->where('auto_valid', false))
+            ->whereDoesntHave('contratActuel.facturesLoyers', fn(Builder $query) => $query->where('periode', $date))->get();
         return response()->json(['emplacements' => EmplacementFactureLoyerResource::collection($emplacements)]);
     }
 }

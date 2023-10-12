@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SiteResource;
+use App\Http\Resources\SiteSelectResource;
 use App\Models\Architecture\Site;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,12 @@ class SitesController extends Controller
     {
         $marches = Site::get();
         return response()->json(['marches' => SiteResource::collection($marches)]);
+    }
+
+    public function select(): JsonResponse
+    {
+        $marches = Site::select('id', 'nom')->get();
+        return response()->json(['marches' => SiteSelectResource::collection($marches)]);
     }
 
     public function store(Request $request): JsonResponse

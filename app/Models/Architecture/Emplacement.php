@@ -58,7 +58,7 @@ class Emplacement extends Model implements Auditable
      * @var array<string, string>
      */
     protected $casts = [
-        'superficie' => 'integer', 'loyer' => 'integer', 'pas_porte' => 'integer', 'caution' => 'integer'
+        'superficie' => 'integer', 'loyer' => 'integer', 'pas_porte' => 'integer', 'caution' => 'integer',
     ];
 
     public const RULES = [
@@ -88,7 +88,7 @@ class Emplacement extends Model implements Auditable
     protected function auto(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->type->auto_valid,
+            get: fn() => $this->relationLoaded('type') ? $this->type->auto_valid : null,
         );
     }
 
@@ -166,7 +166,7 @@ class Emplacement extends Model implements Auditable
      */
     public function scopeWithoutSchedule(Builder $query): Builder
     {
-        return $query->whereHas('type', fn (Builder $query) => $query->where('auto_valid', true));
+        return $query->whereHas('type', fn(Builder $query) => $query->where('auto_valid', true));
     }
 
     /**
@@ -175,7 +175,7 @@ class Emplacement extends Model implements Auditable
      */
     public function scopeInside(Builder $query, array $sites): Builder
     {
-        return $query->whereHas('sites', fn ($query) => $query->whereIn('sites.id', $sites));
+        return $query->whereHas('sites', fn($query) => $query->whereIn('sites.id', $sites));
     }
 
     //relations

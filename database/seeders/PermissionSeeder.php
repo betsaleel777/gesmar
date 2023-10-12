@@ -86,6 +86,14 @@ class PermissionSeeder extends Seeder
             ['name' => 'fermer la caisse'],
             ['name' => 'tout les encaissements sont visibles'],
             ['name' => 'encaissements visibles par leur créateur'],
+            ['name' => 'accès au menu réparation'],
+            ['name' => 'créer une réparation'],
+            ['name' => 'archiver une réparation'],
+            ['name' => 'attaché des dévis de réparation'],
+            ['name' => 'voir les détails d\'une réparation'],
+            ['name' => 'valider la réparation'],
+            ['name' => 'accès au menu ordre de réparation'],
+            ['name' => 'valider un ordre de réparation'],
         ]);
         $permissions->each(fn($permission) => Permission::create($permission));
     }
