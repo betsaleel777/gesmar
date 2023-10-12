@@ -365,11 +365,13 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
             Route::get('/', 'index');
             Route::get('/paginate', 'getPaginate');
             Route::get('/search/{search}/paginate', 'getSearch');
+            Route::get('/paginate-trashed', 'getPaginateTrashed');
+            Route::get('/search-trashed/{search}/paginate', 'getSearchTrashed');
             Route::post('/store', 'store');
-            Route::get('{id}', 'show');
-            Route::put('{id}', 'update');
-            Route::delete('{id}', 'trash');
-            Route::patch('/restore/{id}', 'restore');
+            Route::get('{reparation}', 'show');
+            Route::put('{reparation}', 'update');
+            Route::delete('{reparation}', 'destroy');
+            Route::patch('restore/{id}', 'restore');
         });
     });
 });
