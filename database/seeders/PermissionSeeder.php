@@ -94,6 +94,12 @@ class PermissionSeeder extends Seeder
             ['name' => 'valider la réparation'],
             ['name' => 'accès au menu ordre de réparation'],
             ['name' => 'valider un ordre de réparation'],
+            ['name' => 'accès au menu technicien'],
+            ['name' => 'créer une technicien'],
+            ['name' => 'archiver un technicien'],
+            ['name' => "voir les détails d'un technicien"],
+            ['name' => 'tout les techniciens sont visibles'],
+            ['name' => 'les techniciens sont visibles par leur créateur'],
         ]);
         $permissions->each(fn($permission) => Permission::create($permission));
     }

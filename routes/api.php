@@ -7,6 +7,7 @@ use App\Http\Controllers\Caisse\EncaissementController;
 use App\Http\Controllers\Caisse\FermetureController;
 use App\Http\Controllers\Caisse\OuvertureController;
 use App\Http\Controllers\Exploitation\Maintenance\ReparationController;
+use App\Http\Controllers\Exploitation\Maintenance\TechnicienController;
 use App\Http\Controllers\Exploitation\Reception\ClientsController;
 use App\Http\Controllers\Exploitation\Reception\ContratController;
 use App\Http\Controllers\Exploitation\Reception\ContratsAnnexesController;
@@ -371,6 +372,18 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
             Route::get('{reparation}', 'show');
             Route::put('{reparation}', 'update');
             Route::delete('{reparation}', 'destroy');
+            Route::patch('restore/{id}', 'restore');
+        });
+        Route::controller(TechnicienController::class)->prefix('techniciens')->group(function (): void {
+            Route::get('/', 'index');
+            Route::get('/paginate', 'getPaginate');
+            Route::get('/search/{search}/paginate', 'getSearch');
+            Route::get('/paginate-trashed', 'getPaginateTrashed');
+            Route::get('/search-trashed/{search}/paginate', 'getSearchTrashed');
+            Route::post('/store', 'store');
+            Route::get('{technicien}', 'show');
+            Route::put('{technicien}', 'update');
+            Route::delete('{technicien}', 'destroy');
             Route::patch('restore/{id}', 'restore');
         });
     });

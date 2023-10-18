@@ -72,6 +72,14 @@ return [
             'global' => 'toutes les réparations sont visibles',
             'own' => 'réparations visibles par leur créateur',
         ],
+        'technicien' => [
+            'acceder' => 'accès au menu technicien',
+            'create' => 'créer une technicien',
+            'global' => 'tout les techniciens sont visibles',
+            'own' => 'les techniciens sont visibles par leur créateur',
+            'trash' => 'archiver un technicien',
+            'show' => "voir les détails d'un technicien",
+        ],
         'ordre' => [
             'acceder' => 'accès au menu ordre de réparation',
             'validate' => 'valider un ordre de réparation',
