@@ -30,8 +30,8 @@ class FermetureController extends Controller
     {
         $fermetures = Fermeture::with('ouverture.encaissements.ordonnancement')
             ->where('created_at', 'LIKE', "%$search")
-            ->orWhereHas('ouverture.caissier.user', fn (Builder $query) => $query->where('name', 'LIKE', "%$search%"))
-            ->orWhereHas('ouverture.guichet', fn (Builder $query) => $query->where('nom', 'LIKE', "%$search%"))
+            ->orWhereHas('ouverture.caissier.user', fn(Builder $query) => $query->where('name', 'LIKE', "%$search%"))
+            ->orWhereHas('ouverture.guichet', fn(Builder $query) => $query->where('nom', 'LIKE', "%$search%"))
             ->paginate(10);
         return FermetureListResource::collection($fermetures);
     }
@@ -40,11 +40,12 @@ class FermetureController extends Controller
     {
         $request->validate(Fermeture::RULES);
         $fermeture = Fermeture::make($request->all());
+        $fermeture->codeGenerate();
         $fermeture->save();
         $fermetureSaved = Fermeture::with('ouverture.encaissements.payable')->find($fermeture->id);
         return response()->json([
             'message' => "La caisse a été fermée avec succès.",
-            'fermeture' => FermetureResource::make($fermetureSaved)
+            'fermeture' => FermetureResource::make($fermetureSaved),
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Models\Caisse;
 
 use App\Models\Scopes\RecentScope;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -14,13 +15,13 @@ class Fermeture extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
 
-    protected $fillable = ['ouverture_id', 'total'];
+    protected $fillable = ['code', 'ouverture_id', 'total'];
     protected $casts = ['total' => 'integer'];
     protected $dates = ['created_at'];
 
     const RULES = [
         'caissier_id' => 'required',
-        'total' => 'required|gte:total_normal'
+        'total' => 'required|gte:total_normal',
     ];
 
     protected static function booted(): void
@@ -35,6 +36,12 @@ class Fermeture extends Model implements Auditable
             }
             Guichet::find($ouverture->guichet_id)->setClose();
         });
+    }
+
+    public function codeGenerate(): void
+    {
+        $rang = $this->count() + 1;
+        $this->attributes['code'] = FERMETURE_CODE_PREFIXE . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
     public function ouverture(): BelongsTo

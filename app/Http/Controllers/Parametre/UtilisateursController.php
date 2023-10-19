@@ -43,7 +43,7 @@ class UtilisateursController extends Controller
         $user->password = Hash::make($request->password);
         $user->disconnect();
         $user->save();
-        $user->sites()->sync($request->sites);
+        $user->sites()->sync(explode(',', $request->sites));
         $role = Role::find($request->role_id);
         $user->assignRole($role);
         $user->addMediaFromRequest('avatar')->toMediaCollection('avatar');
