@@ -16,10 +16,7 @@ use App\Http\Controllers\Exploitation\Reception\OrdonnancementController;
 use App\Http\Controllers\Exploitation\Reception\PersonnesController;
 use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
-use App\Http\Controllers\Finance\AttributionEmplacementController;
-use App\Http\Controllers\Finance\BordereauController;
 use App\Http\Controllers\Finance\ChequeController;
-use App\Http\Controllers\Finance\CollecteController;
 use App\Http\Controllers\Finance\CommercialController;
 use App\Http\Controllers\Finance\Facture\FactureAnnexeController;
 use App\Http\Controllers\Finance\Facture\FactureController;
@@ -478,37 +475,6 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
-    });
-    Route::controller(BordereauController::class)->prefix('bordereaux')->group(function (): void {
-        Route::get('/', 'all');
-        Route::get('/collected', 'getCollected');
-        Route::get('/paginate', 'getPaginate');
-        Route::get('/search/{search}/paginate', 'getSearch');
-        Route::get('/trashed', 'trashed');
-        Route::get('/marche/{id}', 'getByMarche');
-        Route::get('/vue-encaissement/{id}', 'getForEncaissement');
-        Route::post('/store', 'store');
-        Route::get('{id}', 'show');
-        Route::put('{id}', 'update');
-        Route::delete('{id}', 'trash');
-        Route::patch('/restore/{id}', 'restore');
-    });
-    Route::controller(AttributionEmplacementController::class)->prefix('attributions')->group(function (): void {
-        Route::get('/', 'all');
-        Route::get('/paginate', 'getPaginate');
-        Route::get('/search/{search}/paginate', 'getSearch');
-        Route::get('/attribuated/{date}/{commercial}', 'allAttribuated');
-        Route::get('/with-bordereau', 'allWithBordereau');
-        Route::post('/store', 'store');
-        Route::patch('/transferer/{id}', 'transfer');
-        Route::get('{id}', 'show');
-        Route::delete('{id}', 'trash');
-    });
-    Route::controller(CollecteController::class)->prefix('collectes')->group(function (): void {
-        Route::get('/', 'all');
-        Route::post('/store', 'store');
-        Route::get('{id}', 'show');
-        Route::delete('{id}', 'trash');
     });
     Route::prefix('caisses')->group(function (): void {
         Route::controller(OuvertureController::class)->prefix('ouvertures')->group(function (): void {

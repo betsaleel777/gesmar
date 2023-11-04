@@ -76,6 +76,6 @@ class Commercial extends Model implements Auditable
      */
     public function bordereaux(): HasMany
     {
-        return $this->HasMany(Bordereau::class);
+        return $this->hasMany(Bordereau::class);
     }
 }

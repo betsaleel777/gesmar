@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Listeners\AbonnementSubscriber;
-use App\Listeners\CollecteSubscriber;
 use App\Listeners\ContratSubscriber;
 use App\Listeners\EncaissementSubscriber;
 use App\Listeners\EquipementSubscriber;
@@ -11,7 +10,6 @@ use App\Listeners\TermeContratSubscriber;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -36,8 +34,7 @@ class EventServiceProvider extends ServiceProvider
         AbonnementSubscriber::class,
         EquipementSubscriber::class,
         EncaissementSubscriber::class,
-        CollecteSubscriber::class,
-        TermeContratSubscriber::class
+        TermeContratSubscriber::class,
     ];
 
     /**
