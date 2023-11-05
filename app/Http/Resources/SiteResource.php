@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
 class SiteResource extends JsonResource
 {
@@ -16,11 +15,11 @@ class SiteResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nom' => Str::lower($this->nom),
-            'pays' => $this->pays,
-            'ville' => $this->ville,
-            'commune' => $this->commune,
-            'postale' => $this->postale,
+            'nom' => $this->whenNotNull(str($this->nom)->lower()),
+            'pays' => $this->whenNotNull($this->pays),
+            'ville' => $this->whenNotNull($this->ville),
+            'commune' => $this->whenNotNull($this->commune),
+            'postale' => $this->whenNotNull($this->postale),
         ];
     }
 }

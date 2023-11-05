@@ -3,10 +3,13 @@
 namespace App\Http\Resources\Bordereau;
 
 use App\Http\Resources\SiteResource;
-use App\Http\Resources\UserResource;
+use App\Models\Bordereau\Bordereau;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CommercialResource extends JsonResource
+/**
+ * @property Bordereau resource
+ */
+class BordereauResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,11 +21,10 @@ class CommercialResource extends JsonResource
         return [
             'id' => $this->id,
             'code' => $this->whenNotNull($this->code),
-            'user_id' => $this->whenNotNull($this->user_id),
-            'site_id' => $this->whenNotNull($this->site_id),
-            'name' => $this->whenLoaded('user', fn() => str($this->user->name)->lower()),
+            'status' => $this->whenNotNull($this->status),
+            'jour' => $this->whenNotNull($this->jour),
+            'commercial' => CommercialResource::make($this->whenLoaded('commercial')),
             'site' => SiteResource::make($this->whenLoaded('site')),
-            'user' => UserResource::make($this->whenLoaded('user')),
         ];
     }
 }

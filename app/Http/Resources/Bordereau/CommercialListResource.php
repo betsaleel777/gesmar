@@ -18,9 +18,8 @@ class CommercialListResource extends JsonResource
             'id' => $this->id,
             'code' => $this->code,
             'user_id' => $this->user_id,
-            'site_id' => $this->site_id,
-            'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
-            'name' => $this->whenLoaded('user', fn () => Str::lower($this->user->name)),
+            'site' => $this->whenLoaded('site', fn() => Str::lower($this->site->nom)),
+            'name' => $this->whenLoaded('user', fn() => Str::lower($this->user->name)),
         ];
     }
 }

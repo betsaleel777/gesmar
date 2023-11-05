@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Models\Architecture\Site;
+use App\Models\Bordereau\Commercial;
 use App\Models\Caisse\Caissier;
-use App\Models\Finance\Commercial;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -13,11 +13,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
-use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperUser
@@ -48,7 +48,7 @@ class User extends Authenticatable implements HasMedia, Auditable
         'adresse' => 'required',
         'password' => 'required|min:6|confirmed',
         'sites' => 'required',
-        'role_id' => 'required'
+        'role_id' => 'required',
     ];
 
     const SECURITY_RULES = [
@@ -97,7 +97,7 @@ class User extends Authenticatable implements HasMedia, Auditable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'connected' => 'boolean'
+        'connected' => 'boolean',
     ];
 
     /**

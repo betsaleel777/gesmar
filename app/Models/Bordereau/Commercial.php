@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Models\Finance;
+namespace App\Models\Bordereau;
 
-use App\Models\Finance\Attribution;
 use App\Models\Scopes\RecentScope;
 use App\Models\User;
 use App\Traits\HasSites;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -18,7 +16,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  */
 class Commercial extends Model implements Auditable
 {
-    use HasFactory, HasSites, SoftDeletes;
+    use HasSites, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['code', 'user_id', 'site_id'];
@@ -27,7 +25,6 @@ class Commercial extends Model implements Auditable
      *
      * @var array<int, string>
      */
-    protected $with = ['user', 'site'];
     const RULES = [
         'user_id' => 'required|numeric',
         'site_id' => 'required|numeric',
@@ -51,8 +48,6 @@ class Commercial extends Model implements Auditable
 
     /**
      * Obtenir l'utilisateur lié à un commercial
-     *
-     * @return BelongsTo<User, Commercial>
      */
     public function user(): BelongsTo
     {
@@ -60,22 +55,10 @@ class Commercial extends Model implements Auditable
     }
 
     /**
-     * Obtenir les emplacements attribués à un commercial
-     *
-     * @return HasMany<Attribution>
-     */
-    public function attributions(): HasMany
-    {
-        return $this->hasMany(Attribution::class);
-    }
-
-    /**
      * Obtenir les bordereaux d'un commercial
-     *
-     * @return HasMany<Bordereau>
      */
-    public function bordereaux(): HasMany
+    public function bordereaux(): BelongsToMany
     {
-        return $this->hasMany(Bordereau::class);
+        return $this->belongsToMany(Bordereau::class, 'bordereau_emplacement', 'commercial_id', 'bordereau_id');
     }
 }

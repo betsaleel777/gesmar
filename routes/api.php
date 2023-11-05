@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Bordereau\CommercialController;
 use App\Http\Controllers\Caisse\BanqueController;
 use App\Http\Controllers\Caisse\CaissierController;
 use App\Http\Controllers\Caisse\CompteController;
@@ -17,7 +18,6 @@ use App\Http\Controllers\Exploitation\Reception\PersonnesController;
 use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
 use App\Http\Controllers\Finance\ChequeController;
-use App\Http\Controllers\Finance\CommercialController;
 use App\Http\Controllers\Finance\Facture\FactureAnnexeController;
 use App\Http\Controllers\Finance\Facture\FactureController;
 use App\Http\Controllers\Finance\Facture\FactureEquipementController;
@@ -465,12 +465,12 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
     });
     Route::controller(CommercialController::class)->prefix('commerciaux')->group(function (): void {
         Route::get('/', 'all');
-        Route::get('/select', 'select');
+        Route::get('/select', 'getSelect');
         Route::get('/users', 'user');
+        Route::post('/attribuer', 'attribuer');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');
-        Route::post('/attribuer', 'attribuate');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
