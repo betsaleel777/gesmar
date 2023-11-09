@@ -3,25 +3,26 @@
 namespace App\Http\Resources\Emplacement;
 
 use App\Http\Resources\SiteResource;
+use App\Models\Architecture\Niveau;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property Niveau resource
+ */
 class NiveauResource extends JsonResource
 {
-    public static $wrap = 'niveau';
     /**
      * Transform the resource into an array.
-     *
      * @param  \Illuminate\Http\Request  $request
      */
     public function toArray($request): array
     {
         return [
             'id' => $this->id,
-            'nom' => $this->nom,
-            'code' => $this->code,
-            'pavillon_id' => $this->pavillon_id,
-            'created_at' => $this->created_at->format('d-m-Y'),
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
+            'pavillon_id' => $this->whenNotNull($this->pavillon_id),
+            'code' => $this->whenNotNull($this->code),
+            'nom' => $this->when(!empty($this->nom), str($this->nom)->lower()),
+            'created_at' => $this->whenNotNull($this->created_at?->format('d-m-Y')),
             'pavillon' => PavillonResource::make($this->whenLoaded('pavillon')),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];

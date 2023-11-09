@@ -3,11 +3,14 @@
 namespace App\Http\Resources\Abonnement;
 
 use App\Http\Resources\SiteResource;
+use App\Models\Architecture\TypeEquipement;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property TypeEquipement resource
+ */
 class TypeEquipementResource extends JsonResource
 {
-    public static $wrap = "type";
     /**
      * Transform the resource into an array.
      *
@@ -16,12 +19,10 @@ class TypeEquipementResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
-            'nom' => $this->nom,
-            'site_id' => $this->site_id,
-            'frais_penalite' => $this->frais_penalite,
-            'caution_abonnement' => $this->caution_abonnement,
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
+            'id' => $this->resource->id,
+            'nom' => $this->when(!empty($this->nom), str($this->nom)->lower()),
+            'frais_penalite' => $this->whenNotNull($this->resource->frais_penalite),
+            'caution_abonnement' => $this->whenNotNull($this->resource->caution_abonnement),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }

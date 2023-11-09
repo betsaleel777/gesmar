@@ -3,11 +3,14 @@
 namespace App\Http\Resources\Emplacement;
 
 use App\Http\Resources\SiteResource;
+use App\Models\Architecture\TypeEmplacement;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property TypeEmplacement resource
+ */
 class TypeEmplacementResource extends JsonResource
 {
-    public static $wrap = "type";
     /**
      * Transform the resource into an array.
      *
@@ -17,13 +20,11 @@ class TypeEmplacementResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nom' => $this->nom,
-            'prefix' => $this->prefix,
-            'auto_valid' => $this->auto_valid,
-            'equipable' => $this->equipable,
-            'site_id' => $this->site_id,
-            'code' => $this->whenAppended('code'),
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
+            'code' => $this->when(!empty($this->getCode()), $this->getCode()),
+            'nom' => $this->when(!empty($this->nom), str($this->nom)->lower()),
+            'prefix' => $this->when(!empty($this->prefix), str($this->prefix)->upper()),
+            'auto_valid' => $this->whenNotNull($this->auto_valid),
+            'equipable' => $this->whenNotNull($this->equipable),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }

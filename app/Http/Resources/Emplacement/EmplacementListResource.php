@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources\Emplacement;
 
+use App\Http\Resources\SiteResource;
+use App\Models\Architecture\Emplacement;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
+/**
+ * @property Emplacement resource
+ */
 class EmplacementListResource extends JsonResource
 {
     /**
@@ -15,15 +19,18 @@ class EmplacementListResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
-            'code' => $this->code,
-            'superficie' => $this->superficie,
-            'loyer' => $this->loyer,
-            'pas_porte' => $this->pas_porte,
-            'liaison' => $this->liaison,
-            'disponibilite' => $this->disponibilite,
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
-            'type' => $this->whenLoaded('type', fn () => Str::lower($this->type->nom)),
+            'id' => $this->resource->id,
+            'code' => $this->whenNotNull($this->resource->code),
+            'superficie' => $this->whenNotNull($this->resource->superficie),
+            'loyer' => $this->whenNotNull($this->resource->loyer),
+            'pas_porte' => $this->whenNotNull($this->resource->pas_porte),
+            'liaison' => $this->whenNotNull($this->resource->liaison),
+            'disponibilite' => $this->whenNotNull($this->resource->disponibilite),
+            'type' => TypeEmplacementResource::make($this->whenLoaded('type')),
+            'zone' => ZoneResource::make($this->whenLoaded('zone')),
+            'niveau' => NiveauResource::make($this->whenLoaded('niveau')),
+            'pavillon' => PavillonResource::make($this->whenLoaded('pavillon')),
+            'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }
 }

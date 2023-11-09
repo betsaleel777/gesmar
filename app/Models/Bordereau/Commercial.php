@@ -21,6 +21,7 @@ class Commercial extends Model implements Auditable
 
     protected $fillable = ['code', 'user_id', 'site_id'];
     protected $auditExclude = ['code'];
+    protected $dates = ['created_at'];
     /**
      *
      * @var array<int, string>

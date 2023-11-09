@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Parametre\Architecture;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Emplacement\EmplacementFactureLoyerResource;
 use App\Http\Resources\Emplacement\EmplacementListResource;
+use App\Http\Resources\Emplacement\EmplacementResource;
 use App\Http\Resources\Emplacement\EmplacementSelectResource;
 use App\Http\Resources\Emplacement\EmplacementSimpleSelectResource;
 use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Zone;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,11 +38,13 @@ class EmplacementsController extends Controller
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
+        $requete = Emplacement::select('id', 'code', 'superficie', 'loyer', 'pas_porte', 'disponibilite', 'liaison', 'type_emplacement_id')
+            ->with(['type' => fn(BelongsTo $query): BelongsTo => $query->select('id', 'nom')]);
         if ($response->allowed()) {
-            $emplacements = Emplacement::get();
+            $emplacements = $requete->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
-            $emplacements = Emplacement::inside($sites)->get();
+            $emplacements = $requete->inside($sites)->get();
         }
         return response()->json(['emplacements' => EmplacementListResource::collection($emplacements)]);
     }
@@ -203,7 +207,7 @@ class EmplacementsController extends Controller
     {
         $emplacements = Emplacement::with('equipements')->whereHas('contrats', fn(Builder $query) => $query->notAborted())
             ->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
-        return response()->json(['emplacements' => $emplacements]);
+        return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
     }
 
     /**
@@ -212,7 +216,7 @@ class EmplacementsController extends Controller
     public function getUnlinkedByMarche(int $id): JsonResponse
     {
         $emplacements = Emplacement::isUnlinked()->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
-        return response()->json(['emplacements' => $emplacements]);
+        return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
     }
 
     /**
@@ -221,7 +225,7 @@ class EmplacementsController extends Controller
     public function getFreeByMarche(int $id): JsonResponse
     {
         $emplacements = Emplacement::isFree()->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id))->get();
-        return response()->json(['emplacements' => $emplacements]);
+        return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
     }
 
     /**
@@ -230,7 +234,7 @@ class EmplacementsController extends Controller
     public function getBusyByMarche(int $id): JsonResponse
     {
         $emplacements = Emplacement::isBusy()->whereHas('site', fn($query) => $query->where('sites.id', $id))->get();
-        return response()->json(['emplacements' => $emplacements]);
+        return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
     }
 
     public function getRentalbyMonthLoyer(string $date): JsonResponse
@@ -239,5 +243,16 @@ class EmplacementsController extends Controller
             ->without('type')->whereHas('contratActuel', fn(Builder $query) => $query->where('auto_valid', false))
             ->whereDoesntHave('contratActuel.facturesLoyers', fn(Builder $query) => $query->where('periode', $date))->get();
         return response()->json(['emplacements' => EmplacementFactureLoyerResource::collection($emplacements)]);
+    }
+
+    public function getByZones(Request $request)
+    {
+        $emplacements = Emplacement::select('id', 'code', 'zone_id', 'type_emplacement_id')
+            ->with('zone:zones.id,zones.nom,niveau_id', 'niveau:niveaux.id,niveaux.nom,pavillon_id',
+                'pavillon:pavillons.id,pavillons.nom,site_id', 'site:sites.id,sites.nom')
+            ->with(['type' => fn($query) => $query->select('type_emplacements.id', 'type_emplacements.nom')])
+            ->whereHas('type', fn($query) => $query->where('auto_valid', true))
+            ->whereHas('zone', fn($query) => $query->whereIn('zones.id', $request->query('zones')))->get();
+        return response()->json(['emplacements' => EmplacementListResource::collection($emplacements)]);
     }
 }

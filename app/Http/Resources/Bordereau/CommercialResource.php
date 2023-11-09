@@ -20,7 +20,6 @@ class CommercialResource extends JsonResource
             'code' => $this->whenNotNull($this->code),
             'user_id' => $this->whenNotNull($this->user_id),
             'site_id' => $this->whenNotNull($this->site_id),
-            'name' => $this->whenLoaded('user', fn() => str($this->user->name)->lower()),
             'site' => SiteResource::make($this->whenLoaded('site')),
             'user' => UserResource::make($this->whenLoaded('user')),
         ];

@@ -24,7 +24,7 @@ class EmplacementFactureLoyerResource extends JsonResource
             'contrat_id' => $this->whenLoaded('contratActuel', $this->resource->contratActuel->id),
             'client' => $this->when(
                 $this->resource->relationLoaded('contratActuel') and $this->resource->contratActuel->relationLoaded('personne'),
-                fn () => $this->resource->contratActuel->personne->nomComplet
+                fn() => $this->resource->contratActuel?->personne?->nomComplet
             ),
         ];
     }

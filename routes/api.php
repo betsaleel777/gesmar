@@ -127,6 +127,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
         Route::get('/', 'all');
         Route::get('/select', 'search');
         Route::get('/trashed', 'trashed');
+        Route::get('/zone-attribution/{id}', 'getForAttribution');
         Route::get('{id}', 'show');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');
@@ -148,6 +149,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
         Route::get('/marche/unlinked/{id}', 'getUnlinkedByMarche');
         Route::get('/marche/free/{id}', 'getFreeByMarche');
         Route::get('/marche/busy/{id}', 'getBusyByMarche');
+        Route::get('zones', 'getByZones');
         Route::post('/store', 'store');
         Route::post('/push', 'push');
         Route::get('{id}', 'show');

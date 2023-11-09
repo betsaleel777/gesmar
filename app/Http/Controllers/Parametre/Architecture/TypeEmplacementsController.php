@@ -4,17 +4,18 @@ namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Emplacement\TypeEmplacementListResource;
+use App\Http\Resources\Emplacement\TypeEmplacementResource;
 use App\Models\Architecture\TypeEmplacement as Type;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class TypeEmplacementsController extends Controller
 {
     public function all(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', TypeEquipement::class);
+        $response = Gate::inspect('viewAny', Type::class);
         if ($response->allowed()) {
             $types = Type::with('site')->get();
         } else {
@@ -71,7 +72,7 @@ class TypeEmplacementsController extends Controller
 
     public function trashed(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', TypeEquipement::class);
+        $response = Gate::inspect('viewAny', Type::class);
         if ($response->allowed()) {
             $types = Type::with('site')->onlyTrashed()->get();
         } else {
@@ -83,7 +84,7 @@ class TypeEmplacementsController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $type = Type::withTrashed()->find($id);
-        return response()->json(['type' => $type]);
+        $type = Type::find($id);
+        return response()->json(['type' => TypeEmplacementResource::make($type)]);
     }
 }

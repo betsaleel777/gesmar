@@ -7,11 +7,11 @@ use App\Http\Resources\Emplacement\PavillonResource;
 use App\Http\Resources\Emplacement\PavillonSelectResource;
 use App\Models\Architecture\Pavillon;
 use App\Models\Architecture\Site;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class PavillonsController extends Controller
@@ -48,13 +48,12 @@ class PavillonsController extends Controller
         $response = Gate::inspect('viewAny', Pavillon::class);
         if ($response->allowed()) {
             $pavillons = Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas('site', fn (Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+                ->orWhereHas('site', fn(Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
             Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas(
-                    'site',
-                    fn (Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%', true)
+                ->orWhereHas('site',
+                    fn(Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%', true)
                         ->whereIn('sites.id', $sites)
                 )->get();
         }
@@ -70,7 +69,7 @@ class PavillonsController extends Controller
         } else {
             $request->validate(Pavillon::RULES);
             $pavillon = new Pavillon($request->all());
-            $pavillon->code = (string) (Site::with('pavillons')->findOrFail((int)$request->site_id)->pavillons->count() + 1);
+            $pavillon->code = (string) (Site::with('pavillons')->findOrFail((int) $request->site_id)->pavillons->count() + 1);
             $pavillon->save();
         }
         $message = "Le pavillon $request->nom a été crée avec succès.";
@@ -114,7 +113,7 @@ class PavillonsController extends Controller
             $pavillons = Pavillon::with('site')->onlyTrashed()->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
-            $pavillons =   Pavillon::with('site')->inside($sites)->onlyTrashed()->get();
+            $pavillons = Pavillon::with('site')->inside($sites)->onlyTrashed()->get();
         }
         return response()->json(['pavillons' => $pavillons]);
     }
@@ -123,12 +122,12 @@ class PavillonsController extends Controller
     {
         $pavillon = Pavillon::with('site')->withTrashed()->find($id);
         $this->authorize('view', $pavillon);
-        return response()->json(['pavillon' => $pavillon]);
+        return response()->json(['pavillon' => PavillonResource::make($pavillon)]);
     }
 
     public function getByMarche(int $id): JsonResponse
     {
         $pavillons = Site::findOrFail($id)->pavillons;
-        return response()->json(['pavillons' => $pavillons]);
+        return response()->json(['pavillons' => PavillonResource::collection($pavillons)]);
     }
 }

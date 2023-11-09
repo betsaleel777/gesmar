@@ -15,7 +15,7 @@ class SiteResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nom' => $this->whenNotNull(str($this->nom)->lower()),
+            'nom' => $this->when(!empty($this->nom), str($this->nom)->lower()),
             'pays' => $this->whenNotNull($this->pays),
             'ville' => $this->whenNotNull($this->ville),
             'commune' => $this->whenNotNull($this->commune),

@@ -2,9 +2,12 @@
 
 namespace App\Http\Resources\Emplacement;
 
+use App\Models\Architecture\Emplacement;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
+/**
+ * @property Emplacement resource
+ */
 class EmplacementSelectResource extends JsonResource
 {
     /**
@@ -16,9 +19,7 @@ class EmplacementSelectResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'texte' => $this->nom . ' ' . $this->whenLoaded('pavillon', fn () => Str::lower($this->pavillon->nom)) . ' ' .
-                $this->whenLoaded('niveau', fn () => Str::lower($this->niveau->nom)) . ' ' .
-                $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
+            'texte' => $this->resource->getFullname(),
         ];
     }
 }

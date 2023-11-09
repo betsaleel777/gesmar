@@ -24,8 +24,7 @@ class AssignationRequest extends FormRequest
     public function rules()
     {
         return [
-            'commercial_id' => 'required|numeric',
-            'site_id' => 'required|numeric',
+            'emplacements' => 'required|array',
             'jour' => 'required',
         ];
     }

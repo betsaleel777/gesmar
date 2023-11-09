@@ -2,7 +2,6 @@
 
 namespace App\Models\Architecture;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,16 +25,6 @@ class Zone extends Model implements Auditable
         'nom' => 'required|max:150',
         'niveau_id' => 'required',
     ];
-    /**
-     *
-     * @var array<int, string>
-     */
-    protected $with = ['niveau', 'pavillon', 'site'];
-    /**
-     *
-     * @var array<int, string>
-     */
-    protected $appends = ['code'];
 
     const MIDDLE_RULES = [
         'niveau_id' => 'required',
@@ -46,21 +35,14 @@ class Zone extends Model implements Auditable
         'nombre' => 'required|numeric|min:1',
     ];
 
-    /**
-     *
-     * @return Attribute<string, never>
-     */
-    protected function code(): Attribute
+    public function getCode(): ?string
     {
-        return Attribute::make(
-            get: fn () => $this->niveau->pavillon->code . $this->niveau->code . str_pad((string) $this->attributes['code'], 4, '0', STR_PAD_LEFT),
-        );
+        $this->loadMissing('niveau:niveaux.id,niveaux.code', 'pavillon:pavillons.id,pavillons.code');
+        return $this->pavillon?->code . $this->niveau?->code . str((string) $this->code)->padLeft(4, '0');
     }
 
     /**
      * Obtenir le niveau d'une zone
-     *
-     * @return BelongsTo<Niveau, Zone>
      */
     public function niveau(): BelongsTo
     {
@@ -69,8 +51,6 @@ class Zone extends Model implements Auditable
 
     /**
      * Obtenir les emplacement d'une zone
-     *
-     * @return HasMany<Emplacement>
      */
     public function emplacements(): HasMany
     {

@@ -4,8 +4,12 @@ namespace App\Http\Resources\Abonnement;
 
 use App\Http\Resources\Emplacement\EmplacementResource;
 use App\Http\Resources\SiteResource;
+use App\Models\Architecture\Equipement;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property Equipement resource
+ */
 class EquipementResource extends JsonResource
 {
     public static $wrap = "equipement";
@@ -18,9 +22,9 @@ class EquipementResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nom' => $this->nom,
-            'code' => $this->code,
-            'alias' => $this->whenLoaded('type', fn () => $this->code . ' ' . $this->type->nom),
+            'nom' => $this->when(!empty($this->nom), str($this->nom)->lower()),
+            'code' => $this->whenNotNull($this->code),
+            'alias' => $this->whenLoaded('type', fn() => $this->code . ' ' . $this->type->nom),
             'prix_unitaire' => $this->prix_unitaire,
             'prix_fixe' => $this->prix_fixe,
             'frais_facture' => $this->frais_facture,

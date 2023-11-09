@@ -2,11 +2,15 @@
 
 namespace App\Http\Resources\Emplacement;
 
+use App\Http\Resources\SiteResource;
+use App\Models\Architecture\Zone;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property Zone resource
+ */
 class ZoneResource extends JsonResource
 {
-    public static $wrap = 'zone';
     /**
      * Transform the resource into an array.
      *
@@ -15,11 +19,11 @@ class ZoneResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
-            'nom' => $this->nom,
-            'niveau_id' => $this->niveau_id,
-            'code' => $this->whenAppended('code'),
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
+            'id' => $this->resource->id,
+            'niveau_id' => $this->resource->niveau_id,
+            'nom' => $this->when(!empty($this->nom), str($this->resource->nom)->lower()),
+            'code' => $this->whenNotNull($this->resource->getCode()),
+            'site' => SiteResource::make($this->whenLoaded('site')),
             'niveau' => NiveauResource::make($this->whenLoaded('niveau')),
         ];
     }

@@ -18,7 +18,7 @@ class EmplacementSimpleSelectResource extends JsonResource
     {
         return [
             'id' => $this->resource->id,
-            'code' => $this->resource->code,
+            'code' => $this->code,
         ];
     }
 }

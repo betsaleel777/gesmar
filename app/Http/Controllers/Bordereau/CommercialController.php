@@ -16,7 +16,8 @@ class CommercialController extends Controller
 {
     public function all(): JsonResponse
     {
-        $commerciaux = Commercial::with('user', 'site')->get();
+        $commerciaux = Commercial::select('id', 'code', 'created_at', 'site_id', 'user_id')->with('site:id,nom')
+            ->with(['user' => fn($query) => $query->select('id', 'name')->without('avatar')])->get();
         return response()->json(['commerciaux' => CommercialListResource::collection($commerciaux)]);
     }
 
@@ -73,7 +74,7 @@ class CommercialController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $commercial = Commercial::with('user', 'site')->find($id);
+        $commercial = Commercial::with('user:id,name', 'site:id,nom')->find($id);
         return response()->json(['commercial' => CommercialResource::make($commercial)]);
     }
 }

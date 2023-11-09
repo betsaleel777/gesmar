@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Events\EquipementRegistred;
+use App\Events\EquipementRemoved;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Abonnement\EquipementListResource;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class EquipementsController extends Controller
 {
@@ -29,11 +30,13 @@ class EquipementsController extends Controller
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Equipement::class);
+        $requete = Equipement::select('nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id', 'site_id', 'emplacement_id')
+            ->with('site:id,nom', 'type:id,nom');
         if ($response->allowed()) {
-            $equipements = Equipement::with('site')->get();
+            $equipements = $requete->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
-            $equipements = Equipement::with('site')->inside($sites)->get();
+            $equipements = $requete->inside($sites)->get();
         }
         return response()->json(['equipements' => EquipementListResource::collection($equipements)]);
     }
@@ -60,7 +63,7 @@ class EquipementsController extends Controller
         $request->validate(Equipement::RULES);
         $ancienEmplacement = (int) $equipement->emplacement_id;
         $equipement->update($request->all());
-        $eventCondition = $ancienEmplacement !== (int)$equipement->emplacement_id;
+        $eventCondition = $ancienEmplacement !== (int) $equipement->emplacement_id;
         EquipementRegistred::dispatchIf($eventCondition, $equipement, $ancienEmplacement);
         $message = "L'équipement $equipement->nom a été modifié avec succès.";
         return response()->json(['message' => $message]);
@@ -71,6 +74,7 @@ class EquipementsController extends Controller
         $equipement = Equipement::findOrFail($id);
         $this->authorize('delete', $equipement);
         $equipement->delete();
+        EquipementRemoved::dispatch($equipement);
         $message = "L'équipement $equipement->nom a été supprimé avec succès.";
         return response()->json(['message' => $message]);
     }
@@ -111,13 +115,11 @@ class EquipementsController extends Controller
 
     /**
      * Récupère les équipements non abonnés et non liés selon le marché et conserve l'équipement déjà lié de l'emplacement
-     *
      */
     public function getGearsForContratView(int $id, int $emplacement, int $site): JsonResponse
     {
         $equipementLinked = Equipement::where('type_equipement_id', $id)->where('emplacement_id', $emplacement)->first();
-        $equipements = Equipement::where('site_id', $site)->where('type_equipement_id', $id)
-            ->unlinked()->unsubscribed()->get();
+        $equipements = Equipement::where('site_id', $site)->where('type_equipement_id', $id)->unlinked()->unsubscribed()->get();
         empty($equipementLinked) ?: $equipements->push($equipementLinked);
         return response()->json(['equipements' => $equipements]);
     }

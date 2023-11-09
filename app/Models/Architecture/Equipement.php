@@ -3,7 +3,6 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusEquipement;
-use App\Events\EquipementRemoved;
 use App\Models\Scopes\RecentScope;
 use App\States\Equipement\StatusAbonnementState;
 use App\States\Equipement\StatusLiaisonsState;
@@ -36,30 +35,10 @@ class Equipement extends Model implements Auditable
         'liaison' => StatusLiaisonsState::class,
     ];
     protected $auditExclude = ['site_id'];
-    protected $fillable = [
-        'nom',
-        'code',
-        'prix_unitaire',
-        'prix_fixe',
-        'frais_facture',
-        'index',
-        'type_equipement_id',
-        'site_id',
-        'emplacement_id',
-    ];
+    protected $fillable = ['nom', 'code', 'prix_unitaire', 'prix_fixe', 'frais_facture', 'index', 'type_equipement_id',
+        'site_id', 'emplacement_id'];
+    protected $casts = ['prix_unitaire' => 'integer', 'prix_fixe' => 'integer', 'frais_facture' => 'integer'];
     protected $dates = ['created_at'];
-
-    /**
-     *
-     * @var array<int, string>
-     */
-    protected $appends = ['alias'];
-
-    /**
-     *
-     * @var array<int, string>
-     */
-    protected $with = ['type'];
 
     public const RULES = [
         'prix_unitaire' => 'required|numeric',
@@ -73,10 +52,6 @@ class Equipement extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
-
-        static::deleted(function (Equipement $equipement): void {
-            EquipementRemoved::dispatch($equipement);
-        });
     }
     /**
      *
@@ -85,7 +60,7 @@ class Equipement extends Model implements Auditable
     protected function alias(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->attributes['code'] . ' ' . $this->type->nom,
+            get: fn() => $this->attributes['code'] . ' ' . $this->type->nom,
         );
     }
 
@@ -113,9 +88,6 @@ class Equipement extends Model implements Auditable
 
     /**
      * Obtenir les equipements qui ont un abonnement en cours
-     *
-     * @param Builder<Equipement> $query
-     * @return Builder<Equipement>
      */
     public function scopeSubscribed(Builder $query): Builder
     {
@@ -124,9 +96,6 @@ class Equipement extends Model implements Auditable
 
     /**
      * Obtenir les equipements qui n'ont pas d'abonnement en cours
-     *
-     * @param Builder<Equipement> $query
-     * @return Builder<Equipement>
      */
     public function scopeUnsubscribed(Builder $query): Builder
     {
@@ -135,9 +104,6 @@ class Equipement extends Model implements Auditable
 
     /**
      * Obtenir les equipements qui sont liés à un emplacement
-     *
-     * @param Builder<Equipement> $query
-     * @return Builder<Equipement>
      */
     public function scopeLinked(Builder $query): Builder
     {
@@ -146,9 +112,6 @@ class Equipement extends Model implements Auditable
 
     /**
      * Obtenir les equipements qui ne sont pas liés à un emplacement
-     *
-     * @param Builder<Equipement> $query
-     * @return Builder<Equipement>
      */
     public function scopeUnlinked(Builder $query): Builder
     {
@@ -157,7 +120,6 @@ class Equipement extends Model implements Auditable
 
     /**
      * Obtenir les equipements appartenant à la liste de site
-     *
      */
     public function scopeInside(Builder $query, array $sites): Builder
     {
@@ -166,8 +128,6 @@ class Equipement extends Model implements Auditable
 
     /**
      * Undocumented function
-     *
-     * @return BelongsTo<TypeEquipement, Equipement>
      */
     public function type(): BelongsTo
     {

@@ -3,7 +3,6 @@
 namespace App\Http\Resources\Emplacement;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
 class ZoneSelectResource extends JsonResource
 {
@@ -16,9 +15,7 @@ class ZoneSelectResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'texte' => $this->nom . ' ' . $this->whenLoaded('pavillon', fn () => Str::lower($this->pavillon->nom)) . ' ' .
-                $this->whenLoaded('niveau', fn () => Str::lower($this->niveau->nom)) . ' ' .
-                $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
+            'texte' => $this->nom . ' ' . $this->code . ' ' . $this->whenLoaded('site', fn() => str($this->site->nom)->lower()),
         ];
     }
 }

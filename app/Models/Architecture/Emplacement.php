@@ -40,13 +40,7 @@ class Emplacement extends Model implements Auditable
         'disponibilite' => StatusDisponibiliteState::class,
         'liaison' => StatusLiaisonsState::class,
     ];
-
     protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'loyer', 'pas_porte', 'caution'];
-    /**
-     *
-     * @var array<int, string>
-     */
-    protected $with = ['type'];
     /**
      *
      * @var array<int, string>
@@ -88,8 +82,14 @@ class Emplacement extends Model implements Auditable
     protected function auto(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->relationLoaded('type') ? $this->type->auto_valid : null,
+            get: fn() => $this->relationLoaded('type') and !empty($this->type->auto_valid) ? $this->type->auto_valid : null,
         );
+    }
+
+    public function getFullname(): string
+    {
+        $this->loadMissing('pavillon:id,nom', 'niveau:id,nom', 'site:id,nom');
+        return $this->nom . ' ' . str($this->pavillon?->nom)->lower() . ' ' . str($this->niveau?->nom)->lower() . str($this->site?->nom)->lower();
     }
 
     public function occuper(): void
@@ -256,8 +256,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir le contrat en cours sur un emplacement
-     *
-     * @return HasOne<Contrat>
      */
     public function contratActuel(): HasOne
     {
@@ -266,8 +264,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les équipements liés à un emplacement
-     *
-     * @return HasMany<Equipement>
      */
     public function equipements(): HasMany
     {

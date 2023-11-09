@@ -5,7 +5,6 @@ namespace App\Models\Architecture;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -35,8 +34,6 @@ class TypeEmplacement extends Model implements Auditable
      *
      * @var array<int, string>
      */
-    protected $appends = ['code'];
-
     public const RULES = [
         'nom' => 'required|max:150',
         'site_id' => 'required',
@@ -48,15 +45,9 @@ class TypeEmplacement extends Model implements Auditable
         static::addGlobalScope(new RecentScope);
     }
 
-    /**
-     *
-     * @return Attribute<string, never>
-     */
-    protected function code(): Attribute
+    public function getCode(): string
     {
-        return Attribute::make(
-            get: fn () => $this->attributes['prefix'] . str_pad((string) $this->attributes['code'], 2, '0', STR_PAD_LEFT),
-        );
+        return !empty($this->prefix) and !empty($this->code) ? $this->prefix . str((string) $this->attributes['code'])->padLeft(2, '0') : null;
     }
 
     /**

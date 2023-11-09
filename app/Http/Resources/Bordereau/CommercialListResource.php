@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources\Bordereau;
 
+use App\Http\Resources\SiteResource;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
+/**
+ * @property Commercial resource
+ */
 class CommercialListResource extends JsonResource
 {
     /**
@@ -15,11 +19,11 @@ class CommercialListResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
-            'code' => $this->code,
-            'user_id' => $this->user_id,
-            'site' => $this->whenLoaded('site', fn() => Str::lower($this->site->nom)),
-            'name' => $this->whenLoaded('user', fn() => Str::lower($this->user->name)),
+            'id' => $this->resource->id,
+            'code' => $this->whenNotNull($this->resource->code),
+            'created_at' => $this->whenNotNull($this->resource->created_at?->format('d-m-Y')),
+            'user' => UserResource::make($this->whenLoaded('user')),
+            'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }
 }

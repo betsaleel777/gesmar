@@ -3,12 +3,14 @@
 namespace App\Http\Resources\Emplacement;
 
 use App\Http\Resources\SiteResource;
+use App\Models\Architecture\Pavillon;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
+/**
+ * @property Pavillon resource
+ */
 class PavillonResource extends JsonResource
 {
-    public static $wrap = 'pavillon';
     /**
      * Transform the resource into an array.
      *
@@ -18,11 +20,10 @@ class PavillonResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'site_id' => $this->site_id,
-            'nom' => Str::lower($this->nom),
-            'created_at' => $this->created_at->format('d-m-Y'),
-            'code' => $this->whenAppended('code'),
-            'marche' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
+            'code' => $this->whenNotNull($this->getCode()),
+            'site_id' => $this->whenNotNull($this->site_id),
+            'nom' => $this->when(!empty($this->nom), str($this->nom)->lower()),
+            'created_at' => $this->whenNotNull($this->created_at?->format('d-m-Y')),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }
