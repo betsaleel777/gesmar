@@ -27,9 +27,10 @@ class OuvertureController extends Controller
 
     public function getSearch(string $search): JsonResource
     {
-        $ouvertures = Ouverture::where('code', 'LIKE', "%$search%")->orWhere('created_at', 'LIKE', "%$search")
-            ->orWhereHas('caissier.user', fn (Builder $query): Builder => $query->where('name', 'LIKE', "%$search%"))
-            ->orWhereHas('guichet', fn (Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))->paginate(10);
+        $ouvertures = Ouverture::whereRaw("DATE_FORMAT(ouvertures.created_at,'%d-%m-%Y') LIKE ?", "$search%")
+            ->orWhere('code', 'LIKE', "%$search%")
+            ->orWhereHas('caissier.user', fn(Builder $query): Builder => $query->where('name', 'LIKE', "%$search%"))
+            ->orWhereHas('guichet', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))->paginate(10);
         return OuvertureListResource::collection($ouvertures);
     }
 
@@ -48,7 +49,7 @@ class OuvertureController extends Controller
     {
         $ouvertures = Ouverture::whereHas(
             'site',
-            fn (Builder $query) =>
+            fn(Builder $query) =>
             $query->where('id', $id)
         )->get();
         return response()->json(['ouverture' => $ouvertures]);
@@ -70,7 +71,7 @@ class OuvertureController extends Controller
     {
         $ouverture = Ouverture::with('encaissements.ordonnancement')->where('caissier_id', $id)->using()->first();
         return empty($ouverture) ? response()->json(['message' => "il n'y a aucune caisse ouverte actuellement pour cet utilisateur"])
-            : response()->json(['ouverture' => OuvertureResource::make($ouverture)]);
+        : response()->json(['ouverture' => OuvertureResource::make($ouverture)]);
     }
 
     public function getUsingByCaissier(int $id)

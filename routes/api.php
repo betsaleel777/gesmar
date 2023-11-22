@@ -467,6 +467,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
     });
     Route::controller(CommercialController::class)->prefix('commerciaux')->group(function (): void {
         Route::get('/', 'all');
+        Route::get('/paginate', 'getPaginate');
+        Route::get('/search/{search}/paginate', 'getSearch');
         Route::get('/select', 'getSelect');
         Route::get('/users', 'user');
         Route::post('/attribuer', 'attribuer');

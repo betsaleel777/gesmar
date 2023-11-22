@@ -29,7 +29,7 @@ class FermetureController extends Controller
     public function getSearch(string $search): JsonResource
     {
         $fermetures = Fermeture::with('ouverture.encaissements.ordonnancement')
-            ->where('created_at', 'LIKE', "%$search")
+            ->whereRaw("DATE_FORMAT(fermetures.created_at,'%d-%m-%Y') LIKE ?", "$search%")
             ->orWhereHas('ouverture.caissier.user', fn(Builder $query) => $query->where('name', 'LIKE', "%$search%"))
             ->orWhereHas('ouverture.guichet', fn(Builder $query) => $query->where('nom', 'LIKE', "%$search%"))
             ->paginate(10);

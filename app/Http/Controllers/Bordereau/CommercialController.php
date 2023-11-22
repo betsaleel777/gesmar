@@ -10,6 +10,7 @@ use App\Http\Resources\Bordereau\CommercialResource;
 use App\Http\Resources\Bordereau\CommercialSelectResource;
 use App\Models\Bordereau\Bordereau;
 use App\Models\Bordereau\Commercial;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,6 +22,22 @@ class CommercialController extends Controller
         $commerciaux = Commercial::select('id', 'code', 'created_at', 'site_id', 'user_id')->with('site:id,nom')
             ->with(['user' => fn($query) => $query->select('id', 'name')->without('avatar')])->get();
         return response()->json(['commerciaux' => CommercialListResource::collection($commerciaux)]);
+    }
+
+    public function getPaginate(): JsonResource
+    {
+        $commerciaux = Commercial::select('id', 'code', 'created_at', 'site_id', 'user_id')->with('site:id,nom')
+            ->with(['user' => fn($query) => $query->select('id', 'name')->without('avatar')])->paginate(10);
+        return CommercialListResource::collection($commerciaux);
+    }
+
+    public function getSearch(string $search): JsonResource
+    {
+        $commerciaux = Commercial::select('id', 'code', 'created_at', 'site_id', 'user_id')->with('site:id,nom')
+            ->with(['user' => fn($query) => $query->select('id', 'name')->without('avatar')])
+            ->whereRaw("DATE_FORMAT(commercials.created_at,'%d-%m-%Y') LIKE ?", "$search%")->orWhere('code', 'LIKE', "%$search%")
+            ->orWhereHas('user', fn(Builder $query): Builder => $query->where('name', 'LIKE', "%$search%"))->paginate(10);
+        return CommercialListResource::collection($commerciaux);
     }
 
     public function getSelect(): JsonResponse
