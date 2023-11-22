@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Emplacement\NiveauListResource;
+use App\Http\Resources\Emplacement\NiveauResource;
 use App\Http\Resources\Emplacement\NiveauSelectResource;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Niveau;
@@ -12,8 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class NiveauxController extends Controller implements StandardControllerInterface
 {
@@ -40,11 +41,13 @@ class NiveauxController extends Controller implements StandardControllerInterfac
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Niveau::class);
+        $request = Niveau::select('id', 'nom', 'pavillon_id', 'created_at')
+            ->with('pavillon:pavillons.id,pavillons.nom', 'site:sites.id,sites.nom');
         if ($response->allowed()) {
-            $niveaux = Niveau::with('pavillon', 'site')->get();
+            $niveaux = $request->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
-            $niveaux = Niveau::with('pavillon', 'site')->inside($sites)->get();
+            $niveaux = $request->inside($sites)->get();
         }
         return response()->json(['niveaux' => NiveauListResource::collection($niveaux)]);
     }
@@ -54,14 +57,14 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         $response = Gate::inspect('viewAny', Niveau::class);
         if ($response->allowed()) {
             $niveaux = Niveau::with('site', 'pavillon')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas('site', fn (Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
-                ->orWhereHas('pavillon', fn (Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+                ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
+                ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
             $niveaux = Niveau::with('site', 'pavillon')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas('site', fn (Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%', true)
-                    ->whereIn('sites.id', $sites))
-                ->orWhereHas('pavillon', fn (Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
+                ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%', true)
+                        ->whereIn('sites.id', $sites))
+                ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
         }
         return NiveauSelectResource::collection($niveaux);
     }
@@ -75,7 +78,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         } else {
             $request->validate(Niveau::RULES);
             $niveau = new Niveau($request->all());
-            $pavillon = Pavillon::with('niveaux')->findOrFail((int)$request->pavillon_id);
+            $pavillon = Pavillon::with('niveaux')->findOrFail((int) $request->pavillon_id);
             $niveau->code = (string) ($pavillon->niveaux->count() + 1);
             $niveau->save();
         }
@@ -127,9 +130,10 @@ class NiveauxController extends Controller implements StandardControllerInterfac
 
     public function show(int $id): JsonResponse
     {
-        $niveau = Niveau::with('pavillon', 'site')->withTrashed()->find($id);
+        $niveau = Niveau::select('id', 'nom', 'pavillon_id', 'created_at')
+            ->with('pavillon:pavillons.id,pavillons.nom', 'site:sites.id,sites.nom')->find($id);
         $this->authorize('view', $niveau);
-        return response()->json(['niveau' => $niveau]);
+        return response()->json(['niveau' => NiveauResource::make($niveau)]);
     }
 
     public function getByPavillon(int $id): JsonResponse

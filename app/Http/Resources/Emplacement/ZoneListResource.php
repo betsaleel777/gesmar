@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources\Emplacement;
 
+use App\Http\Resources\SiteResource;
+use App\Models\Architecture\Zone;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
+/**
+ * @property Zone resource
+ */
 class ZoneListResource extends JsonResource
 {
     /**
@@ -15,14 +19,13 @@ class ZoneListResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
-            'nom' => Str::lower($this->nom),
-            'niveau_id' => $this->niveau_id,
-            'created_at' => $this->created_at->format('d-m-Y'),
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
-            'niveau' => $this->whenLoaded('niveau', fn () => Str::lower($this->niveau->nom)),
-            'pavillon' => $this->whenLoaded('pavillon', fn () => Str::lower($this->pavillon->nom)),
-            'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
+            'id' => $this->resource->id,
+            'nom' => $this->when(!empty($this->resource->nom), $this->resource->nom),
+            'niveau_id' => $this->resource->niveau_id,
+            'created_at' => $this->whenNotNull($this->resource->created_at?->format('d-m-Y')),
+            'niveau' => NiveauResource::make($this->whenLoaded('niveau')),
+            'pavillon' => PavillonResource::make($this->whenLoaded('pavillon')),
+            'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }
 }

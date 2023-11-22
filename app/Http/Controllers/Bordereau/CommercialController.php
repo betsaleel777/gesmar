@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Bordereau;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssignationRequest;
+use App\Http\Resources\Bordereau\BordereauResource;
 use App\Http\Resources\Bordereau\CommercialListResource;
 use App\Http\Resources\Bordereau\CommercialResource;
 use App\Http\Resources\Bordereau\CommercialSelectResource;
@@ -11,6 +12,7 @@ use App\Models\Bordereau\Bordereau;
 use App\Models\Bordereau\Commercial;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class CommercialController extends Controller
 {
@@ -42,10 +44,11 @@ class CommercialController extends Controller
     public function attribuer(AssignationRequest $request): JsonResponse
     {
         $bordereau = Bordereau::make($request->validated());
+        $commercial = Commercial::with('user:id,name')->find($request->commercial_id);
         $bordereau->codeGenerate();
+        $bordereau->site_id = $commercial->site_id;
         $bordereau->save();
         $bordereau->emplacements()->attach($request->emplacements);
-        $commercial = Commercial::with('user:id,name')->find($request->commercial_id);
         return response()->json(['message' =>
             "Le bordereau $bordereau->code a été assigné avec succès au commercial " . str($commercial->user->name)->lower()]);
     }
@@ -76,5 +79,11 @@ class CommercialController extends Controller
     {
         $commercial = Commercial::with('user:id,name', 'site:id,nom')->find($id);
         return response()->json(['commercial' => CommercialResource::make($commercial)]);
+    }
+
+    public function getMonthBordereaux(Commercial $commercial): JsonResource
+    {
+        $bordereaux = $commercial->bordereaux()->whereYear('jour', now()->year)->whereMonth('jour', now()->month)->get();
+        return BordereauResource::collection($bordereaux);
     }
 }

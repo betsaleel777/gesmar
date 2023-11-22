@@ -26,6 +26,7 @@ class AssignationRequest extends FormRequest
         return [
             'emplacements' => 'required|array',
             'jour' => 'required',
+            'commercial_id' => 'required|numeric',
         ];
     }
 }

@@ -34,11 +34,12 @@ class PavillonsController extends Controller
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Pavillon::class);
+        $requete = Pavillon::select('id', 'nom', 'site_id', 'created_at')->with('site:id,nom');
         if ($response->allowed()) {
-            $pavillons = Pavillon::with('site')->get();
+            $pavillons = $requete->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
-            Pavillon::with('site')->inside($sites)->get();
+            $requete->inside($sites)->get();
         }
         return response()->json(['pavillons' => PavillonResource::collection($pavillons)]);
     }
@@ -90,7 +91,7 @@ class PavillonsController extends Controller
 
     public function trash(int $id): JsonResponse
     {
-        $pavillon = Pavillon::findOrFail($id);
+        $pavillon = Pavillon::find($id);
         $this->authorize('delete', $pavillon);
         $pavillon->delete();
         $message = "Le pavillon $pavillon->nom a été supprimé avec succès.";
@@ -109,18 +110,19 @@ class PavillonsController extends Controller
     public function trashed(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Pavillon::class);
+        $requete = Pavillon::select('id', 'nom', 'site_id', 'created_at')->with('site:id,nom');
         if ($response->allowed()) {
-            $pavillons = Pavillon::with('site')->onlyTrashed()->get();
+            $pavillons = $requete->onlyTrashed()->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
-            $pavillons = Pavillon::with('site')->inside($sites)->onlyTrashed()->get();
+            $pavillons = $requete->inside($sites)->onlyTrashed()->get();
         }
         return response()->json(['pavillons' => $pavillons]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $pavillon = Pavillon::with('site')->withTrashed()->find($id);
+        $pavillon = Pavillon::select('id', 'nom', 'site_id')->find($id);
         $this->authorize('view', $pavillon);
         return response()->json(['pavillon' => PavillonResource::make($pavillon)]);
     }

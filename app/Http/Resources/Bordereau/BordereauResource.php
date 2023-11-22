@@ -22,7 +22,7 @@ class BordereauResource extends JsonResource
             'id' => $this->id,
             'code' => $this->whenNotNull($this->code),
             'status' => $this->whenNotNull($this->status),
-            'jour' => $this->whenNotNull($this->jour),
+            'jour' => $this->whenNotNull($this->jour?->format('d-m-Y')),
             'commercial' => CommercialResource::make($this->whenLoaded('commercial')),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];

@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -58,8 +58,8 @@ class Commercial extends Model implements Auditable
     /**
      * Obtenir les bordereaux d'un commercial
      */
-    public function bordereaux(): BelongsToMany
+    public function bordereaux(): HasMany
     {
-        return $this->belongsToMany(Bordereau::class, 'bordereau_emplacement', 'commercial_id', 'bordereau_id');
+        return $this->hasMany(Bordereau::class);
     }
 }

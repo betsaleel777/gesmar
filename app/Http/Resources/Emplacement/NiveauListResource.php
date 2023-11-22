@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Emplacement;
 
+use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
@@ -17,11 +18,10 @@ class NiveauListResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nom' => Str::lower($this->nom),
+            'nom' => $this->when(!empty($this->nom), str($this->nom)->lower()),
             'created_at' => $this->created_at->format('d-m-Y'),
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
-            'pavillon' => $this->whenLoaded('pavillon', fn () => Str::lower($this->pavillon->nom)),
-            'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
+            'pavillon' => PavillonResource::make($this->whenLoaded('pavillon')),
+            'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }
 }

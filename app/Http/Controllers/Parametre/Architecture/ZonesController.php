@@ -40,11 +40,13 @@ class ZonesController extends Controller implements StandardControllerInterface
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Zone::class);
+        $requete = Zone::select('id', 'nom', 'niveau_id', 'created_at')->with('niveau:niveaux.id,niveaux.nom,pavillon_id',
+            'pavillon:pavillons.id,pavillons.nom,site_id', 'site:sites.id,sites.nom');
         if ($response->allowed()) {
-            $zones = Zone::get();
+            $zones = $requete->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
-            $zones = Zone::inside($sites)->get();
+            $zones = $requete->inside($sites)->get();
         }
         return response()->json(['zones' => ZoneListResource::collection($zones)]);
     }
@@ -137,7 +139,8 @@ class ZonesController extends Controller implements StandardControllerInterface
 
     public function show(int $id): JsonResponse
     {
-        $zone = Zone::with('niveau', 'pavillon', 'site')->withTrashed()->find($id);
+        $zone = Zone::select('id', 'nom', 'niveau_id')->with('niveau:niveaux.id,niveaux.nom', 'pavillon:pavillons.id,pavillons.nom',
+            'site:sites.id,sites.nom')->find($id);
         $this->authorize('view', $zone);
         return response()->json(['zone' => $zone]);
     }

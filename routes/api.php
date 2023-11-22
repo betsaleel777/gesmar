@@ -471,6 +471,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
         Route::get('/users', 'user');
         Route::post('/attribuer', 'attribuer');
         Route::get('/trashed', 'trashed');
+        Route::get('/bordereaux-month/{commercial}', 'getMonthBordereaux');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');

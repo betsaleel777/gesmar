@@ -6,6 +6,7 @@ use App\Enums\StatusBordereau;
 use App\Models\Architecture\Emplacement;
 use App\StateMachines\BordereauStateMachine;
 use App\Traits\HasSites;
+use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -15,11 +16,12 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Bordereau extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable , HasSites;
+    use \OwenIt\Auditing\Auditable , HasSites, HasStateMachines;
 
     protected $fillable = ['code', 'commercial_id', 'site_id', 'jour'];
     protected $dates = ['created_at'];
     protected $casts = ['jour' => 'date'];
+    protected $table = 'bordereaux';
     public $stateMachines = ['status' => BordereauStateMachine::class];
 
     public function codeGenerate(): void
