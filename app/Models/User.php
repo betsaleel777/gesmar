@@ -39,7 +39,6 @@ class User extends Authenticatable implements HasMedia, Auditable
         'adresse',
         'password',
     ];
-    protected $with = ['avatar'];
     protected $auditExclude = ['connected'];
     const RULES = [
         'name' => 'required|max:150|unique:users,name',

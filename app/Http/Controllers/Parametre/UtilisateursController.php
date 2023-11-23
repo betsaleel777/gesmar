@@ -16,7 +16,7 @@ class UtilisateursController extends Controller
     public function all(): JsonResponse
     {
         $this->authorize('viewAny', User::class);
-        $users = User::get();
+        $users = User::with('avatar')->get();
         return response()->json(['users' => UserResource::collection($users)]);
     }
 
@@ -29,7 +29,7 @@ class UtilisateursController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $user = User::with(['roles', 'permissions', 'sites'])->withTrashed()->findOrFail($id);
+        $user = User::with(['roles', 'permissions', 'sites', 'avatar'])->withTrashed()->findOrFail($id);
         $this->authorize('view', $user);
         $permissions = $user->getAllPermissions();
         return response()->json(['user' => UserResource::make($user), 'permissions' => $permissions]);

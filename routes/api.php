@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Bordereau\BordereauController;
 use App\Http\Controllers\Bordereau\CommercialController;
 use App\Http\Controllers\Caisse\BanqueController;
 use App\Http\Controllers\Caisse\CaissierController;
@@ -140,6 +141,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
         Route::get('/select', 'select');
         Route::get('/simple-select', 'simpleSelect');
         Route::get('/autos', 'allAuto');
+        Route::get('/autos/site/{id}', 'allAutoBySite');
         Route::get('/equipables', 'equipables');
         Route::get('/trashed', 'trashed');
         Route::get('/rental/{date}', 'getRentalbyMonthLoyer');
@@ -480,6 +482,18 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('/restore/{id}', 'restore');
+    });
+    Route::controller(BordereauController::class)->prefix('bordereaux')->group(function (): void {
+        Route::get('/', 'index');
+        Route::get('paginate', 'getPaginate');
+        Route::get('search/{search}/paginate', 'getSearch');
+        Route::get('select', 'getSelect');
+        Route::get('edit/{id}', 'getEdit');
+        Route::post('store', 'store');
+        Route::get('{id}', 'show');
+        Route::put('{id}', 'update');
+        Route::delete('{id}', 'trash');
+        Route::patch('restore/{id}', 'restore');
     });
     Route::prefix('caisses')->group(function (): void {
         Route::controller(OuvertureController::class)->prefix('ouvertures')->group(function (): void {

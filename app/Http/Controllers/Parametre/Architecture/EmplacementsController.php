@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -83,6 +84,15 @@ class EmplacementsController extends Controller
             $emplacements = Emplacement::with('zone', 'niveau', 'pavillon', 'site')->withoutSchedule()->inside($sites)->get();
         }
         return response()->json(['emplacements' => $emplacements]);
+    }
+
+    public function allAutoBySite(int $id): JsonResource
+    {
+        $emplacements = Emplacement::select('id', 'code', 'zone_id', 'type_emplacement_id')
+            ->with('zone:zones.id,zones.nom,niveau_id', 'niveau:niveaux.id,niveaux.nom,pavillon_id',
+                'pavillon:pavillons.id,pavillons.nom,site_id', 'site:sites.id,sites.nom')->withoutSchedule()
+            ->whereHas('site', fn(Builder $query): Builder => $query->where('sites.id', $id))->get();
+        return EmplacementListResource::collection($emplacements);
     }
 
     public function equipables(): JsonResponse
