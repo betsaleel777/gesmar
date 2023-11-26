@@ -16,7 +16,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Bordereau extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable , HasSites, HasStateMachines;
+    use \OwenIt\Auditing\Auditable, HasSites, HasStateMachines;
 
     protected $fillable = ['code', 'commercial_id', 'site_id', 'jour'];
     protected $dates = ['created_at'];
@@ -26,7 +26,7 @@ class Bordereau extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = $this->count + 1;
+        $rang = $this->count() + 1;
         $this->attributes['code'] = BORDEREAU_CODE_PREFIXE . str((string) $rang)->padLeft(5, '0') . Carbon::now()->format('y');
     }
 

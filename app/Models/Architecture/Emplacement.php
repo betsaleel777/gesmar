@@ -3,16 +3,19 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusEmplacement;
+use App\Models\Bordereau\Bordereau;
 use App\Models\Exploitation\Contrat;
 use App\Models\Scopes\RecentScope;
 use App\States\Emplacement\StatusDisponibiliteState;
 use App\States\Emplacement\StatusLiaisonsState;
 use App\Traits\HasContrats;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -36,19 +39,13 @@ class Emplacement extends Model implements Auditable
      * Summary of stateMachines
      * @var array<string, class-string>
      */
-    public $stateMachines = [
-        'disponibilite' => StatusDisponibiliteState::class,
-        'liaison' => StatusLiaisonsState::class,
-    ];
+    public $stateMachines = ['disponibilite' => StatusDisponibiliteState::class, 'liaison' => StatusLiaisonsState::class];
     protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'loyer', 'pas_porte', 'caution'];
     /**
-     *
      * @var array<int, string>
      */
     protected $appends = ['auto'];
     /**
-     * les propriétés qui doivent être caster.
-     *
      * @var array<string, string>
      */
     protected $casts = [
@@ -89,7 +86,8 @@ class Emplacement extends Model implements Auditable
     public function getFullname(): string
     {
         $this->loadMissing('pavillon:id,nom', 'niveau:id,nom', 'site:id,nom');
-        return $this->nom . ' ' . str($this->pavillon?->nom)->lower() . ' ' . str($this->niveau?->nom)->lower() . str($this->site?->nom)->lower();
+        return $this->nom . ' ' . str($this->pavillon?->nom)->lower() . ' ' . str($this->niveau?->nom)
+            ->lower() . str($this->site?->nom)->lower();
     }
 
     public function occuper(): void
@@ -116,9 +114,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les emplacements occupés
-     *
-     * @param Builder<Emplacement> $query
-     * @return Builder<Emplacement>
      */
     public function scopeIsBusy(Builder $query): Builder
     {
@@ -127,9 +122,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les emplacements libres
-     *
-     * @param Builder<Emplacement> $query
-     * @return Builder<Emplacement>
      */
     public function scopeIsFree(Builder $query): Builder
     {
@@ -138,9 +130,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les emplacements liés à au moins un equipement
-     *
-     * @param Builder<Emplacement> $query
-     * @return Builder<Emplacement>
      */
     public function scopeIsLinked(Builder $query): Builder
     {
@@ -149,9 +138,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les emplacements liés à aucun equipement
-     *
-     * @param Builder<Emplacement> $query
-     * @return Builder<Emplacement>
      */
     public function scopeIsUnlinked(Builder $query): Builder
     {
@@ -160,9 +146,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les emplacements qui dont les contrat se valide sans passer par l'ordonnancement
-     *
-     * @param Builder<Emplacement> $query
-     * @return Builder<Emplacement>
      */
     public function scopeWithoutSchedule(Builder $query): Builder
     {
@@ -171,19 +154,35 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les emplacements appartenant à la liste de site accéssible
-     *
      */
     public function scopeInside(Builder $query, array $sites): Builder
     {
         return $query->whereHas('sites', fn($query) => $query->whereIn('sites.id', $sites));
     }
 
+    public function scopeRemoveAlreadyAssignedToBordereau(Builder $query, int $site, string $jour): Builder
+    {
+        return $query->whereNotIn('id', fn($query) => $query->select('emplacements.id')->from('emplacements')
+                ->join('bordereau_emplacement', 'bordereau_emplacement.emplacement_id', '=', 'emplacements.id')
+                ->join('bordereaux', 'bordereaux.id', '=', 'bordereau_emplacement.bordereau_id')
+                ->where('bordereaux.site_id', $site)
+                ->where('bordereaux.jour', Carbon::parse($jour)->format('Y-m-d')));
+    }
+
+    public function scopeRemoveOtherAlreadyAssignedToBordereau(Builder $query, int $site, int $commercial, string $jour): Builder
+    {
+        return $query->whereNotIn('id', fn($query) => $query->select('emplacements.id')->from('emplacements')
+                ->join('bordereau_emplacement', 'bordereau_emplacement.emplacement_id', '=', 'emplacements.id')
+                ->join('bordereaux', 'bordereaux.id', '=', 'bordereau_emplacement.bordereau_id')
+                ->where('bordereaux.site_id', $site)
+                ->where('bordereaux.commercial_id', '!=', $commercial)
+                ->where('bordereaux.jour', Carbon::parse($jour)->format('Y-m-d')));
+    }
+
     //relations
 
     /**
      * Obtenir la zone d'un emplacement
-     *
-     * @return BelongsTo<Zone, Emplacement>
      */
     public function zone(): BelongsTo
     {
@@ -211,8 +210,6 @@ class Emplacement extends Model implements Auditable
     }
     /**
      * Obtenir le marche de l'emplacement
-     *
-     * @return HasOneDeep
      */
     public function site(): HasOneDeep
     {
@@ -226,8 +223,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir le type d'un emplacement
-     *
-     * @return BelongsTo<TypeEmplacement, Emplacement>
      */
     public function type(): BelongsTo
     {
@@ -236,8 +231,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les abonnements d'un emplacement
-     *
-     * @return HasMany<Abonnement>
      */
     public function abonnements(): hasMany
     {
@@ -246,8 +239,6 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les abonnements en cours pour un emplacement
-     *
-     * @return HasMany<Abonnement>
      */
     public function abonnementsActuels(): hasMany
     {
@@ -268,5 +259,10 @@ class Emplacement extends Model implements Auditable
     public function equipements(): HasMany
     {
         return $this->hasMany(Equipement::class);
+    }
+
+    public function bordereaux(): BelongsToMany
+    {
+        return $this->belongsToMany(Bordereau::class, 'bordereau_emplacement', 'emplacement_id', 'bordereau_id');
     }
 }

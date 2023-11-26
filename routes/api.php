@@ -141,7 +141,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
         Route::get('/select', 'select');
         Route::get('/simple-select', 'simpleSelect');
         Route::get('/autos', 'allAuto');
-        Route::get('/autos/site/{id}', 'allAutoBySite');
+        Route::get('/autos/site', 'allAutoBySite');
         Route::get('/equipables', 'equipables');
         Route::get('/trashed', 'trashed');
         Route::get('/rental/{date}', 'getRentalbyMonthLoyer');

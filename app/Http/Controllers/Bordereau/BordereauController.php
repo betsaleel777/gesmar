@@ -44,7 +44,8 @@ class BordereauController extends Controller
 
     public function getEdit(int $id): JsonResource
     {
-        $bordereau = Bordereau::select('id', 'code', 'commercial_id', 'site_id')->with('commercial.user:id,name', 'commercial:id,user_id')
+        $bordereau = Bordereau::select('id', 'code', 'commercial_id', 'jour', 'site_id')
+            ->with('commercial.user:id,name', 'commercial:id,user_id')
             ->with(['emplacements' => fn(BelongsToMany $query): BelongsToMany =>
                 $query->select('emplacements.id', 'emplacements.code', 'emplacements.created_at', 'emplacements.zone_id')
                     ->with('zone:zones.id,zones.nom,niveau_id', 'niveau:niveaux.id,niveaux.nom,pavillon_id',

@@ -86,12 +86,13 @@ class EmplacementsController extends Controller
         return response()->json(['emplacements' => $emplacements]);
     }
 
-    public function allAutoBySite(int $id): JsonResource
+    public function allAutoBySite(Request $request): JsonResource
     {
         $emplacements = Emplacement::select('id', 'code', 'zone_id', 'type_emplacement_id')
             ->with('zone:zones.id,zones.nom,niveau_id', 'niveau:niveaux.id,niveaux.nom,pavillon_id',
-                'pavillon:pavillons.id,pavillons.nom,site_id', 'site:sites.id,sites.nom')->withoutSchedule()
-            ->whereHas('site', fn(Builder $query): Builder => $query->where('sites.id', $id))->get();
+                'pavillon:pavillons.id,pavillons.nom,site_id', 'site:sites.id,sites.nom')
+            ->removeOtherAlreadyAssignedToBordereau($request->integer('site'), $request->integer('commercial'), $request->jour)
+            ->whereHas('site', fn(Builder $query): Builder => $query->where('sites.id', $request->site))->withoutSchedule()->get();
         return EmplacementListResource::collection($emplacements);
     }
 
@@ -261,8 +262,8 @@ class EmplacementsController extends Controller
             ->with('zone:zones.id,zones.nom,niveau_id', 'niveau:niveaux.id,niveaux.nom,pavillon_id',
                 'pavillon:pavillons.id,pavillons.nom,site_id', 'site:sites.id,sites.nom')
             ->with(['type' => fn($query) => $query->select('type_emplacements.id', 'type_emplacements.nom')])
-            ->whereHas('type', fn($query) => $query->where('auto_valid', true))
-            ->whereHas('zone', fn($query) => $query->whereIn('zones.id', $request->query('zones')))->get();
+            ->whereHas('zone', fn($query) => $query->whereIn('zones.id', $request->query('zones')))
+            ->removeAlreadyAssignedToBordereau($request->integer('site'), $request->jour)->withoutSchedule()->get();
         return response()->json(['emplacements' => EmplacementListResource::collection($emplacements)]);
     }
 }

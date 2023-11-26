@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('bordereaux', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->date('jour')->unique();
+            $table->date('jour');
             $table->string('status', 20);
             $table->foreignId('site_id')->constrained('sites')->cascadeOnDelete();
             $table->foreignId('commercial_id')->constrained('commercials')->cascadeOnDelete();
