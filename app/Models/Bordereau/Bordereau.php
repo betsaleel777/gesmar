@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Bordereau extends Model implements Auditable
@@ -60,4 +61,8 @@ class Bordereau extends Model implements Auditable
         return $this->belongsToMany(Emplacement::class, 'bordereau_emplacement', 'bordereau_id', 'emplacement_id');
     }
 
+    public function collectes(): HasMany
+    {
+        return $this->hasMany(Collecte::class);
+    }
 }

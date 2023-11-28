@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Bordereau\BordereauController;
+use App\Http\Controllers\Bordereau\CollecteController;
 use App\Http\Controllers\Bordereau\CommercialController;
 use App\Http\Controllers\Caisse\BanqueController;
 use App\Http\Controllers\Caisse\CaissierController;
@@ -489,11 +490,16 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
         Route::get('search/{search}/paginate', 'getSearch');
         Route::get('select', 'getSelect');
         Route::get('edit/{id}', 'getEdit');
-        Route::post('store', 'store');
+        Route::get('for-collecte/{id}', 'getOneForCollecte');
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
         Route::delete('{id}', 'trash');
         Route::patch('restore/{id}', 'restore');
+    });
+    Route::controller(CollecteController::class)->prefix('collectes')->group(function (): void {
+        Route::get('/', 'index');
+        Route::get('collected', 'getAlreadyCollected');
+        Route::post('store', 'store');
     });
     Route::prefix('caisses')->group(function (): void {
         Route::controller(OuvertureController::class)->prefix('ouvertures')->group(function (): void {

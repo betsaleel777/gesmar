@@ -54,6 +54,13 @@ class BordereauController extends Controller
         return BordereauResource::make($bordereau);
     }
 
+    public function getOneForCollecte(int $id): JsonResource
+    {
+        $bordereau = Bordereau::select('id', 'code', 'commercial_id', 'jour')->with('commercial.user:id,name', 'commercial:id,user_id')
+            ->with('emplacements:id,code,loyer')->find($id);
+        return BordereauResource::make($bordereau);
+    }
+
     public function update(int $id, BordereauRequest $request): JsonResponse
     {
         $request->validated();

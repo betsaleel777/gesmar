@@ -13,6 +13,6 @@ class RecentScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        $builder->orderByDesc('created_at');
+        $builder->orderByDesc("{$model->getTable()}.created_at");
     }
 }
