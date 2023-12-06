@@ -14,7 +14,7 @@ class CaissierController extends Controller
 {
     public function all(): JsonResponse
     {
-        $caissiers = Caissier::get();
+        $caissiers = Caissier::with('user:id,name')->get();
         return response()->json(['caissiers' => CaissierListResouce::collection($caissiers)]);
     }
 
@@ -31,7 +31,7 @@ class CaissierController extends Controller
 
     public function trash(int $id): JsonResponse
     {
-        $caissier = Caissier::findOrFail($id);
+        $caissier = Caissier::with('user:id,name')->find($id);
         $this->authorize('delete', $caissier);
         $caissier->delete();
         $message = "Le caissier: $caissier->code a été supprimé avec succès.";
@@ -40,7 +40,7 @@ class CaissierController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $caissier = Caissier::with('attributionsGuichet')->findOrFail($id);
+        $caissier = Caissier::with('attributionsGuichet', 'user:id,name')->findOrFail($id);
         $this->authorize('view', $caissier);
         return response()->json(['caissier' => CaissierResource::make($caissier)]);
     }

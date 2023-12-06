@@ -25,6 +25,7 @@ class EmplacementListResource extends JsonResource
             'loyer' => $this->whenNotNull($this->resource->loyer),
             'pas_porte' => $this->whenNotNull($this->resource->pas_porte),
             'liaison' => $this->whenNotNull($this->resource->liaison),
+            'montant' => $this->whenNotNull($this->montant), // montant collecté sur un bordereau donné
             'disponibilite' => $this->whenNotNull($this->resource->disponibilite),
             'type' => TypeEmplacementResource::make($this->whenLoaded('type')),
             'zone' => ZoneResource::make($this->whenLoaded('zone')),

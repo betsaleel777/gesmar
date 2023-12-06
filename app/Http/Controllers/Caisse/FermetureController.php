@@ -22,16 +22,16 @@ class FermetureController extends Controller
 
     public function getPaginate(): JsonResource
     {
-        $fermetures = Fermeture::with('ouverture.encaissements.ordonnancement')->paginate(10);
+        $fermetures = Fermeture::with('guichet:guichets.id,guichets.nom', 'caissier:caissiers.id,caissiers.user_id', 'caissier.user:id,name')->paginate(10);
         return FermetureListResource::collection($fermetures);
     }
 
     public function getSearch(string $search): JsonResource
     {
-        $fermetures = Fermeture::with('ouverture.encaissements.ordonnancement')
+        $fermetures = Fermeture::with('guichet:guichets.id,guichets.nom', 'caissier:caissiers.id,caissiers.user_id', 'caissier.user:id,name')
             ->whereRaw("DATE_FORMAT(fermetures.created_at,'%d-%m-%Y') LIKE ?", "$search%")
-            ->orWhereHas('ouverture.caissier.user', fn(Builder $query) => $query->where('name', 'LIKE', "%$search%"))
-            ->orWhereHas('ouverture.guichet', fn(Builder $query) => $query->where('nom', 'LIKE', "%$search%"))
+            ->orWhereHas('guichet', fn(Builder $query) => $query->where('guichets.nom', 'LIKE', "%$search%"))
+            ->orWhereHas('caissier.user', fn(Builder $query) => $query->where('users.name', 'LIKE', "%$search%"))
             ->paginate(10);
         return FermetureListResource::collection($fermetures);
     }

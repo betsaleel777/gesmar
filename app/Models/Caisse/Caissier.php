@@ -25,10 +25,7 @@ class Caissier extends Model implements Auditable
      *
      * @var array<int, string>
      */
-    protected $with = ['user'];
-    const RULES = [
-        'user_id' => 'required|numeric',
-    ];
+    const RULES = ['user_id' => 'required|numeric'];
 
     const ATTRIBUTION_RULES = [
         'dates' => 'required',
@@ -48,8 +45,6 @@ class Caissier extends Model implements Auditable
 
     /**
      * Obtenir l'utilisateur lié à un caissier
-     *
-     * @return BelongsTo<User, Caissier>
      */
     public function user(): BelongsTo
     {
@@ -58,8 +53,6 @@ class Caissier extends Model implements Auditable
 
     /**
      * Obtenir les attributions de guichet d'un caissier
-     *
-     * @return BelongsToMany<Guichet>
      */
     public function attributionsGuichet(): BelongsToMany
     {

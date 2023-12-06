@@ -24,7 +24,6 @@ class Ouverture extends Model implements Auditable
     protected $dates = ['created_at'];
     protected $casts = ['date' => 'date'];
     protected $appends = ['status'];
-    protected $with = ['guichet.site', 'caissier'];
 
     const RULES = [
         'guichet_id' => 'required|numeric',
@@ -69,7 +68,7 @@ class Ouverture extends Model implements Auditable
 
     public function caissier(): BelongsTo
     {
-        return $this->belongsTo(Caissier::class,);
+        return $this->belongsTo(Caissier::class, );
     }
 
     public function guichet(): BelongsTo

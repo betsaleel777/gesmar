@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Caisse;
 
+use App\Events\EncaissementRegistred;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Caisse\EncaissementListeResource;
 use App\Http\Resources\Caisse\EncaissementResource;
@@ -20,11 +21,12 @@ class EncaissementController extends Controller
         $espece = new Espece($request->all());
         $espece->save();
         $encaissement = new Encaissement($request->all());
-        $ouverture = Ouverture::without('guichet', 'caissier')->using()->where('caissier_id', $request->caissier_id)->first();
+        $ouverture = Ouverture::using()->where('caissier_id', $request->caissier_id)->first();
         $encaissement->ouverture_id = $ouverture->id;
         $espece = Espece::findOrFail($espece->id);
         $encaissement->payable()->associate($espece);
         $encaissement->save();
+        EncaissementRegistred::dispatch($encaissement);
     }
 
     private static function storePayableCheque(Request $request): void
@@ -33,28 +35,25 @@ class EncaissementController extends Controller
         $cheque = new Cheque($request->all());
         $cheque->save();
         $encaissement = new Encaissement($request->all());
-        $ouverture = Ouverture::without('guichet', 'caissier')->using()->where('caissier_id', $request->caissier_id)->first();
+        $ouverture = Ouverture::using()->where('caissier_id', $request->caissier_id)->first();
         $encaissement->ouverture_id = $ouverture->id;
         $cheque = Cheque::findOrFail($cheque->id);
         $encaissement->payable()->associate($cheque);
         $encaissement->save();
+        EncaissementRegistred::dispatch($encaissement);
     }
 
     public function all(): JsonResponse
     {
-        $encaissements = Encaissement::with('payable', 'caissier', 'ordonnancement')->opened()->get();
+        $encaissements = Encaissement::with('payable', 'caissier:id,user_id', 'caissier.user:id,name', 'ordonnancement:id,code',
+            'bordereau:id,code')->opened()->get();
         return response()->json(['encaissements' => EncaissementListeResource::collection($encaissements)]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $encaissement = Encaissement::with(
-            'payable',
-            'caissier',
-            'ordonnancement.emplacement',
-            'ordonnancement.personne',
-            'ouverture.guichet'
-        )->find($id);
+        $encaissement = Encaissement::with('payable', 'caissier:id,user_id', 'caissier.user:id,name', 'ordonnancement:id,total,code',
+            'ordonnancement.emplacement:emplacements.id,emplacements.code', 'ordonnancement.personne:personnes.id,personnes.nom', 'ouverture:id,guichet_id', 'ouverture.guichet:id,nom', 'bordereau:id,code')->find($id);
         return response()->json(['encaissement' => EncaissementResource::make($encaissement)]);
     }
 

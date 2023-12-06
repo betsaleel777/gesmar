@@ -45,10 +45,6 @@ class Site extends Model implements Auditable
         ];
     }
 
-    /**
-     *
-     * @return HasMany<Pavillon>
-     */
     public function pavillons(): HasMany
     {
         return $this->hasMany(Pavillon::class);
@@ -56,8 +52,6 @@ class Site extends Model implements Auditable
 
     /**
      * Afficher directement tout les emplacements d'un site (marché)
-     *
-     * @return HasManyDeep<Emplacement>
      */
     public function emplacements(): HasManyDeep
     {
@@ -66,49 +60,27 @@ class Site extends Model implements Auditable
 
     /**
      * Afficher directement toutes les zones d'un site (marché)
-     *
-     * @return HasManyDeep<Zone>
      */
     public function zones(): HasManyDeep
     {
         return $this->hasManyDeep(Zone::class, [Pavillon::class, Niveau::class]);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return HasMany<Equipement>
-     */
     public function equipements(): HasMany
     {
         return $this->hasMany(Equipement::class);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return HasMany<Personne>
-     */
     public function personnes(): HasMany
     {
         return $this->hasMany(Personne::class);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return HasMany<Abonnement>
-     */
     public function abonnements(): HasMany
     {
         return $this->hasMany(Abonnement::class);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return HasMany<ServiceAnnexe>
-     */
     public function servicesAnnexes(): HasMany
     {
         return $this->hasMany(ServiceAnnexe::class);

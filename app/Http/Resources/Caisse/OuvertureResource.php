@@ -15,26 +15,16 @@ class OuvertureResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
-            'guichet_id' => $this->guichet_id,
-            'caissier_id' => $this->caissier_id,
-            'date' => $this->date->format('d-m-Y'),
-            'created_at' => $this->created_at->format('d-m-Y'),
-            'montant' => $this->montant,
+            'code' => $this->whenLoaded($this->code),
+            'guichet_id' => $this->whenLoaded($this->guichet_id),
+            'caissier_id' => $this->whenLoaded($this->caissier_id),
+            'montant' => $this->whenLoaded($this->montant),
             'status' => $this->whenAppended('status'),
-            'caissier' => $this->whenLoaded('caissier', fn () => $this->caissier),
+            'date' => $this->whenLoaded($this->date?->format('d-m-Y')),
+            'created_at' => $this->whenNotNull($this->created_at?->format('d-m-Y')),
+            'caissier' => $this->whenLoaded('caissier', fn() => $this->caissier),
             'guichet' => $this->whenLoaded('guichet', GuichetResource::make($this->guichet)),
-            'total' => $this->when(
-                $this->relationLoaded('encaissements'),
-                function () {
-                    $total = 0;
-                    foreach ($this->encaissements as $encaissement) {
-                        $total += $encaissement->relationLoaded('ordonnancement') ? $encaissement->ordonnancement->total : 0;
-                    }
-                    return $total;
-                },
-                0
-            ),
+            'total' => $this->whenNotNull($this->total),
         ];
     }
 }

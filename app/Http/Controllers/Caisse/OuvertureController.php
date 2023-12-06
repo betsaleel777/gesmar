@@ -21,13 +21,14 @@ class OuvertureController extends Controller
 
     public function getPaginate(): JsonResource
     {
-        $ouvertures = Ouverture::paginate(10);
+        $ouvertures = Ouverture::with('guichet.site:id,nom', 'guichet:id,nom,site_id', 'caissier:id,user_id', 'caissier.user:id,name')->paginate(10);
         return OuvertureListResource::collection($ouvertures);
     }
 
     public function getSearch(string $search): JsonResource
     {
-        $ouvertures = Ouverture::whereRaw("DATE_FORMAT(ouvertures.created_at,'%d-%m-%Y') LIKE ?", "$search%")
+        $ouvertures = Ouverture::with('guichet.site:id,nom', 'guichet:id,nom,site_id', 'caissier:id,user_id', 'caissier.user:id,name')
+            ->whereRaw("DATE_FORMAT(ouvertures.created_at,'%d-%m-%Y') LIKE ?", "$search%")
             ->orWhere('code', 'LIKE', "%$search%")
             ->orWhereHas('caissier.user', fn(Builder $query): Builder => $query->where('name', 'LIKE', "%$search%"))
             ->orWhereHas('guichet', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))->paginate(10);
@@ -47,11 +48,7 @@ class OuvertureController extends Controller
 
     public function getByMarche(int $id): JsonResponse
     {
-        $ouvertures = Ouverture::whereHas(
-            'site',
-            fn(Builder $query) =>
-            $query->where('id', $id)
-        )->get();
+        $ouvertures = Ouverture::whereHas('site', fn(Builder $query) => $query->where('id', $id))->get();
         return response()->json(['ouverture' => $ouvertures]);
     }
 

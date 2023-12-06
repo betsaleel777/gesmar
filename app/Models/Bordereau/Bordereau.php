@@ -63,6 +63,6 @@ class Bordereau extends Model implements Auditable
 
     public function collectes(): HasMany
     {
-        return $this->hasMany(Collecte::class);
+        return $this->hasMany(Collecte::class, 'bordereau_id');
     }
 }

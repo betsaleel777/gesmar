@@ -2,8 +2,12 @@
 
 namespace App\Http\Resources\Caisse;
 
+use App\Models\Finance\Cheque;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property Cheque resource
+ */
 class ChequeResource extends JsonResource
 {
     /**
@@ -15,11 +19,11 @@ class ChequeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'montant' => $this->montant,
-            'banque_id' => $this->banque_id,
-            'compte_id' => $this->compte_id,
-            'numero' => $this->numero,
-            'valeur' => $this->valeur,
+            'montant' => $this->whenNotNull($this->montant),
+            'banque_id' => $this->whenNotNull($this->banque_id),
+            'compte_id' => $this->whenNotNull($this->compte_id),
+            'numero' => $this->whenNotNull($this->numero),
+            'valeur' => $this->whenNotNull($this->valeur),
             'banque' => BanqueResource::make($this->whenLoaded('banque')),
             'compte' => CompteResource::make($this->whenLoaded('compte')),
         ];

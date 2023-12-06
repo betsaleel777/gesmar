@@ -3,7 +3,7 @@
 namespace App\Models\Caisse;
 
 use App\Enums\StatusEncaissement;
-use App\Events\EncaissementRegistred;
+use App\Models\Bordereau\Bordereau;
 use App\Models\Exploitation\Ordonnancement;
 use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,21 +21,14 @@ class Encaissement extends Model implements Auditable
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use \OwenIt\Auditing\Auditable;
 
-    protected $fillable = ['ordonnancement_id', 'payable_id', 'caissier_id', 'ouverture_id'];
+    protected $fillable = ['ordonnancement_id', 'bordereau_id', 'payable_id', 'caissier_id', 'ouverture_id'];
     protected $dates = ['created_at'];
-    const RULES = [
-        'ordonnancement_id' => 'required',
-    ];
     protected $appends = ['status'];
+    const RULES = ['ordonnancement_id' => 'required_without:bordereau_id', 'bordereau_id' => 'required_without:ordonnancement_id'];
+
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
-
-        static::created(function (Encaissement $encaissement) {
-            $ordonnancement = Ordonnancement::find($encaissement->ordonnancement_id);
-            $encaissement->setOpen();
-            EncaissementRegistred::dispatch($ordonnancement);
-        });
     }
 
     public function setClose(): void
@@ -59,10 +52,14 @@ class Encaissement extends Model implements Auditable
     }
 
     // relations directes
-
     public function ordonnancement(): BelongsTo
     {
         return $this->belongsTo(Ordonnancement::class);
+    }
+
+    public function bordereau(): BelongsTo
+    {
+        return $this->belongsTo(Bordereau::class);
     }
 
     public function payable()

@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Exploitation\Ordonnancement;
+use App\Models\Caisse\Encaissement;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -18,9 +18,9 @@ class EncaissementRegistred
      *
      * @return void
      */
-    public function __construct(public Ordonnancement $ordonnancement)
+    public function __construct(public Encaissement $encaissement)
     {
-        $this->ordonnancement = $ordonnancement;
+        $this->encaissement = $encaissement;
     }
 
     /**

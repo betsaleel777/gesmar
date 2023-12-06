@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Caisse;
 
+use App\Http\Resources\Bordereau\BordereauResource;
+use App\Http\Resources\Ordonnancement\OrdonnancementResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class EncaissementListeResource extends JsonResource
@@ -15,17 +17,15 @@ class EncaissementListeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'ordonnancement_id' => $this->ordonnancement_id,
-            'created_at' => $this->created_at->format('d-m-Y'),
-            'type' => str($this->payable_type)->explode('\\')[3],
-            'payable_id' => $this->payable_id,
-            'caissier_id' => $this->caissier_id,
+            'ordonnancement_id' => $this->whenNotNull($this->ordonnancement_id),
+            'payable_id' => $this->whenNotNull($this->payable_id),
+            'caissier_id' => $this->whenNotNull($this->caissier_id),
             'status' => $this->whenAppended('status'),
-            'ordonnancement' => $this->whenLoaded('ordonnancement', fn () => $this->ordonnancement->code),
-            'caissier' => $this->when(
-                $this->relationLoaded('caissier') and $this->caissier->relationLoaded('user'),
-                fn () => $this->caissier->user->name
-            ),
+            'created_at' => $this->whenNotNull($this->created_at?->format('d-m-Y')),
+            'type' => $this->whenNotNull($this->whenHas('payable_type', str($this->payable_type)->explode('\\')[3])),
+            'ordonnancement' => OrdonnancementResource::make($this->whenLoaded('ordonnancement')),
+            'bordereau' => BordereauResource::make($this->whenLoaded('bordereau')),
+            'caissier' => CaissierResource::make($this->whenLoaded('caissier')),
             $this->mergeWhen(str($this->payable_type)->explode('\\')[3] === 'Espece', [
                 'montant' => $this->payable->montant,
                 'versement' => $this->payable->versement,

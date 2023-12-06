@@ -2,18 +2,23 @@
 
 namespace App\Models\Caisse;
 
+use App\Models\Exploitation\Ordonnancement;
 use App\Models\Scopes\RecentScope;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as ContractAuditable;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
  * @mixin IdeHelperFermeture
  */
-class Fermeture extends Model implements Auditable
+class Fermeture extends Model implements ContractAuditable
 {
-    use \OwenIt\Auditing\Auditable;
+    use Auditable, HasRelationships;
 
     protected $fillable = ['code', 'ouverture_id', 'total'];
     protected $casts = ['total' => 'integer'];
@@ -47,5 +52,25 @@ class Fermeture extends Model implements Auditable
     public function ouverture(): BelongsTo
     {
         return $this->belongsTo(Ouverture::class);
+    }
+
+    public function ordonnancement(): HasManyDeep
+    {
+        return $this->hasManyDeep(
+            Ordonnancement::class,
+            [Ouverture::class, Encaissement::class],
+            ['id', 'ouverture_id', 'id'],
+            ['ouverture_id', 'id', 'ordonnancement_id']
+        );
+    }
+
+    public function guichet(): HasOneThrough
+    {
+        return $this->hasOneThrough(Guichet::class, Ouverture::class, 'id', 'id', 'ouverture_id', 'guichet_id');
+    }
+
+    public function caissier(): HasOneThrough
+    {
+        return $this->hasOneThrough(Caissier::class, Ouverture::class, 'id', 'id', 'ouverture_id', 'caissier_id');
     }
 }

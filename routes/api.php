@@ -487,8 +487,11 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
     Route::controller(BordereauController::class)->prefix('bordereaux')->group(function (): void {
         Route::get('/', 'index');
         Route::get('paginate', 'getPaginate');
+        Route::get('for-cashout', 'getForCashout');
         Route::get('search/{search}/paginate', 'getSearch');
         Route::get('select', 'getSelect');
+        Route::get('one-for-cashout/{id}', 'getOneForCashout');
+        Route::get('uncashed', 'getUncashed');
         Route::get('edit/{id}', 'getEdit');
         Route::get('for-collecte/{id}', 'getOneForCollecte');
         Route::get('{id}', 'show');

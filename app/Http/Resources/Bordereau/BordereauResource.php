@@ -14,7 +14,6 @@ class BordereauResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
      * @param  \Illuminate\Http\Request  $request
      */
     public function toArray($request): array
@@ -25,9 +24,11 @@ class BordereauResource extends JsonResource
             'status' => $this->whenNotNull($this->status),
             'site_id' => $this->whenNotNull($this->site_id),
             'jour' => $this->whenNotNull($this->jour?->format('d-m-Y')),
+            'total' => $this->whenNotNull($this->total),
             'commercial' => CommercialResource::make($this->whenLoaded('commercial')),
             'site' => SiteResource::make($this->whenLoaded('site')),
             'emplacements' => EmplacementListResource::collection($this->whenLoaded('emplacements')),
+            'collectes' => CollecteResource::collection($this->whenLoaded('collectes')),
         ];
     }
 }

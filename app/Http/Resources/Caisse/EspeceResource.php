@@ -15,8 +15,8 @@ class EspeceResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'montant' => $this->montant,
-            'versement' => $this->versement,
+            'montant' => $this->whenNotNull($this->montant),
+            'versement' => $this->whenNotNull($this->versement),
         ];
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Caisse;
 
-use App\Http\Resources\Bordereau\AttributionResource;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +16,8 @@ class CaissierResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
+            'user_id' => $this->whenNotNull($this->user_id),
+            'code' => $this->whenNotNull($this->code),
             'user' => UserResource::make($this->whenLoaded('user')),
             'attributions' => AttributionGuichetResource::collection($this->whenLoaded('attributionsGuichet')),
         ];
