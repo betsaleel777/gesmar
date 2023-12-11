@@ -39,6 +39,7 @@ class BordereauController extends Controller
 
     public function show(int $id): JsonResponse
     {
+        $calebasse = Bordereau::select('jour')->find($id);
         $bordereau = Bordereau::select('id', 'code', 'commercial_id', 'created_at', 'jour')->withSum('collectes as total', 'montant')
             ->with('commercial:id,user_id', 'commercial.user:id,name')
             ->with(['emplacements' => fn($query) => $query->select('emplacements.id', 'emplacements.code', 'emplacements.loyer')
@@ -62,8 +63,11 @@ class BordereauController extends Controller
 
     public function getOneForCollecte(int $id): JsonResource
     {
+        $calebasse = Bordereau::select('jour')->find($id);
         $bordereau = Bordereau::select('id', 'code', 'commercial_id', 'jour')->with('commercial.user:id,name', 'commercial:id,user_id')
-            ->with('emplacements:id,code,loyer')->find($id);
+            ->with(['emplacements' => fn(BelongsToMany $query): BelongsToMany =>
+                $query->select('emplacements.id', 'emplacements.code', 'emplacements.loyer')->removeAlreadyCollected($calebasse->jour),
+            ])->find($id);
         return BordereauResource::make($bordereau);
     }
 

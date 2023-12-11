@@ -502,6 +502,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
     Route::controller(CollecteController::class)->prefix('collectes')->group(function (): void {
         Route::get('/', 'index');
         Route::get('collected', 'getAlreadyCollected');
+        Route::get('globale-collected', 'getAlreadyGlobaleCollected');
         Route::post('store', 'store');
     });
     Route::prefix('caisses')->group(function (): void {

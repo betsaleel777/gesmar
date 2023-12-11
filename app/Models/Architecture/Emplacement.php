@@ -179,6 +179,18 @@ class Emplacement extends Model implements Auditable
                 ->where('bordereaux.jour', Carbon::parse($jour)->format('Y-m-d')));
     }
 
+    public function scopeRemoveAlreadyCollected(Builder $query, string $jour): Builder
+    {
+        return $query->whereNotIn('emplacements.id', fn($query) => $query->select('emplacements.id')->from('emplacements')
+                ->join('collectes', 'collectes.emplacement_id', '=', 'emplacements.id')
+                ->where('collectes.jour', Carbon::parse($jour)->format('Y-m-d')));
+        // ->whereNotIn('collectes.id', fn($query) => $query->select('collectes.id')->from('collectes')
+        //         ->whereBetween('collectes.jour', [Carbon::parse($jour)->subDays(15), Carbon::parse($jour)->format('Y-m-d')]));
+
+        //         Collecte::select('collectes.id')->from('collectes')->join('bordereaux','collectes.bordereau_id','=','bordereaux.id')
+        //         ->whereRaw('collectes.jour BETWEEN DATE_SUB(bordereaux.jour, INTERVAL 15 DAY) AND bordereaux.jour');
+    }
+
     //relations
 
     /**
