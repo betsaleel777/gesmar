@@ -22,16 +22,17 @@ class FactureInitialeController extends Controller
 
     public function getPaginate(): JsonResource
     {
-        $factures = Facture::with(['contrat' => ['personne', 'emplacement']])->isSuperMarket()->isInitiale()->isFacture()->paginate(10);
+        $factures = Facture::with(['contrat' => ['personne', 'emplacement']])->isSuperMarket()
+            ->isInitiale()->isFacture()->paginate(10);
         return FactureInitialeListResource::collection($factures);
     }
 
     public function getSearch(string $search): JsonResource
     {
         $factures = Facture::with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
             ->isSuperMarket()->isInitiale()->isFacture()->paginate(10);
 
         return FactureInitialeListResource::collection($factures);

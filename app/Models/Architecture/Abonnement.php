@@ -3,8 +3,6 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusAbonnement;
-use App\Events\AbonnementRegistred;
-use App\Events\AbonnementResilied;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasEmplacement;
 use App\Traits\HasEquipement;
@@ -12,8 +10,8 @@ use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\ModelStatus\HasStatuses;
 use OwenIt\Auditing\Contracts\Auditable;
+use Spatie\ModelStatus\HasStatuses;
 
 /**
  * @mixin IdeHelperAbonnement
@@ -28,10 +26,6 @@ class Abonnement extends Model implements Auditable
     protected $casts = ['index_depart' => 'integer', 'index_fin' => 'integer', 'index_autre' => 'integer'];
     protected $dates = ['created_at'];
     protected $auditExclude = ['code', 'site_id'];
-    /**
-     *
-     * @var array<int, string>
-     */
     protected $appends = ['status'];
 
     public const RULES = [
@@ -45,20 +39,10 @@ class Abonnement extends Model implements Auditable
 
     /**
      * The "booted" method of the model.
-     *
-     * @return void
      */
     protected static function booted()
     {
         static::addGlobalScope(new RecentScope);
-
-        static::deleted(function (Abonnement $abonnement) {
-            AbonnementResilied::dispatch($abonnement);
-        });
-
-        static::saved(function (Abonnement $abonnement) {
-            AbonnementRegistred::dispatch($abonnement);
-        });
     }
 
     public function stop(): void
@@ -79,9 +63,6 @@ class Abonnement extends Model implements Auditable
     // scopes
     /**
      * Obtenir les abonnements résiliés
-     *
-     * @param  Builder<Abonnement>  $query
-     * @return Builder<Abonnement>
      */
     public function scopeStopped(Builder $query): Builder
     {
@@ -90,9 +71,6 @@ class Abonnement extends Model implements Auditable
 
     /**
      * Obtenir les abonnements en cours
-     *
-     * @param  Builder<Abonnement>  $query
-     * @return Builder<Abonnement>
      */
     public function scopeProgressing(Builder $query): Builder
     {
@@ -101,9 +79,6 @@ class Abonnement extends Model implements Auditable
 
     /**
      * Obtenir les abonnements en erreur d'index
-     *
-     * @param  Builder<Abonnement>  $query
-     * @return Builder<Abonnement>
      */
     public function scopeIndexError(Builder $query): Builder
     {
@@ -112,9 +87,6 @@ class Abonnement extends Model implements Auditable
 
     /**
      * Obtenir les abonnements sans erreur d'index
-     *
-     * @param  Builder<Abonnement>  $query
-     * @return Builder<Abonnement>
      */
     public function scopeWithoutError(Builder $query): Builder
     {
@@ -123,7 +95,6 @@ class Abonnement extends Model implements Auditable
 
     /**
      * Obtenir les pavillons appartenant à la liste de site accéssible à l'utilisateur courant
-     *
      */
     public function scopeInside(Builder $query, array $sites): Builder
     {

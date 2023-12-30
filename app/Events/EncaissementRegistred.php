@@ -20,7 +20,6 @@ class EncaissementRegistred
      */
     public function __construct(public Encaissement $encaissement)
     {
-        $this->encaissement = $encaissement;
     }
 
     /**

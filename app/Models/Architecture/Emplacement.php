@@ -257,12 +257,25 @@ class Emplacement extends Model implements Auditable
         return $this->hasMany(Abonnement::class)->progressing();
     }
 
+    public function contrats(): HasMany
+    {
+        return $this->hasMany(Contrat::class);
+    }
+
     /**
      * Obtenir le contrat en cours sur un emplacement
      */
     public function contratActuel(): HasOne
     {
         return $this->hasOne(Contrat::class)->validated();
+    }
+
+    /**
+     * Obtenir le contrat en cours sur un emplacement
+     */
+    public function contratPending(): HasOne
+    {
+        return $this->hasOne(Contrat::class)->enAttente();
     }
 
     /**

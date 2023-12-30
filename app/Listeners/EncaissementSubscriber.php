@@ -33,7 +33,7 @@ class EncaissementSubscriber
         $contrat = Contrat::with('personne', 'emplacement')->findOrFail($ordonnancement->paiements->first()->facture->contrat_id);
         $contrat->codeContratGenerate();
         $contrat->save();
-        $contrat->status === StatusContrat::VALIDATED->value ?: $contrat->validated();
+        $contrat->status === StatusContrat::VALIDATED->value ?: $contrat->validate();
         $contrat->personne->status === StatusPersonne::CLIENT->name ?: $contrat->personne->client();
         if ($contrat->emplacement) {
             $contrat->emplacement->occuper();

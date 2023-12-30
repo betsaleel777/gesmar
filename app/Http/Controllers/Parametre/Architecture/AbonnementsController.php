@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Parametre\Architecture;
 
+use App\Events\AbonnementRegistred;
 use App\Events\AbonnementResilied;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Abonnement\AbonnementListResource;
@@ -9,12 +10,11 @@ use App\Http\Resources\Abonnement\AbonnementSelectResource;
 use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
-use App\Models\Exploitation\Contrat;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class AbonnementsController extends Controller
 {
@@ -62,7 +62,7 @@ class AbonnementsController extends Controller
             $abonnement->index_autre = $equipement['index_autre'];
             $abonnement->equipement_id = $equipement['id'];
             $abonnement->save();
-            $abonnement->process();
+            AbonnementRegistred::dispatch($abonnement);
         }
         $message = "L'abonnement $abonnement->code a été crée avec succès.";
         return response()->json(['message' => $message]);
@@ -72,15 +72,14 @@ class AbonnementsController extends Controller
     {
         $this->authorize('create', Abonnement::class);
         $request->validate(['equipement_id' => 'required', 'index_depart' => 'required', 'index_autre' => 'required']);
-        $equipement = Equipement::with('type')->findOrFail((int)$request->equipement_id);
+        $equipement = Equipement::with('type')->find((int) $request->equipement_id);
         $abonnement = new Abonnement($request->all());
         $abonnement->site_id = $equipement->site_id;
         $abonnement->code = self::codeGenerate($equipement->site_id);
         $abonnement->save();
-        $request->index_depart === (int)$request->index_autre ? $abonnement->process() : $abonnement->error();
-        Contrat::find($request->contrat_id)->equipements()->updateExistingPivot($equipement->type, ['abonnable' => false]);
+        AbonnementRegistred::dispatch($abonnement);
         $message = "L'abonnement $abonnement->code a été crée avec succès.";
-        return response()->json(['message' => $message, 'abonnement' => $abonnement]);
+        return response()->json(['message' => $message]);
     }
 
     public function update(int $id, Request $request): JsonResponse
@@ -125,11 +124,10 @@ class AbonnementsController extends Controller
     public function getRentalbyMonthGear(string $date): JsonResponse
     {
         $nestedRelation = 'emplacement.contratActuel.facturesEquipements';
-        $requete = Abonnement::with(['equipement', 'emplacement.contratActuel' => ['personne', 'facturesEquipements']])->progressing()
-            ->whereHas('emplacement.contratActuel', fn (Builder $query) => $query->where('auto_valid', false));
-        $abonnements = $requete->whereDoesntHave($nestedRelation, fn (Builder $query) => $query->where('periode', $date))->get();
-        // à revoir
-        $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn (Builder $query) => $query->where('periode', $date)->isUnpaid())->get();
+        $requete = Abonnement::with(['equipement', 'emplacement.contratActuel' => ['personne', 'facturesEquipements']])
+            ->progressing()->whereHas('emplacement.contratActuel', fn(Builder $query) => $query->where('auto_valid', false));
+        $abonnements = $requete->whereDoesntHave($nestedRelation, fn(Builder $query) => $query->where('periode', $date))->get();
+        $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn(Builder $query) => $query->where('periode', $date)->isUnpaid())->get();
         $abonnements->merge($abonnementsFactureUnpaid)->filter();
         return response()->json(['abonnements' => $abonnements]);
     }

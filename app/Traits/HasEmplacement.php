@@ -10,10 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 trait HasEmplacement
 {
-    /**
-     *
-     * @return BelongsTo<Emplacement, self>
-     */
     public function emplacement(): BelongsTo
     {
         return $this->belongsTo(Emplacement::class);

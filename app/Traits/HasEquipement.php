@@ -10,10 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 trait HasEquipement
 {
-    /**
-     *
-     * @return BelongsTo<Equipement, self>
-     */
     public function equipement(): BelongsTo
     {
         return $this->belongsTo(Equipement::class);

@@ -18,10 +18,9 @@ class FactureAnnexeResource extends JsonResource
         return [
             'id' => $this->id,
             'code' => $this->code,
-            'status' => $this->whenAppended('status'),
-            'contrat_code' => $this->whenLoaded('contrat', fn () => $this->contrat->code),
+            'contrat_code' => $this->whenLoaded('contrat', fn() => $this->contrat->code),
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),
-            'paiements' => PaiementResource::make($this->whenLoaded('paiements')),
+            'paiements' => PaiementResource::collection($this->whenLoaded('paiements')),
         ];
     }
 }

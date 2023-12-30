@@ -9,6 +9,7 @@ use App\Http\Controllers\Caisse\CompteController;
 use App\Http\Controllers\Caisse\EncaissementController;
 use App\Http\Controllers\Caisse\FermetureController;
 use App\Http\Controllers\Caisse\OuvertureController;
+use App\Http\Controllers\Decisionel\DashbaordController;
 use App\Http\Controllers\Exploitation\Maintenance\ReparationController;
 use App\Http\Controllers\Exploitation\Maintenance\TechnicienController;
 use App\Http\Controllers\Exploitation\Reception\ClientsController;
@@ -534,4 +535,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
             Route::put('{id}', 'update');
         });
     });
+});
+Route::middleware('auth:sanctum')->controller(DashbaordController::class)->prefix('dashboard')->group(function (): void {
+    Route::get('reception', 'reception');
 });

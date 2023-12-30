@@ -17,13 +17,13 @@ class FactureAnnexeListResource extends JsonResource
             'id' => $this->id,
             'code' => $this->code,
             'status' => $this->whenAppended('status'),
-            'contrat_code' => $this->whenLoaded('contrat', fn () => $this->contrat->code),
+            'contrat_code' => $this->whenLoaded('contrat', fn() => $this->contrat->code),
             'personne' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
-                fn () => $this->contrat->personne->alias
+                fn() => $this->contrat->personne->getAlias()
             ),
-            'annexe' => $this->whenLoaded('annexe', fn () => $this->annexe->nom),
-            'prix' => $this->whenLoaded('annexe', fn () => $this->annexe->prix),
+            'annexe' => $this->whenLoaded('annexe', fn() => $this->annexe->nom),
+            'prix' => $this->whenLoaded('annexe', fn() => $this->annexe->prix),
         ];
     }
 }

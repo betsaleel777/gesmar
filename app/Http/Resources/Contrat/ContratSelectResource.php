@@ -17,8 +17,8 @@ class ContratSelectResource extends JsonResource
             'id' => $this->id,
             'code' => $this->codification(),
             'texte' => match (true) {
-                !empty($this->annexe) and $this->relationLoaded('personne') =>  $this->codification() . '-' . $this->annexe->code . '-' . $this->personne->alias,
-                !empty($this->emplacement) and $this->relationLoaded('personne') => $this->codification() . '-' . $this->emplacement->code . '-' . $this->personne->alias
+                !empty($this->annexe) and $this->relationLoaded('personne') => $this->codification() . '-' . $this->annexe->code . '-' . $this->personne->getAlias(),
+                !empty($this->emplacement) and $this->relationLoaded('personne') => $this->codification() . '-' . $this->emplacement->code . '-' . $this->personne->getAlias()
             },
         ];
     }

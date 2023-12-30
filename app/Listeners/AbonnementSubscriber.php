@@ -17,11 +17,16 @@ class AbonnementSubscriber
 
     public function updateDependenciesAfterCreate(AbonnementRegistred $event): void
     {
-        $equipement = Equipement::findOrFail($event->abonnement->equipement_id);
+        $event->abonnement->index_depart === $event->abonnement->index_autre ? $event->abonnement->process() : $event->abonnement->error();
+        $equipement = Equipement::find($event->abonnement->equipement_id);
         $equipement->emplacement_id = $event->abonnement->emplacement_id;
         $equipement->save();
         $equipement->liaison === StatusEquipement::LINKED->value ?: $equipement->lier();
         $equipement->abonner();
+        $contrat = $event->abonnement->load('emplacement:id', 'emplacement.contratPending')->emplacement->contratPending;
+        if ($contrat) {
+            $contrat->equipements()->updateExistingPivot($equipement->type, ['abonnable' => false]);
+        }
     }
 
     /**

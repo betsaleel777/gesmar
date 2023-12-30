@@ -3,6 +3,7 @@
 namespace App\Models\Finance;
 
 use App\Enums\StatusFacture;
+use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Paiement;
@@ -40,21 +41,11 @@ class Facture extends Model implements Auditable
         'periode',
     ];
     protected $auditExclude = ['code'];
-    /**
-     *
-     * @var array<int, string>
-     */
+
     protected $with = ['contrat'];
-    /**
-     *
-     * @var array<int, string>
-     */
+
     protected $appends = ['status'];
-    /**
-     * les propriétés qui doivent être caster.
-     *
-     * @var array<string, string>
-     */
+
     protected $casts = [
         'avance' => 'integer', 'caution' => 'integer', 'index_fin' => 'integer',
         'pas_porte' => 'integer', 'index_depart' => 'integer', 'contrat_id' => 'integer',
@@ -82,8 +73,6 @@ class Facture extends Model implements Auditable
 
     /**
      * règles du formulaire de création d'une facture initiale
-     *
-     * @return array<string, string>
      */
     public static function initialeRules(): array
     {
@@ -104,8 +93,6 @@ class Facture extends Model implements Auditable
 
     /**
      * règles du formulaire de création d'une facture d'équipement
-     *
-     * @return array<string, string>
      */
     public static function gearRules(): array
     {
@@ -120,8 +107,6 @@ class Facture extends Model implements Auditable
 
     /**
      * règles du formulaire de création d'une facture de loyer (bail)
-     *
-     * @return array<string, string>
      */
     public static function loyerRules(): array
     {
@@ -167,9 +152,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les facture de service annexes
-     *
-     * @param  Builder<Facture>  $query
-     * @return Builder<Facture>
      */
     public function scopeIsAnnexe(Builder $query): Builder
     {
@@ -178,9 +160,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les factures d'équipement
-     *
-     * @param  Builder<Facture>  $query
-     * @return Builder<Facture>
      */
     public function scopeIsEquipement(Builder $query): Builder
     {
@@ -189,9 +168,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les factures initiales
-     *
-     * @param  Builder<Facture>  $query
-     * @return Builder<Facture>
      */
     public function scopeIsInitiale(Builder $query): Builder
     {
@@ -200,9 +176,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les factures de loyer
-     *
-     * @param  Builder<Facture>  $query
-     * @return Builder<Facture>
      */
     public function scopeIsLoyer(Builder $query): Builder
     {
@@ -211,9 +184,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les prospects
-     *
-     * @param Builder<Facture> $query
-     * @return Builder<Facture>
      */
     public function scopeIsPaid(Builder $query): Builder
     {
@@ -222,9 +192,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les factures payées partielements ou impayées
-     *
-     * @param Builder<Facture> $query
-     * @return Builder<Facture>
      */
     public function scopeIsUnpaid(Builder $query): Builder
     {
@@ -233,9 +200,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les proformas
-     *
-     * @param Builder<Facture> $query
-     * @return Builder<Facture>
      */
     public function scopeIsProforma(Builder $query): Builder
     {
@@ -244,9 +208,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les factures
-     *
-     * @param Builder<Facture> $query
-     * @return Builder<Facture>
      */
     public function scopeIsFacture(Builder $query): Builder
     {
@@ -255,21 +216,16 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les factures pour les emplacement avec paiement de loyer mensuel à l'ordonnancement
-     *
-     * @param Builder<Facture> $query
-     * @return Builder<Facture>
      */
     public function scopeIsSuperMarket(Builder $query): Builder
     {
-        return $query->whereHas('contrat', fn (Builder $query) => $query->where('auto_valid', false));
+        return $query->whereHas('contrat', fn(Builder $query) => $query->where('auto_valid', false));
     }
 
     // relations
 
     /**
      * Undocumented function
-     *
-     * @return BelongsTo<ServiceAnnexe, Facture>
      */
     public function annexe(): BelongsTo
     {
@@ -278,8 +234,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Undocumented function
-     *
-     * @return BelongsTo<Contrat, Facture>
      */
     public function contrat(): BelongsTo
     {
@@ -288,8 +242,6 @@ class Facture extends Model implements Auditable
 
     /**
      * Obtenir les paiements d'une facture
-     *
-     * @return HasMany<Paiement>
      */
     public function paiements(): HasMany
     {

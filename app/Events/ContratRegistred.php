@@ -20,8 +20,6 @@ class ContratRegistred
      */
     public function __construct(public Contrat $contrat, public int $avance = 0)
     {
-        $this->contrat = $contrat;
-        $this->avance = $avance;
     }
 
     /**

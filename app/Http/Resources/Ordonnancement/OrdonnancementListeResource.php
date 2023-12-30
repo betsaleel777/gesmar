@@ -21,15 +21,15 @@ class OrdonnancementListeResource extends JsonResource
             'created_at' => $this->created_at->format('d-m-Y'),
             'personne' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
-                fn () => $this->contrat->personne->alias
+                fn() => $this->contrat->personne->getAlias()
             ),
             'emplacement' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('emplacement'),
-                fn () => $this->contrat->emplacement?->code
+                fn() => $this->contrat->emplacement?->code
             ),
             'annexe' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('annexe'),
-                fn () => $this->contrat->annexe?->code
+                fn() => $this->contrat->annexe?->code
             ),
         ];
     }
