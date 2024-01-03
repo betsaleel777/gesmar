@@ -8,8 +8,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Abonnement\EquipementListResource;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -30,8 +32,7 @@ class EquipementsController extends Controller
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Equipement::class);
-        $requete = Equipement::select('nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id', 'site_id', 'emplacement_id')
-            ->with('site:id,nom', 'type:id,nom');
+        $requete = Equipement::select('id', 'nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id', 'site_id', 'emplacement_id')->with('site:id,nom', 'type:id,nom');
         if ($response->allowed()) {
             $equipements = $requete->get();
         } else {
@@ -39,6 +40,22 @@ class EquipementsController extends Controller
             $equipements = $requete->inside($sites)->get();
         }
         return response()->json(['equipements' => EquipementListResource::collection($equipements)]);
+    }
+
+    public function getPaginate(): JsonResource
+    {
+        $equipements = Equipement::select('id', 'nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id', 'site_id', 'emplacement_id', 'abonnement', 'liaison')->with('site:id,nom', 'type:id,nom')->paginate(10);
+        return EquipementListResource::collection($equipements);
+    }
+
+    public function getSearch(string $search): JsonResource
+    {
+        $equipements = Equipement::select('nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id',
+            'site_id', 'emplacement_id', 'abonnement', 'liaison')->with('site:id,nom', 'type:id,nom')
+            ->where('code', 'LIKE', "%$search%")->orWhere('nom', 'LIKE', "%$search%")
+            ->orWhereHas('type', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))
+            ->paginate(10);
+        return EquipementListResource::collection($equipements);
     }
 
     public function store(Request $request): JsonResponse

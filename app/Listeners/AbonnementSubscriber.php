@@ -2,9 +2,11 @@
 
 namespace App\Listeners;
 
+use App\Enums\StatusEmplacement;
 use App\Enums\StatusEquipement;
 use App\Events\AbonnementRegistred;
 use App\Events\AbonnementResilied;
+use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\Equipement;
 
 class AbonnementSubscriber
@@ -23,6 +25,8 @@ class AbonnementSubscriber
         $equipement->save();
         $equipement->liaison === StatusEquipement::LINKED->value ?: $equipement->lier();
         $equipement->abonner();
+        $emplacement = Emplacement::find($event->abonnement->emplacement_id);
+        $emplacement->liaison === StatusEmplacement::LINKED->value ?: $emplacement->lier();
         $contrat = $event->abonnement->load('emplacement:id', 'emplacement.contratPending')->emplacement->contratPending;
         if ($contrat) {
             $contrat->equipements()->updateExistingPivot($equipement->type, ['abonnable' => false]);

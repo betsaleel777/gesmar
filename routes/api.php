@@ -163,6 +163,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     });
     Route::controller(AbonnementsController::class)->prefix('abonnements')->group(function (): void {
         Route::get('/', 'all');
+        Route::get('/paginate', 'getPaginate');
+        Route::get('/search/{search}/paginate', 'getSearch');
         Route::get('/trashed', 'trashed');
         Route::get('/rental-gear/{date}', 'getRentalbyMonthGear');
         Route::post('/store', 'store');
@@ -186,6 +188,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     });
     Route::controller(EquipementsController::class)->prefix('equipements')->group(function (): void {
         Route::get('/', 'all');
+        Route::get('/paginate', 'getPaginate');
+        Route::get('/search/{search}/paginate', 'getSearch');
         Route::get('/trashed', 'trashed');
         Route::get('/unlinkedsubscribed', 'getUnlinkedsubscribed');
         Route::get('{id}', 'show');

@@ -13,6 +13,7 @@ use App\Models\Architecture\Site;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -36,6 +37,20 @@ class AbonnementsController extends Controller
             $abonnements = Abonnement::with('emplacement', 'equipement')->inside($sites)->get();
         }
         return response()->json(['abonnements' => AbonnementListResource::collection($abonnements)]);
+    }
+
+    public function getPaginate(): JsonResource
+    {
+        $abonnements = Abonnement::with('emplacement', 'equipement')->paginate(10);
+        return AbonnementListResource::collection($abonnements);
+    }
+
+    public function getSearch(string $search): JsonResource
+    {
+        $abonnements = Abonnement::with('emplacement', 'equipement')->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('equipement', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))->paginate(10);
+        return AbonnementListResource::collection($abonnements);
     }
 
     public function select(): JsonResponse
