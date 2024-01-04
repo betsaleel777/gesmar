@@ -126,6 +126,13 @@ class Equipement extends Model implements Auditable
         return $query->whereIn('site_id', $sites);
     }
 
+    public function scopeFilterBetweenLiaisonDate(
+        Builder $query, ?array $dates, string $status = StatusEquipement::LINKED->value): Builder {
+        [$start, $end] = $dates;
+        return $query->when($dates, fn(Builder $query): Builder =>
+            $query->whereHasLiaison(fn(Builder $query): Builder => $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
+    }
+
     /**
      * Undocumented function
      */

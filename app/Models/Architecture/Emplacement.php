@@ -37,17 +37,12 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Summary of stateMachines
-     * @var array<string, class-string>
      */
     public $stateMachines = ['disponibilite' => StatusDisponibiliteState::class, 'liaison' => StatusLiaisonsState::class];
     protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'loyer', 'pas_porte', 'caution'];
-    /**
-     * @var array<int, string>
-     */
+
     protected $appends = ['auto'];
-    /**
-     * @var array<string, string>
-     */
+
     protected $casts = [
         'superficie' => 'integer', 'loyer' => 'integer', 'pas_porte' => 'integer', 'caution' => 'integer',
     ];
@@ -184,18 +179,30 @@ class Emplacement extends Model implements Auditable
         return $query->whereNotIn('emplacements.id', fn($query) => $query->select('emplacements.id')->from('emplacements')
                 ->join('collectes', 'collectes.emplacement_id', '=', 'emplacements.id')
                 ->where('collectes.jour', Carbon::parse($jour)->format('Y-m-d')));
-        // ->whereNotIn('collectes.id', fn($query) => $query->select('collectes.id')->from('collectes')
-        //         ->whereBetween('collectes.jour', [Carbon::parse($jour)->subDays(15), Carbon::parse($jour)->format('Y-m-d')]));
+    }
 
-        //         Collecte::select('collectes.id')->from('collectes')->join('bordereaux','collectes.bordereau_id','=','bordereaux.id')
-        //         ->whereRaw('collectes.jour BETWEEN DATE_SUB(bordereaux.jour, INTERVAL 15 DAY) AND bordereaux.jour');
+    public function scopeFilterBetweenDisponibilityDate(
+        Builder $query, ?array $dates, string $status = StatusEmplacement::FREE->value): Builder {
+        [$start, $end] = $dates;
+        return $query->when($dates, fn(Builder $query): Builder =>
+            $query->whereHasDisponibilite(fn(Builder $query): Builder => $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
+    }
+
+    public function scopeFilterBetweenLiaisonDate(
+        Builder $query, ?array $dates, string $status = StatusEmplacement::LINKED->value): Builder {
+        [$start, $end] = $dates;
+        return $query->when($dates, fn(Builder $query): Builder =>
+            $query->whereHasLiaison(fn(Builder $query): Builder => $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
+    }
+
+    public function scopeFilterBetweenSubscribeDate(Builder $query, ?array $dates, bool $subscribed = true): Builder
+    {
+        [$start, $end] = $dates;
+        $hasBetween = $subscribed ? fn(Builder $query) => $query->whereHas('abonnementsActuels', fn(Builder $query) : Builder => $query->whereBetween('created_at', [$start, $end])): $query->whereDoesntHave('abonnementsActuels', fn(Builder $query): Builder => $query->whereBetween('created_at', [$start, $end]));
+        return $query->when($dates, fn(Builder $query): Builder => $hasBetween($query));
     }
 
     //relations
-
-    /**
-     * Obtenir la zone d'un emplacement
-     */
     public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class);

@@ -9,7 +9,7 @@ use App\Http\Controllers\Caisse\CompteController;
 use App\Http\Controllers\Caisse\EncaissementController;
 use App\Http\Controllers\Caisse\FermetureController;
 use App\Http\Controllers\Caisse\OuvertureController;
-use App\Http\Controllers\Decisionel\DashbaordController;
+use App\Http\Controllers\Decisionel\DashboardReceptionController;
 use App\Http\Controllers\Exploitation\Maintenance\ReparationController;
 use App\Http\Controllers\Exploitation\Maintenance\TechnicienController;
 use App\Http\Controllers\Exploitation\Reception\ClientsController;
@@ -540,6 +540,13 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
         });
     });
 });
-Route::middleware('auth:sanctum')->controller(DashbaordController::class)->prefix('dashboard')->group(function (): void {
-    Route::get('reception', 'reception');
+Route::middleware('auth:sanctum')->prefix('dashboard')->group(function (): void {
+    Route::prefix('reception')->controller(DashboardReceptionController::class)->group(function (): void {
+        Route::get('validation-rate', 'demandeValidationRate');
+        Route::get('conversion-rate', 'personneConversionRate');
+        Route::get('busy-rate', 'emplacementBusyRate');
+        Route::get('equipped-rate', 'emplacementEquippedRate');
+        Route::get('linked-rate', 'equipementLinkedRate');
+        Route::get('subscribed-rate', 'emplacementSubscribedRate');
+    });
 });
