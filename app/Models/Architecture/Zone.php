@@ -38,7 +38,14 @@ class Zone extends Model implements Auditable
     public function getCode(): ?string
     {
         $this->loadMissing('niveau:niveaux.id,niveaux.code', 'pavillon:pavillons.id,pavillons.code');
-        return $this->pavillon?->code . $this->niveau?->code . str((string) $this->code)->padLeft(4, '0');
+        return str((string) $this->pavillon?->code)->padLeft(2, '0') . $this->niveau?->code . str((string) $this->code)->padLeft(4, '0');
+    }
+
+    public function getLongName(): ?string
+    {
+        $this->loadMissing('niveau:niveaux.id,niveaux.nom', 'pavillon:pavillons.id,pavillons.nom', 'site:sites.id,sites.nom');
+        return str($this->nom)->lower() . ' ' . str($this->niveau?->nom)->lower() . ' ' . str($this->pavillon?->nom)->lower() . ' ' .
+        str($this->site?->nom)->lower();
     }
 
     /**

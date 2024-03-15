@@ -29,10 +29,10 @@ class EmplacementsController extends Controller
      */
     private static function codeGenerate(int $id): array
     {
-        $zone = Zone::with('emplacements')->findOrFail($id);
+        $zone = Zone::with('emplacements')->find($id);
         $rang = (string) ($zone->emplacements->count() + 1);
         $place = str_pad($rang, 3, '0', STR_PAD_LEFT);
-        $code = $zone->code . $place;
+        $code = $zone->getCode() . $place;
         return ['code' => $code, 'rang' => $rang];
     }
 

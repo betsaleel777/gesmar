@@ -2,8 +2,12 @@
 
 namespace App\Http\Resources\Emplacement;
 
+use App\Models\Architecture\Zone;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property Zone resource
+ */
 class ZoneSelectResource extends JsonResource
 {
     /**
@@ -15,7 +19,7 @@ class ZoneSelectResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'texte' => $this->nom . ' ' . $this->code . ' ' . $this->whenLoaded('site', fn() => str($this->site->nom)->lower()),
+            'texte' => $this->resource->getLongName(),
         ];
     }
 }

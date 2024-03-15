@@ -55,13 +55,15 @@ class ZonesController extends Controller implements StandardControllerInterface
     {
         $response = Gate::inspect('viewAny', Zone::class);
         if ($response->allowed()) {
-            $zones = Zone::with('site', 'pavillon', 'niveau')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+            $zones = Zone::with('site:sites.id,sites.nom', 'pavillon:pavillons.id,pavillons.nom', 'niveau:niveaux.id,niveaux.nom')
+                ->where('nom', 'LIKE', '%' . $request->query('search') . '%')
                 ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
                 ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))
                 ->orWhereHas('niveau', fn(Builder $query) => $query->where('niveaux.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
         } else {
             $sites = Auth::user()->sites->modelkeys();
-            $zones = Zone::with('site', 'pavillon', 'niveau')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+            $zones = Zone::with('site:sites.id,sites.nom', 'pavillon:pavillons.id,pavillons.nom', 'niveau:niveaux.id,niveaux.nom')
+                ->where('nom', 'LIKE', '%' . $request->query('search') . '%')
                 ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%', true)
                         ->whereIn('sites.id', $sites))
                 ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))
