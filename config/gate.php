@@ -107,6 +107,7 @@ return [
             'bordereau' => [
                 'acceder' => 'accès à la liste des bordereau',
                 'global' => 'tout les bordereaux sont visibles',
+                'update' => 'modifier un bordereau',
                 'own' => 'bordereaux visible par leur créateur',
                 'show' => "voir les détails d'un bordereau",
             ],
