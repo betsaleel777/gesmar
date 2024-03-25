@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use App\Models\Architecture\Emplacement;
 use App\Models\Exploitation\Contrat;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -21,7 +20,7 @@ class ContratScheduled
      *
      * @return void
      */
-    public function __construct(public Contrat $contrat, public Emplacement $emplacement)
+    public function __construct(public Contrat $contrat)
     {
     }
 

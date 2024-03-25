@@ -42,7 +42,8 @@ class ContratSubscriber
         $event->contrat->save();
         $personne = Personne::findOrFail($event->contrat->personne_id);
         $personne->client();
-        $event->emplacement->occuper();
+        $emplacement = Emplacement::find($event->contrat->emplacement_id);
+        $emplacement->occuper();
     }
 
     public function updateFactureStatus(FactureStatusChange $event): void
@@ -57,8 +58,7 @@ class ContratSubscriber
         if ($event->contrat->isAnnexe()) {
             $this->createFactureAnnexe($event);
         } else {
-            $event->contrat->load('emplacement.type');
-            $event->contrat->emplacement->type->auto_valid ?: $this->createFactureInitiale($event);
+            $event->contrat->auto_valid ?: $this->createFactureInitiale($event);
         }
     }
 
@@ -71,7 +71,7 @@ class ContratSubscriber
         return [
             ContratRegistred::class => 'createFacture',
             FactureStatusChange::class => 'updateFactureStatus',
-            ContratScheduled::class => 'validerSansSigner'
+            ContratScheduled::class => 'validerSansSigner',
         ];
     }
 }

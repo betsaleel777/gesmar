@@ -333,6 +333,10 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
             Route::get('/personne/{id}', [ContratController::class, 'contratByPerson']);
             Route::controller(ContratsAnnexesController::class)->prefix('annexes')->group(function (): void {
                 Route::get('/', 'all');
+                Route::get('/paginate', 'getPaginate');
+                Route::get('/search/{search}/paginate', 'getSearch');
+                Route::get('/valides/paginate', 'getValidesPaginate');
+                Route::get('/valides/search/{search}/paginate', 'getValidesSearch');
                 Route::get('/valides', 'valides');
                 Route::get('/trashed', 'trashed');
                 Route::post('/store', 'store');
@@ -344,6 +348,10 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
             });
             Route::controller(ContratsEmplacementsController::class)->prefix('emplacements')->group(function (): void {
                 Route::get('/', 'all');
+                Route::get('/paginate', 'getPaginate');
+                Route::get('/search/{search}/paginate', 'getSearch');
+                Route::get('/valides/paginate', 'getValidesPaginate');
+                Route::get('/valides/search/{search}/paginate', 'getValidesSearch');
                 Route::get('/print/{id}', 'print');
                 Route::get('/valides', 'valides');
                 Route::get('/trashed', 'trashed');

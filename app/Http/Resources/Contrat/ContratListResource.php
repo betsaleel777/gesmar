@@ -17,7 +17,7 @@ class ContratListResource extends JsonResource
         return [
             'id' => $this->id,
             'code' => $this->code_contrat ?? $this->code,
-            'created_at' => $this->created_at->format('d-m-Y'),
+            'created_at' => $this->created_at?->format('d-m-Y'),
             'status' => $this->whenAppended('status'),
             'emplacement' => $this->whenLoaded('emplacement', fn() => $this->emplacement->code),
             'annexe' => $this->whenLoaded('annexe', fn() => $this->annexe->code),
