@@ -4,6 +4,7 @@ namespace App\Models\Finance;
 
 use App\Models\Caisse\Banque;
 use App\Models\Caisse\Encaissement;
+use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +28,11 @@ class Cheque extends Model implements Auditable
         'numero' => 'required',
         'valeur' => 'required|same:montant',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
 
     /**
      * Undocumented function

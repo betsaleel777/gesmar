@@ -14,13 +14,13 @@ class SitesController extends Controller
 {
     public function all(): JsonResponse
     {
-        $marches = Site::get();
+        $marches = Site::bySiteAttribuate()->get();
         return response()->json(['marches' => SiteResource::collection($marches)]);
     }
 
     public function select(): JsonResponse
     {
-        $marches = Site::select('id', 'nom')->get();
+        $marches = Site::select('id', 'nom')->bySiteAttribuate()->get();
         return response()->json(['marches' => SiteSelectResource::collection($marches)]);
     }
 
@@ -62,10 +62,9 @@ class SitesController extends Controller
 
     public function trash(int $id): JsonResponse
     {
-        $marche = Site::findOrFail($id);
+        $marche = Site::find($id);
         $marche->delete();
-        $message = "Le marché $marche->nom a été supprimé avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le marché $marche->nom a été supprimé avec succès."]);
     }
 
     public function restore(int $id): JsonResponse

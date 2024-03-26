@@ -3,6 +3,7 @@
 namespace App\Models\Architecture;
 
 use App\Models\Exploitation\Contrat;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,6 +35,7 @@ class TypeEquipement extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     /**

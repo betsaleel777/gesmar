@@ -2,6 +2,8 @@
 
 namespace App\Models\Architecture;
 
+use App\Models\Scopes\OwnSiteScope;
+use App\Models\Scopes\RecentScope;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -37,6 +39,15 @@ class Pavillon extends Model implements Auditable
     const PUSH_RULES = [
         'nombre' => 'required|numeric|min:1',
     ];
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
+    }
 
     public function getCode(): ?string
     {

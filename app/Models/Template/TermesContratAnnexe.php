@@ -7,13 +7,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-
 /**
  * @mixin IdeHelperTermesContratAnnexe
  */
 class TermesContratAnnexe extends TermesContrat implements HasMedia
 {
-    use  InteractsWithMedia;
+    use InteractsWithMedia;
 
     protected $table = 'termes_contrats';
 
@@ -27,15 +26,12 @@ class TermesContratAnnexe extends TermesContrat implements HasMedia
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->type = self::TYPE;
     }
 
-    protected static function booted()
+    protected static function booted(): void
     {
-        $type = self::TYPE;
-        static::addGlobalScope('annexe', function (Builder $builder) use ($type) {
-            $builder->where('type', $type);
-        });
+        parent::boot();
+        static::addGlobalScope('annexe', fn(Builder $builder): Builder => $builder->where('type', self::TYPE));
     }
 
     public function codeGenerate(): void

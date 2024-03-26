@@ -3,6 +3,7 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusAbonnement;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasEmplacement;
 use App\Traits\HasEquipement;
@@ -43,6 +44,7 @@ class Abonnement extends Model implements Auditable
     protected static function booted()
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     public function stop(): void

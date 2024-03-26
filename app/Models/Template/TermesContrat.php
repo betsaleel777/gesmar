@@ -3,14 +3,16 @@
 namespace App\Models\Template;
 
 use App\Enums\StatusTermeContrat;
+use App\Models\Scopes\OwnSiteScope;
+use App\Models\Scopes\RecentScope;
 use App\Models\User;
 use App\States\Terme\StatusTermeStateMachine;
 use App\Traits\HasSites;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -25,13 +27,13 @@ class TermesContrat extends Model implements Auditable
 
     const RULES = ['site_id' => 'required', 'contenu' => 'required'];
 
-    /**
-     * Summary of stateMachines
-     * @var array<string, class-string>
-     */
-    public $stateMachines = [
-        'status' => StatusTermeStateMachine::class,
-    ];
+    public $stateMachines = ['status' => StatusTermeStateMachine::class];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
+    }
 
     public function used(): void
     {

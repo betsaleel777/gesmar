@@ -2,6 +2,8 @@
 
 namespace App\Models\Architecture;
 
+use App\Models\Scopes\OwnSiteScope;
+use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,6 +36,12 @@ class Zone extends Model implements Auditable
     const PUSH_RULES = [
         'nombre' => 'required|numeric|min:1',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
+    }
 
     public function getCode(): ?string
     {

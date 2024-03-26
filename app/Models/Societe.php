@@ -2,21 +2,20 @@
 
 namespace App\Models;
 
-use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use OwenIt\Auditing\Contracts\Auditable;
+use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Spatie\Image\Manipulations;
-use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @mixin IdeHelperSociete
  */
 class Societe extends Model implements HasMedia, Auditable
 {
-    use HasSites, InteractsWithMedia;
+    use InteractsWithMedia;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'sigle', 'siege', 'capital', 'smartphone', 'email', 'phone'];

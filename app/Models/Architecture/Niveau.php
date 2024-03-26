@@ -2,6 +2,8 @@
 
 namespace App\Models\Architecture;
 
+use App\Models\Scopes\OwnSiteScope;
+use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,13 +36,19 @@ class Niveau extends Model implements Auditable
         'nombre' => 'required|numeric|min:1',
     ];
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
+    }
+
     /**
      * Obtenir les niveau appartenant à la liste de site
      *
      */
     public function scopeInside(Builder $query, array $sites): Builder
     {
-        return $query->whereHas('sites', fn ($query) => $query->whereIn('sites.id', $sites));
+        return $query->whereHas('sites', fn($query) => $query->whereIn('sites.id', $sites));
     }
 
     /**

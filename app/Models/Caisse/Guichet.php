@@ -3,6 +3,7 @@
 namespace App\Models\Caisse;
 
 use App\Enums\StatusGuichet;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,6 +37,7 @@ class Guichet extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     public function codeGenerate(): void

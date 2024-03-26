@@ -5,6 +5,7 @@ namespace App\Models\Architecture;
 use App\Enums\StatusEmplacement;
 use App\Models\Bordereau\Bordereau;
 use App\Models\Exploitation\Contrat;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\States\Emplacement\StatusDisponibiliteState;
 use App\States\Emplacement\StatusLiaisonsState;
@@ -66,6 +67,7 @@ class Emplacement extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     /**

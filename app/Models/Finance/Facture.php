@@ -59,10 +59,6 @@ class Facture extends Model implements Auditable
     protected static function booted()
     {
         static::addGlobalScope(new RecentScope);
-
-        static::deleted(function (Facture $facture) {
-            Contrat::findOrFail($facture->contrat_id)->delete();
-        });
     }
 
     public function codeGenerate(string $prefix): void
@@ -77,7 +73,7 @@ class Facture extends Model implements Auditable
     public static function initialeRules(): array
     {
         return [
-            ...self::RULES, ...[
+             ...self::RULES, ...[
                 'avance' => 'required|numeric',
                 'caution' => 'required|numeric',
                 'pas_porte' => 'required|numeric',
@@ -97,7 +93,7 @@ class Facture extends Model implements Auditable
     public static function gearRules(): array
     {
         return [
-            ...self::RULES, ...[
+             ...self::RULES, ...[
                 'equipement_id' => 'required|numeric',
                 'index_depart' => 'required|numeric',
                 'index_fin' => 'required|numeric',
@@ -110,7 +106,7 @@ class Facture extends Model implements Auditable
      */
     public static function loyerRules(): array
     {
-        return [...self::RULES, ...['periode' => 'required']];
+        return [ ...self::RULES, ...['periode' => 'required']];
     }
 
     public function payer(): void

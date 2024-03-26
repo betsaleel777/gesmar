@@ -3,6 +3,7 @@
 namespace App\Models\Finance;
 
 use App\Models\Caisse\Encaissement;
+use App\Models\Scopes\RecentScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -21,6 +22,11 @@ class Espece extends Model implements Auditable
         'montant' => 'required',
         'versement' => 'required',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
 
     /**
      * Undocumented function

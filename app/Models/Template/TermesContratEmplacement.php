@@ -26,15 +26,12 @@ class TermesContratEmplacement extends TermesContrat implements HasMedia
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->type = self::TYPE;
     }
 
-    protected static function booted()
+    protected static function booted(): void
     {
-        $type = self::TYPE;
-        static::addGlobalScope('bail', function (Builder $builder) use ($type) {
-            $builder->where('type', $type);
-        });
+        parent::boot();
+        static::addGlobalScope('bail', fn(Builder $builder): Builder => $builder->where('type', self::TYPE));
     }
 
     public function codeGenerate(): void

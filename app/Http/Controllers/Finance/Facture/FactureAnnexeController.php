@@ -28,11 +28,10 @@ class FactureAnnexeController extends FactureController
     public function getSearch(string $search): JsonResource
     {
         $factures = Facture::with('contrat.personne', 'annexe')->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.annexe', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.annexe', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
             ->isAnnexe()->isFacture()->paginate(10);
-
         return FactureAnnexeListResource::collection($factures);
     }
 

@@ -12,7 +12,7 @@ class BanqueController extends Controller
 {
     public function all(): JsonResponse
     {
-        $banques = Banque::get();
+        $banques = Banque::with('site')->get();
         return response()->json(['banques' => BanqueResource::collection($banques)]);
     }
 
@@ -28,14 +28,14 @@ class BanqueController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $banque = Banque::findOrFail($id);
+        $banque = Banque::with('site')->find($id);
         $this->authorize('view', $banque);
         return response()->json(['banque' => $banque]);
     }
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $banque = Banque::findOrFail($id);
+        $banque = Banque::find($id);
         $this->authorize('update', $banque);
         $request->validate(Banque::RULES);
         $banque->update($request->all());

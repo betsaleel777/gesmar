@@ -2,6 +2,8 @@
 
 namespace App\Models\Caisse;
 
+use App\Models\Scopes\OwnSiteScope;
+use App\Models\Scopes\RecentScope;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +16,6 @@ class Compte extends Model implements Auditable
 {
     use HasFactory, HasSites;
     use \OwenIt\Auditing\Auditable;
-
 
     protected $fillable = ['code', 'nom', 'site_id'];
     protected $dates = ['created_at'];
@@ -30,4 +31,10 @@ class Compte extends Model implements Auditable
         'code' => 'required',
         'nom' => 'required|max:191',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
+    }
 }

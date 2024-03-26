@@ -3,6 +3,7 @@
 namespace App\Models\Architecture;
 
 use App\Enums\ModeServiceAnnexe;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasContrats;
 use App\Traits\HasSites;
@@ -28,9 +29,13 @@ class ServiceAnnexe extends Model implements Auditable
         'mode' => 'required',
     ];
 
-    protected static function booted(): void
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted()
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     public function codeGenerate(): void

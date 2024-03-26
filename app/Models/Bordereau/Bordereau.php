@@ -4,6 +4,8 @@ namespace App\Models\Bordereau;
 
 use App\Enums\StatusBordereau;
 use App\Models\Architecture\Emplacement;
+use App\Models\Scopes\OwnSiteScope;
+use App\Models\Scopes\RecentScope;
 use App\StateMachines\BordereauStateMachine;
 use App\Traits\HasSites;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
@@ -24,6 +26,12 @@ class Bordereau extends Model implements Auditable
     protected $casts = ['jour' => 'date'];
     protected $table = 'bordereaux';
     public $stateMachines = ['status' => BordereauStateMachine::class];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
+    }
 
     public function codeGenerate(): void
     {

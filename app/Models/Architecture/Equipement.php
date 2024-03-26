@@ -3,6 +3,7 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusEquipement;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\States\Equipement\StatusAbonnementState;
 use App\States\Equipement\StatusLiaisonsState;
@@ -52,6 +53,7 @@ class Equipement extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
     /**
      *

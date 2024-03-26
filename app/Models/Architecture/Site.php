@@ -3,7 +3,10 @@
 namespace App\Models\Architecture;
 
 use App\Models\Exploitation\Personne;
+use App\Models\Scopes\RecentScope;
+use App\Models\User;
 use App\Traits\HasContrats;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -43,6 +46,18 @@ class Site extends Model implements Auditable
             'commune' => 'required',
             'ville' => 'required',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new RecentScope);
+    }
+
+    public function scopeBySiteAttribuate(Builder $query): Builder
+    {
+        $user = User::with('sites')->find(auth()->user()->id);
+        return $query->when(!$user->hasRole(SUPERROLE), fn(Builder $query): Builder =>
+            $query->whereIn("sites.id", $user->sites->modelkeys()));
     }
 
     public function pavillons(): HasMany

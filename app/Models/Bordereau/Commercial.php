@@ -2,6 +2,7 @@
 
 namespace App\Models\Bordereau;
 
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Models\User;
 use App\Traits\HasSites;
@@ -39,6 +40,7 @@ class Commercial extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     public function codeGenerate(): void
