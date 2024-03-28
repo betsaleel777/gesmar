@@ -7,12 +7,14 @@ use App\Http\Resources\Caisse\BanqueResource;
 use App\Models\Caisse\Banque;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class BanqueController extends Controller
 {
     public function all(): JsonResponse
     {
-        $banques = Banque::with('site')->get();
+        $response = Gate::inspect('viewAny', Banque::class);
+        $banques = $response->allowed() ? Banque::with('site')->get() : Banque::with('site')->owner()->get();
         return response()->json(['banques' => BanqueResource::collection($banques)]);
     }
 
@@ -22,8 +24,7 @@ class BanqueController extends Controller
         $request->validate(Banque::RULES);
         $banque = new Banque($request->all());
         $banque->save();
-        $message = "La banque: $banque->sigle a été enregistré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "La banque: $banque->sigle a été enregistré avec succès."]);
     }
 
     public function show(int $id): JsonResponse
@@ -39,7 +40,6 @@ class BanqueController extends Controller
         $this->authorize('update', $banque);
         $request->validate(Banque::RULES);
         $banque->update($request->all());
-        $message = 'La banque a été modifié avec succès.';
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => 'La banque a été modifié avec succès.']);
     }
 }

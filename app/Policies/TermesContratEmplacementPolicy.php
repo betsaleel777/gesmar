@@ -4,11 +4,12 @@ namespace App\Policies;
 
 use App\Models\Template\TermesContratEmplacement;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TermesContratEmplacementPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
     /**
      * Determine whether the user can view any models.

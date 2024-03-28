@@ -10,6 +10,8 @@ use App\Models\Scopes\RecentScope;
 use App\States\Emplacement\StatusDisponibiliteState;
 use App\States\Emplacement\StatusLiaisonsState;
 use App\Traits\HasContrats;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,9 +34,11 @@ class Emplacement extends Model implements Auditable
 {
     use SoftDeletes;
     use HasStateMachines;
-    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use HasResponsible;
+    use HasOwnerScope;
     use HasContrats;
     use \OwenIt\Auditing\Auditable;
+    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
     /**
      * Summary of stateMachines
@@ -45,7 +49,10 @@ class Emplacement extends Model implements Auditable
     protected $appends = ['auto'];
 
     protected $casts = [
-        'superficie' => 'integer', 'loyer' => 'integer', 'pas_porte' => 'integer', 'caution' => 'integer',
+        'superficie' => 'integer',
+        'loyer' => 'integer',
+        'pas_porte' => 'integer',
+        'caution' => 'integer',
     ];
 
     public const RULES = [
@@ -187,7 +194,8 @@ class Emplacement extends Model implements Auditable
         Builder $query, ?array $dates, string $status = StatusEmplacement::FREE->value): Builder {
         [$start, $end] = $dates;
         return $query->when($dates, fn(Builder $query): Builder =>
-            $query->whereHasDisponibilite(fn(Builder $query): Builder => $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
+            $query->whereHasDisponibilite(fn(Builder $query): Builder =>
+                $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
     }
 
     public function scopeFilterBetweenLiaisonDate(

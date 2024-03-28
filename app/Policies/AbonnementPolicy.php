@@ -4,102 +4,76 @@ namespace App\Policies;
 
 use App\Models\Architecture\Abonnement;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 
 class AbonnementPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
+    private static function userCheck(User $user, Abonnement $abonnement): bool
+    {
+        return $abonnement->load('shortAudit')->shortAudit->user_id === $user->id;
+    }
+
     public function viewAny(User $user)
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        $user->can(config('gate.abonnement.list-global')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Abonnement $abonnement)
+    public function view(User $user, Abonnement $abonnement): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
+        return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->can(config('gate.abonnement.create')) ? true : false;
+    }
+
+    public function update(User $user, Abonnement $abonnement): bool
+    {
+        if ($user->can(config('gate.abonnement.edit'))) {
+            return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function delete(User $user, Abonnement $abonnement): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
+        if ($user->can(config('gate.abonnement.trash'))) {
+            return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Abonnement $abonnement)
+    public function abort(User $user, Abonnement $abonnement): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
+        if ($user->can(config('gate.abonnement.abort'))) {
+            return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Abonnement $abonnement)
+    public function restore(User $user, Abonnement $abonnement): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
+        if ($user->can(config('gate.abonnement.restore'))) {
+            return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Abonnement $abonnement)
+    public function forceDelete(User $user, Abonnement $abonnement): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
+        if ($user->can(config('gate.abonnement.delete'))) {
+            return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
+        } else {
+            return false;
         }
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Abonnement $abonnement)
-    {
-        //
     }
 }

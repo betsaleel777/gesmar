@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as ContractsAuditable;
 
+/**
+ * @mixin IdeHelperCollecte
+ */
 class Collecte extends Model implements ContractsAuditable
 {
     use Auditable;

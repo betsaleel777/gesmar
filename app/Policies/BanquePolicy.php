@@ -4,104 +4,67 @@ namespace App\Policies;
 
 use App\Models\Caisse\Banque;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 
 class BanquePolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
+    private static function userCheck(User $user, Banque $banque): bool
+    {
+        return $banque->load('shortAudit')->shortAudit->user_id === $user->id;
+    }
+
     public function viewAny(User $user)
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        $user->can(config('gate.banque.list-global')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Banque $banque)
+    public function view(User $user, Banque $banque): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->can(config('gate.abonnement.create')) ? true : false;
+    }
+
+    public function update(User $user, Banque $banque): bool
+    {
+        if ($user->can(config('gate.banque.edit'))) {
+            return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function delete(User $user, Banque $banque): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        if ($user->can(config('gate.banque.trash'))) {
+            return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Banque $banque)
+    public function restore(User $user, Banque $banque): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        if ($user->can(config('gate.banque.restore'))) {
+            return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Banque $banque)
+    public function forceDelete(User $user, Banque $banque): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Banque $banque)
-    {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Banque $banque)
-    {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        if ($user->can(config('gate.banque.delete'))) {
+            return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
+        } else {
+            return false;
         }
     }
 }

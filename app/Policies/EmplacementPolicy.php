@@ -4,12 +4,13 @@ namespace App\Policies;
 
 use App\Models\Architecture\Emplacement;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 
 class EmplacementPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
     /**
      * Determine whether the user can view any models.

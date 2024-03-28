@@ -4,12 +4,13 @@ namespace App\Policies;
 
 use App\Models\Architecture\Niveau;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 
 class NiveauPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
     /**
      * Determine whether the user can view any models.

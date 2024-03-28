@@ -177,7 +177,6 @@ class EmplacementsController extends Controller
 
     /**
      * Insertion massive d'emplacement de même attributs
-     *
      */
     public function push(Request $request): JsonResponse
     {

@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AbonnementsController extends Controller
@@ -30,38 +29,34 @@ class AbonnementsController extends Controller
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Abonnement::class);
-        if ($response->allowed()) {
-            $abonnements = Abonnement::with('emplacement', 'equipement')->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $abonnements = Abonnement::with('emplacement', 'equipement')->inside($sites)->get();
-        }
+        $query = Abonnement::with('emplacement', 'equipement');
+        $abonnements = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['abonnements' => AbonnementListResource::collection($abonnements)]);
     }
 
     public function getPaginate(): JsonResource
     {
-        $abonnements = Abonnement::with('emplacement', 'equipement')->paginate(10);
+        $response = Gate::inspect('viewAny', Abonnement::class);
+        $query = Abonnement::with('emplacement', 'equipement');
+        $abonnements = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return AbonnementListResource::collection($abonnements);
     }
 
     public function getSearch(string $search): JsonResource
     {
-        $abonnements = Abonnement::with('emplacement', 'equipement')->where('code', 'LIKE', "%$search%")
+        $response = Gate::inspect('viewAny', Abonnement::class);
+        $query = Abonnement::with('emplacement', 'equipement')->where('code', 'LIKE', "%$search%")
             ->orWhereHas('emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->orWhereHas('equipement', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))->paginate(10);
+            ->orWhereHas('equipement', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"));
+        $abonnements = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return AbonnementListResource::collection($abonnements);
     }
 
     public function select(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Abonnement::class);
-        if ($response->allowed()) {
-            $abonnements = Abonnement::with('emplacement', 'equipement.type')->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $abonnements = Abonnement::with('emplacement', 'equipement.type')->inside($sites)->get();
-        }
+        $query = Abonnement::with('emplacement', 'equipement.type');
+        $abonnements = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['abonnements' => AbonnementSelectResource::collection($abonnements)]);
     }
 
@@ -79,8 +74,7 @@ class AbonnementsController extends Controller
             $abonnement->save();
             AbonnementRegistred::dispatch($abonnement);
         }
-        $message = "L'abonnement $abonnement->code a été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'abonnement $abonnement->code a été crée avec succès."]);
     }
 
     public function insert(Request $request): JsonResponse
@@ -93,18 +87,16 @@ class AbonnementsController extends Controller
         $abonnement->code = self::codeGenerate($equipement->site_id);
         $abonnement->save();
         AbonnementRegistred::dispatch($abonnement);
-        $message = "L'abonnement $abonnement->code a été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'abonnement $abonnement->code a été crée avec succès."]);
     }
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $abonnement = Abonnement::findOrFail($id);
+        $abonnement = Abonnement::find($id);
         $this->authorize('update', $abonnement);
         $request->validate(Abonnement::RULES);
         $abonnement->update($request->all());
-        $message = "L'abonnement $request->code a été modifié avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'abonnement $request->code a été modifié avec succès."]);
     }
 
     public function show(int $id): JsonResponse
@@ -117,23 +109,22 @@ class AbonnementsController extends Controller
     public function lastIndex(int $id): JsonResponse
     {
         $equipement = null;
-        $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->orderBy('id', 'DESC')->firstWhere('equipement_id', $id);
-        if (empty($abonnement->index_depart)) {
-            $equipement = Equipement::findOrFail($id);
-        }
+        $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->firstWhere('equipement_id', $id);
+        $this->authorize('view', $abonnement);
+        if (empty($abonnement->index_depart)) {$equipement = Equipement::findOrFail($id);}
         return response()->json(['index' => $abonnement->index_fin ?? $abonnement->index_depart ?? $equipement?->index]);
     }
 
     public function finish(int $id, Request $request): JsonResponse
     {
+        $abonnement = Abonnement::find($id);
+        $this->authorize('abort', $abonnement);
         $request->validate(Abonnement::FINISH_RULES);
-        $abonnement = Abonnement::findOrFail($id);
         $abonnement->index_fin = $request->indexFin;
         $abonnement->save();
         $abonnement->stop();
         AbonnementResilied::dispatch($abonnement);
-        $message = "L'abonnement $request->code a été résilié avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'abonnement $request->code a été résilié avec succès."]);
     }
 
     public function getRentalbyMonthGear(string $date): JsonResponse

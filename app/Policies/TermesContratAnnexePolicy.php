@@ -4,11 +4,12 @@ namespace App\Policies;
 
 use App\Models\Template\TermesContratAnnexe;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TermesContratAnnexePolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
     /**
      * Determine whether the user can view any models.

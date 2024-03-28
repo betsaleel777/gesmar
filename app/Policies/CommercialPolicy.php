@@ -4,33 +4,31 @@ namespace App\Policies;
 
 use App\Models\Finance\Commercial;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CommercialPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
     /**
      * Determine whether the user can view any models.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Commercial  $commercial
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Commercial $commercial)
+    public function view(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -51,7 +49,7 @@ class CommercialPolicy
      * @param  \App\Models\Commercial  $commercial
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Commercial $commercial)
+    public function update(User $user)
     {
         //
     }
@@ -63,7 +61,7 @@ class CommercialPolicy
      * @param  \App\Models\Commercial  $commercial
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Commercial $commercial)
+    public function delete(User $user)
     {
         //
     }
@@ -75,7 +73,7 @@ class CommercialPolicy
      * @param  \App\Models\Commercial  $commercial
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Commercial $commercial)
+    public function restore(User $user)
     {
         //
     }
@@ -87,7 +85,7 @@ class CommercialPolicy
      * @param  \App\Models\Commercial  $commercial
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Commercial $commercial)
+    public function forceDelete(User $user)
     {
         //
     }

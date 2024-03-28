@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperBordereau
+ */
 class Bordereau extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable, HasSites, HasStateMachines;

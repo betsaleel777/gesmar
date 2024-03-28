@@ -2,13 +2,14 @@
 
 namespace App\Policies;
 
-use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Spatie\Permission\Models\Permission;
 
 class PermissionPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
     /**
      * Determine whether the user can view any models.
