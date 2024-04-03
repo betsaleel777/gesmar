@@ -27,13 +27,6 @@ class BanqueController extends Controller
         return response()->json(['message' => "La banque: $banque->sigle a été enregistré avec succès."]);
     }
 
-    public function show(int $id): JsonResponse
-    {
-        $banque = Banque::with('site')->find($id);
-        $this->authorize('view', $banque);
-        return response()->json(['banque' => $banque]);
-    }
-
     public function update(int $id, Request $request): JsonResponse
     {
         $banque = Banque::find($id);

@@ -5,105 +5,19 @@ namespace App\Policies;
 use App\Models\User;
 use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Response;
 
 class PermissionPolicy
 {
     use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
     public function viewAny(User $user)
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        $user->can(config('gate.permission.list')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Permission  $permission
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Permission $permission)
+    public function update(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
-    {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Permission  $permission
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Permission $permission)
-    {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Permission  $permission
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Permission $permission)
-    {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Permission  $permission
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Permission $permission)
-    {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Permission  $permission
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Permission $permission)
-    {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.permission.edit')) ? true : false;
     }
 }

@@ -22,14 +22,9 @@ class BanquePolicy
         $user->can(config('gate.banque.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Banque $banque): bool
-    {
-        return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
-    }
-
     public function create(User $user): bool
     {
-        return $user->can(config('gate.abonnement.create')) ? true : false;
+        return $user->can(config('gate.banque.create')) ? true : false;
     }
 
     public function update(User $user, Banque $banque): bool

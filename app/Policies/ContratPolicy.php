@@ -12,96 +12,104 @@ class ContratPolicy
 {
     use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
+    private static function userCheck(User $user, Contrat $contrat): bool
+    {
+        return $contrat->load('shortAudit')->shortAudit->user_id === $user->id;
+    }
+
     public function viewAny(User $user)
     {
-        $user->can(config('gate.exploitation.reception.demande.global')) ? Response::allow() : Response::deny();
+        $user->can(config('gate.contrat.list-global')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User $user
-     * @param  \App\Models\Contrat $contrat
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Contrat $contrat)
+    public function viewValidAny(User $user)
     {
-        if ($user->can(config('gate.exploitation.reception.demande.show'))) {
-            return true;
+        $user->can(config('gate.contrat.list-valid-global')) ? Response::allow() : Response::deny();
+    }
+
+    public function viewValid(User $user, Contrat $contrat): bool
+    {
+        if ($user->can(config('gate.contrat.valid-show'))) {
+            return $user->can(config('gate.contrat.list-valid-own')) ? self::userCheck($user, $contrat) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
+    public function view(User $user, Contrat $contrat): bool
+    {
+        if ($user->can(config('gate.contrat.show'))) {
+            return $user->can(config('gate.contrat.list-own')) ? self::userCheck($user, $contrat) : true;
+        } else {
+            return false;
+        }
+    }
+
     public function create(User $user)
     {
-        if ($user->can(config('gate.exploitation.reception.demande.create'))) {
-            return true;
+        return $user->can(config('gate.contrat.create')) ? true : false;
+    }
+
+    public function update(User $user, Contrat $contrat): bool
+    {
+        if ($user->can(config('gate.contrat.edit'))) {
+            return $user->can(config('gate.contrat.list-own')) ? self::userCheck($user, $contrat) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User $user
-     * @param  \App\Models\Contrat $contrat
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Contrat $contrat)
+    public function delete(User $user, Contrat $contrat): bool
     {
-
-        if ($user->can(config('gate.exploitation.reception.demande.edit'))) {
-            return true;
+        if ($user->can(config('gate.contrat.trash'))) {
+            return $user->can(config('gate.contrat.list-own')) ? self::userCheck($user, $contrat) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User $user
-     * @param  \App\Models\Contrat $contrat
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Contrat $contrat)
+    public function restore(User $user, Contrat $contrat): bool
     {
-        if ($user->can(config('gate.exploitation.reception.demande.trash'))) {
-            return true;
+        if ($user->can(config('gate.restore.trash'))) {
+            return $user->can(config('gate.contrat.list-own')) ? self::userCheck($user, $contrat) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User $user
-     * @param  \App\Models\Contrat $contrat
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Contrat $contrat)
+    public function forceDelete(User $user, Contrat $contrat): bool
     {
-        if ($user->can(config('gate.exploitation.reception.demande.restore'))) {
-            return true;
+        if ($user->can(config('gate.contrat.delete'))) {
+            return $user->can(config('gate.contrat.list-own')) ? self::userCheck($user, $contrat) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User $user
-     * @param  \App\Models\Contrat $contrat
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Contrat $contrat)
+    public function schedule(User $user, Contrat $contrat): bool
     {
-        return true;
+        if ($user->can(config('gate.contrat.schedule'))) {
+            return $user->can(config('gate.contrat.list-own')) ? self::userCheck($user, $contrat) : true;
+        } else {
+            return false;
+        }
+    }
+
+    public function endorse(User $user, Contrat $contrat): bool
+    {
+        if ($user->can(config('gate.contrat.endorse'))) {
+            return $user->can(config('gate.contrat.list-own')) ? self::userCheck($user, $contrat) : true;
+        } else {
+            return false;
+        }
+    }
+
+    public function validate(User $user, Contrat $contrat): bool
+    {
+        if ($user->can(config('gate.contrat.validate'))) {
+            return $user->can(config('gate.contrat.list-own')) ? self::userCheck($user, $contrat) : true;
+        } else {
+            return false;
+        }
     }
 }

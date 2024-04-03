@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class EquipementsController extends Controller
@@ -33,28 +32,26 @@ class EquipementsController extends Controller
     {
         $response = Gate::inspect('viewAny', Equipement::class);
         $requete = Equipement::select('id', 'nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id', 'site_id', 'emplacement_id')->with('site:id,nom', 'type:id,nom');
-        if ($response->allowed()) {
-            $equipements = $requete->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $equipements = $requete->inside($sites)->get();
-        }
+        $equipements = $response->allowed() ? $requete->get() : $requete->owner()->get();
         return response()->json(['equipements' => EquipementListResource::collection($equipements)]);
     }
 
     public function getPaginate(): JsonResource
     {
-        $equipements = Equipement::select('id', 'nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id', 'site_id', 'emplacement_id', 'abonnement', 'liaison')->with('site:id,nom', 'type:id,nom')->paginate(10);
+        $response = Gate::inspect('viewAny', Equipement::class);
+        $query = Equipement::select('id', 'nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id', 'site_id', 'emplacement_id', 'abonnement', 'liaison')->with('site:id,nom', 'type:id,nom');
+        $equipements = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return EquipementListResource::collection($equipements);
     }
 
     public function getSearch(string $search): JsonResource
     {
-        $equipements = Equipement::select('nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id',
+        $response = Gate::inspect('viewAny', Equipement::class);
+        $query = Equipement::select('nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id',
             'site_id', 'emplacement_id', 'abonnement', 'liaison')->with('site:id,nom', 'type:id,nom')
             ->where('code', 'LIKE', "%$search%")->orWhere('nom', 'LIKE', "%$search%")
-            ->orWhereHas('type', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))
-            ->paginate(10);
+            ->orWhereHas('type', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"));
+        $equipements = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return EquipementListResource::collection($equipements);
     }
 
@@ -69,42 +66,35 @@ class EquipementsController extends Controller
         $equipement->save();
         is_null($equipement->emplacement_id) ?: $equipement->lier();
         EquipementRegistred::dispatchIf(!is_null($equipement->emplacement_id), $equipement);
-        $message = "L'équipement $equipement->nom a été enregistré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'équipement $equipement->nom a été enregistré avec succès."]);
     }
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $equipement = Equipement::findOrFail($id);
+        $equipement = Equipement::find($id);
         $this->authorize('update', $equipement);
         $request->validate(Equipement::RULES);
         $ancienEmplacement = (int) $equipement->emplacement_id;
         $equipement->update($request->all());
         $eventCondition = $ancienEmplacement !== (int) $equipement->emplacement_id;
         EquipementRegistred::dispatchIf($eventCondition, $equipement, $ancienEmplacement);
-        $message = "L'équipement $equipement->nom a été modifié avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'équipement $equipement->nom a été modifié avec succès."]);
     }
 
     public function trash(int $id): JsonResponse
     {
-        $equipement = Equipement::findOrFail($id);
+        $equipement = Equipement::find($id);
         $this->authorize('delete', $equipement);
         $equipement->delete();
         EquipementRemoved::dispatch($equipement);
-        $message = "L'équipement $equipement->nom a été supprimé avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'équipement $equipement->nom a été supprimé avec succès."]);
     }
 
     public function trashed(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Equipement::class);
-        if ($response->allowed()) {
-            $equipements = Equipement::onlyTrashed()->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $equipements = Equipement::onlyTrashed()->inside($sites)->get();
-        }
+        $query = Equipement::onlyTrashed();
+        $equipements = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['equipements' => $equipements]);
     }
 
@@ -113,8 +103,7 @@ class EquipementsController extends Controller
         $equipement = Equipement::withTrashed()->find($id);
         $this->authorize('restore', $equipement);
         $equipement->restore();
-        $message = "L'équipement $equipement->nom a été restauré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'équipement $equipement->nom a été restauré avec succès."]);
     }
 
     public function show(int $id): JsonResponse

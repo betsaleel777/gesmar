@@ -4,6 +4,8 @@ namespace App\Models\Caisse;
 
 use App\Models\Scopes\RecentScope;
 use App\Models\User;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +19,8 @@ class Caissier extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
+    use HasOwnerScope;
+    use HasResponsible;
 
     protected $fillable = ['code', 'user_id'];
     protected $dates = ['created_at'];

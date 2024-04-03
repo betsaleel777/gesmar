@@ -12,97 +12,50 @@ class CaissierPolicy
 {
     use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
+    private static function userCheck(User $user, Caissier $caissier): bool
+    {
+        return $caissier->load('shortAudit')->shortAudit->user_id === $user->id;
+    }
+
     public function viewAny(User $user)
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        $user->can(config('gate.caissier.list-global')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Caissier  $caissier
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Caissier $caissier)
+    public function view(User $user, Caissier $caissier): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        return $user->can(config('gate.caissier.list-own')) ? self::userCheck($user, $caissier) : true;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->can(config('gate.caissier.create')) ? true : false;
+    }
+
+    public function delete(User $user, Caissier $caissier): bool
+    {
+        if ($user->can(config('gate.caissier.trash'))) {
+            return $user->can(config('gate.caissier.list-own')) ? self::userCheck($user, $caissier) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function restore(User $user, Caissier $caissier): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        if ($user->can(config('gate.caissier.restore'))) {
+            return $user->can(config('gate.caissier.list-own')) ? self::userCheck($user, $caissier) : true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Caissier  $caissier
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Caissier $caissier)
+    public function attribuate(User $user, Caissier $caissier): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Caissier  $caissier
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Caissier $caissier)
-    {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Caissier  $caissier
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Caissier $caissier)
-    {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Caissier  $caissier
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Caissier $caissier)
-    {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        if ($user->can(config('gate.caissier.attribuate'))) {
+            return $user->can(config('gate.caissier.list-own')) ? self::userCheck($user, $caissier) : true;
+        } else {
+            return false;
         }
     }
 }

@@ -7,102 +7,59 @@ use App\Models\User;
 use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
+use ReflectionClass;
 
 class GuichetPolicy
 {
     use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
+    private static function userCheck(User $user, Guichet $guichet): bool
+    {
+        return $guichet->load('shortAudit')->shortAudit->user_id === $user->id;
+    }
+
+    private static function checkPermissionWithOwner(User $user, Guichet $guichet, string $action): bool
+    {
+        $name = str((new ReflectionClass($guichet))->getShortName())->lower();
+        if ($user->can(config("gate.$name.$action"))) {
+            return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $guichet) : true;
+        } else {
+            return false;
+        }
+    }
+
     public function viewAny(User $user)
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        $user->can(config('gate.guichet.list-global')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Guichet  $guichet
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Guichet $guichet)
+    public function view(User $user, Guichet $guichet): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $guichet, 'show');
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function create(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
+        return $user->can(config('gate.guichet.create')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Guichet  $guichet
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Guichet $guichet)
+    public function update(User $user, Guichet $guichet): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $guichet, 'edit');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Guichet  $guichet
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Guichet $guichet)
+    public function delete(User $user, Guichet $guichet): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $guichet, 'trash');
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Guichet  $guichet
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Guichet $guichet)
+    public function restore(User $user, Guichet $guichet): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $guichet, 'restore');
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Guichet  $guichet
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Guichet $guichet)
+    public function forceDelete(User $user, Guichet $guichet): bool
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $guichet, 'delete');
     }
 }

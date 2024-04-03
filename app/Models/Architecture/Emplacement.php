@@ -149,19 +149,19 @@ class Emplacement extends Model implements Auditable
     }
 
     /**
+     * Obtenir les emplacements d'un marché ou site précis
+     */
+    public function scopeBySite(Builder $query, int $id): Builder
+    {
+        return $query->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id));
+    }
+
+    /**
      * Obtenir les emplacements qui dont les contrat se valide sans passer par l'ordonnancement
      */
     public function scopeWithoutSchedule(Builder $query): Builder
     {
         return $query->whereHas('type', fn(Builder $query) => $query->where('auto_valid', true));
-    }
-
-    /**
-     * Obtenir les emplacements appartenant à la liste de site accéssible
-     */
-    public function scopeInside(Builder $query, array $sites): Builder
-    {
-        return $query->whereHas('sites', fn($query) => $query->whereIn('sites.id', $sites));
     }
 
     public function scopeRemoveAlreadyAssignedToBordereau(Builder $query, int $site, string $jour): Builder

@@ -24,7 +24,11 @@ class AbonnementPolicy
 
     public function view(User $user, Abonnement $abonnement): bool
     {
-        return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
+        if ($user->can(config('gate.abonnement.show'))) {
+            return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
+        } else {
+            return false;
+        }
     }
 
     public function create(User $user): bool
