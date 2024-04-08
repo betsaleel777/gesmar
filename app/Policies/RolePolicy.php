@@ -5,58 +5,38 @@ namespace App\Policies;
 use App\Models\User;
 use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Spatie\Permission\Models\Role;
 
 class RolePolicy
 {
     use HandlesAuthorization, HasPolicyFilter;
 
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.list')) ? true : false;
     }
 
-    public function view(User $user, Role $role)
+    public function create(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.create')) ? true : false;
     }
 
-    public function create(User $user)
+    public function update(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.edit')) ? true : false;
     }
 
-    public function update(User $user, Role $role)
+    public function delete(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.trash')) ? true : false;
     }
 
-    public function delete(User $user, Role $role)
+    public function restore(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.restore')) ? true : false;
     }
 
-    public function restore(User $user, Role $role)
+    public function forceDelete(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
-    }
-
-    public function forceDelete(User $user, Role $role)
-    {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.delete')) ? true : false;
     }
 }

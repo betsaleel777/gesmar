@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Caisse;
 
+use App\Events\FermetureRegistred;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Caisse\FermetureListResource;
 use App\Http\Resources\Caisse\FermetureResource;
@@ -10,48 +11,57 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 class FermetureController extends Controller
 {
 
     public function index(): JsonResponse
     {
-        $fermetures = Fermeture::with('ouverture.encaissements.ordonnancement')->get();
+        $response = Gate::inspect('viewAny', Fermeture::class);
+        $query = Fermeture::with('ouverture.encaissements.ordonnancement');
+        $fermetures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['fermetures' => FermetureListResource::collection($fermetures)]);
     }
 
     public function getPaginate(): JsonResource
     {
-        $fermetures = Fermeture::with('guichet:guichets.id,guichets.nom', 'caissier:caissiers.id,caissiers.user_id', 'caissier.user:id,name')->paginate(10);
+        $response = Gate::inspect('viewAny', Fermeture::class);
+        $query = Fermeture::with('guichet:guichets.id,guichets.nom', 'caissier:caissiers.id,caissiers.user_id', 'caissier.user:id,name');
+        $fermetures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FermetureListResource::collection($fermetures);
     }
 
     public function getSearch(string $search): JsonResource
     {
-        $fermetures = Fermeture::with('guichet:guichets.id,guichets.nom', 'caissier:caissiers.id,caissiers.user_id', 'caissier.user:id,name')
+        $response = Gate::inspect('viewAny', Fermeture::class);
+        $query = Fermeture::with('guichet:guichets.id,guichets.nom', 'caissier:caissiers.id,caissiers.user_id', 'caissier.user:id,name')
             ->whereRaw("DATE_FORMAT(fermetures.created_at,'%d-%m-%Y') LIKE ?", "$search%")
             ->orWhereHas('guichet', fn(Builder $query) => $query->where('guichets.nom', 'LIKE', "%$search%"))
-            ->orWhereHas('caissier.user', fn(Builder $query) => $query->where('users.name', 'LIKE', "%$search%"))
-            ->paginate(10);
+            ->orWhereHas('caissier.user', fn(Builder $query) => $query->where('users.name', 'LIKE', "%$search%"));
+        $fermetures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FermetureListResource::collection($fermetures);
     }
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Fermeture::class);
         $request->validate(Fermeture::RULES);
         $fermeture = Fermeture::make($request->all());
         $fermeture->codeGenerate();
         $fermeture->save();
-        $fermetureSaved = Fermeture::with('ouverture.encaissements.payable')->find($fermeture->id);
+        FermetureRegistred::dispatch($fermeture);
+        $fermeture->load('ouverture.encaissements.payable');
         return response()->json([
             'message' => "La caisse a été fermée avec succès.",
-            'fermeture' => FermetureResource::make($fermetureSaved),
+            'fermeture' => FermetureResource::make($fermeture),
         ]);
     }
 
-    public function show(int $id)
+    public function show(int $id): JsonResponse
     {
         $fermeture = Fermeture::with('ouverture.encaissements.payable')->find($id);
+        $this->authorize('view', Fermeture::class);
         return response()->json(['fermeture' => FermetureResource::make($fermeture)]);
     }
 }

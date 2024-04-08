@@ -7,6 +7,8 @@ use App\Models\Architecture\Emplacement;
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\StateMachines\BordereauStateMachine;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use App\Traits\HasSites;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Carbon\Carbon;
@@ -22,7 +24,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  */
 class Bordereau extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable, HasSites, HasStateMachines;
+    use \OwenIt\Auditing\Auditable, HasSites, HasStateMachines, HasResponsible, HasOwnerScope;
 
     protected $fillable = ['code', 'commercial_id', 'site_id', 'jour'];
     protected $dates = ['created_at'];

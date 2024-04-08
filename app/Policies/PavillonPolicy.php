@@ -28,9 +28,9 @@ class PavillonPolicy
         }
     }
 
-    public function viewAny(User $user)
+    public function viewAny(User $user): response
     {
-        $user->can(config('gate.pavillon.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.pavillon.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function view(User $user, Pavillon $pavillon)

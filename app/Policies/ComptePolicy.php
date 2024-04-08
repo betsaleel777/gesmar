@@ -17,9 +17,9 @@ class ComptePolicy
         return $compte->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    public function viewAny(User $user)
+    public function viewAny(User $user): Response
     {
-        $user->can(config('gate.compte.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.compte.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function view(User $user, Compte $compte)

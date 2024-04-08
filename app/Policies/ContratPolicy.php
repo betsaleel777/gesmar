@@ -17,9 +17,9 @@ class ContratPolicy
         return $contrat->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    public function viewAny(User $user)
+    public function viewAny(User $user): Response
     {
-        $user->can(config('gate.contrat.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.contrat.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function viewValidAny(User $user)

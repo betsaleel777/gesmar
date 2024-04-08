@@ -9,60 +9,72 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 class FactureEquipementController extends Controller
 {
     const RELATIONS = ['contrat' => ['emplacement', 'personne']];
+
     public function all(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->isEquipement()->isFacture()->get();
+        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
+        $query = Facture::with(self::RELATIONS)->isEquipement()->isFacture();
+        $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => FactureEquipementListResource::collection($factures)]);
     }
 
     public function getPaginate(): JsonResource
     {
-        $factures = Facture::with(['contrat' => ['personne', 'emplacement']])->isEquipement()->isFacture()->paginate(10);
+        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
+        $query = Facture::with(self::RELATIONS)->isEquipement()->isFacture();
+        $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureEquipementListResource::collection($factures);
     }
 
     public function getSearch(string $search): JsonResource
     {
-        $factures = Facture::with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->isEquipement()->isFacture()->paginate(10);
-
+        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
+        $query = Facture::with(self::RELATIONS)->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->isEquipement()->isFacture();
+        $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureEquipementListResource::collection($factures);
     }
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->isPaid()->isEquipement()->get();
+        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
+        $query = Facture::with(self::RELATIONS)->isPaid()->isEquipement();
+        $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->isUnpaid()->isEquipement()->get();
+        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
+        $query = Facture::with(self::RELATIONS)->isUnpaid()->isEquipement();
+        $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with(['contrat.site', 'annexe'])->isEquipement()->find($id);
+        $facture = Facture::with(['contrat.site', 'equipement'])->isEquipement()->find($id);
+        $this->authorize('view', [$facture, 'equiepement']);
         return response()->json(['facture' => $facture]);
     }
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', [Facture::class, 'equipement']);
         foreach ($request->all() as $ligne) {
             $facture = new Facture($ligne);
             $facture->codeGenerate(EQUIPEMENT_FACTURE_PREFIXE);
             $facture->save();
             $facture->facturable();
         }
-        $message = "Les factures d'équipement ont été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Les factures d'équipement ont été crée avec succès."]);
     }
 }

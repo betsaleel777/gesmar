@@ -2,23 +2,22 @@
 
 namespace App\Policies;
 
-use App\Models\Architecture\TypeEmplacement;
+use App\Models\Exploitation\TypePersonne;
 use App\Models\User;
-use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Response;
 use ReflectionClass;
 
-class TypeEmplacementPolicy
+class TypePersonnePolicy
 {
-    use HandlesAuthorization, HasPolicyFilter;
+    use HandlesAuthorization;
 
-    private static function userCheck(User $user, TypeEmplacement $type): bool
+    private static function userCheck(User $user, TypePersonne $type): bool
     {
         return $type->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, TypeEmplacement $type, string $action): bool
+    private static function checkPermissionWithOwner(User $user, TypePersonne $type, string $action): bool
     {
         $name = str((new ReflectionClass($type))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
@@ -30,35 +29,35 @@ class TypeEmplacementPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.type-emplacement.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.type-personne.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, TypeEmplacement $type): bool
+    public function view(User $user, TypePersonne $type): bool
     {
         return self::checkPermissionWithOwner($user, $type, 'show');
     }
 
     public function create(User $user): bool
     {
-        return $user->can(config('gate.type-emplacement.create')) ? true : false;
+        return $user->can(config('gate.type-personne.create')) ? true : false;
     }
 
-    public function update(User $user, TypeEmplacement $type): bool
+    public function update(User $user, TypePersonne $type): bool
     {
         return self::checkPermissionWithOwner($user, $type, 'edit');
     }
 
-    public function delete(User $user, TypeEmplacement $type): bool
+    public function delete(User $user, TypePersonne $type): bool
     {
         return self::checkPermissionWithOwner($user, $type, 'trash');
     }
 
-    public function restore(User $user, TypeEmplacement $type): bool
+    public function restore(User $user, TypePersonne $type): bool
     {
         return self::checkPermissionWithOwner($user, $type, 'restore');
     }
 
-    public function forceDelete(User $user, TypeEmplacement $type): bool
+    public function forceDelete(User $user, TypePersonne $type): bool
     {
         return self::checkPermissionWithOwner($user, $type, 'delete');
     }

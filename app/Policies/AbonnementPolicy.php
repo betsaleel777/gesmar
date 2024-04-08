@@ -17,9 +17,9 @@ class AbonnementPolicy
         return $abonnement->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    public function viewAny(User $user)
+    public function viewAny(User $user): Response
     {
-        $user->can(config('gate.abonnement.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.abonnement.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function view(User $user, Abonnement $abonnement): bool

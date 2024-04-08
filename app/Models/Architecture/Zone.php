@@ -4,6 +4,8 @@ namespace App\Models\Architecture;
 
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,6 +21,8 @@ class Zone extends Model implements Auditable
     use SoftDeletes;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use \OwenIt\Auditing\Auditable;
+    use HasResponsible;
+    use HasOwnerScope;
 
     protected $fillable = ['nom', 'code', 'niveau_id'];
     protected $dates = ['created_at'];

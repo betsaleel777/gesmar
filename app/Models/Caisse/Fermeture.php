@@ -2,8 +2,12 @@
 
 namespace App\Models\Caisse;
 
+use App\Models\Architecture\Site;
 use App\Models\Exploitation\Ordonnancement;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as ContractAuditable;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
@@ -18,7 +23,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  */
 class Fermeture extends Model implements ContractAuditable
 {
-    use Auditable, HasRelationships;
+    use Auditable, HasRelationships, HasResponsible, HasOwnerScope;
 
     protected $fillable = ['code', 'ouverture_id', 'total'];
     protected $casts = ['total' => 'integer'];
@@ -32,15 +37,7 @@ class Fermeture extends Model implements ContractAuditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
-
-        static::created(function (Fermeture $fermeture) {
-            $ouverture = Ouverture::with('encaissements')->find($fermeture->ouverture_id);
-            $ouverture->setConfirmed();
-            foreach ($ouverture->encaissements as $encaissement) {
-                $encaissement->setClose();
-            }
-            Guichet::find($ouverture->guichet_id)->setClose();
-        });
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     public function codeGenerate(): void
@@ -61,6 +58,16 @@ class Fermeture extends Model implements ContractAuditable
             [Ouverture::class, Encaissement::class],
             ['id', 'ouverture_id', 'id'],
             ['ouverture_id', 'id', 'ordonnancement_id']
+        );
+    }
+
+    public function site(): HasOneDeep
+    {
+        return $this->hasOneDeep(
+            Site::class,
+            [Ouverture::class, Guichet::class],
+            ['id', 'id', 'id'],
+            ['ouverture_id', 'guichet_id', 'site_id'],
         );
     }
 

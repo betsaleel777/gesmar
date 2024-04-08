@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 class FactureLoyerController extends Controller
 {
@@ -16,54 +17,64 @@ class FactureLoyerController extends Controller
 
     public function all(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->isLoyer()->isFacture()->get();
+        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
+        $query = Facture::with(self::RELATIONS)->isLoyer()->isFacture();
+        $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => FactureLoyerListResource::collection($factures)]);
     }
 
     public function getPaginate(): JsonResource
     {
-        $factures = Facture::with(['contrat' => ['personne', 'emplacement']])->isLoyer()->isFacture()->paginate(10);
+        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
+        $query = Facture::with(['contrat' => ['personne', 'emplacement']])->isLoyer()->isFacture();
+        $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureLoyerListResource::collection($factures);
     }
 
     public function getSearch(string $search): JsonResource
     {
-        $factures = Facture::with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->isLoyer()->isFacture()->paginate(10);
-
+        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
+        $query = Facture::with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->isLoyer()->isFacture();
+        $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureLoyerListResource::collection($factures);
     }
 
     public function facturesValidees(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->isPaid()->isLoyer()->get();
+        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
+        $query = Facture::with(self::RELATIONS)->isPaid()->isLoyer();
+        $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function facturesNonValidees(): JsonResponse
     {
-        $factures = Facture::with(self::RELATIONS)->isUnpaid()->isLoyer()->get();
+        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
+        $query = Facture::with(self::RELATIONS)->isUnpaid()->isLoyer();
+        $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
     }
 
     public function show(int $id): JsonResponse
     {
         $facture = Facture::with(self::RELATIONS)->isLoyer()->find($id);
+        $this->authorize('view', [$facture, 'loyer']);
         return response()->json(['facture' => $facture]);
     }
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', [Facture::class, 'loyer']);
         foreach ($request->all() as $data) {
             $facture = new Facture($data);
             $facture->codeGenerate(LOYER_FACTURE_PREFIXE);
             $facture->save();
             $facture->facturable();
         }
-        $message = "Factures générées avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Factures générées avec succès."]);
     }
 }

@@ -25,10 +25,6 @@ class Caissier extends Model implements Auditable
     protected $fillable = ['code', 'user_id'];
     protected $dates = ['created_at'];
     protected $auditExclude = ['code'];
-    /**
-     *
-     * @var array<int, string>
-     */
     const RULES = ['user_id' => 'required|numeric'];
 
     const ATTRIBUTION_RULES = [

@@ -3,17 +3,21 @@
 namespace App\Models\Finance;
 
 use App\Enums\StatusFacture;
-use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\ServiceAnnexe;
+use App\Models\Architecture\Site;
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Paiement;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasEquipement;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
@@ -27,6 +31,8 @@ class Facture extends Model implements Auditable
     use HasStatuses;
     use HasEquipement;
     use \OwenIt\Auditing\Auditable;
+    use HasResponsible;
+    use HasOwnerScope;
 
     protected $fillable = [
         'code',
@@ -41,9 +47,7 @@ class Facture extends Model implements Auditable
         'periode',
     ];
     protected $auditExclude = ['code'];
-
     protected $with = ['contrat'];
-
     protected $appends = ['status'];
 
     protected $casts = [
@@ -59,6 +63,7 @@ class Facture extends Model implements Auditable
     protected static function booted()
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     public function codeGenerate(string $prefix): void
@@ -220,17 +225,11 @@ class Facture extends Model implements Auditable
 
     // relations
 
-    /**
-     * Undocumented function
-     */
     public function annexe(): BelongsTo
     {
         return $this->belongsTo(ServiceAnnexe::class);
     }
 
-    /**
-     * Undocumented function
-     */
     public function contrat(): BelongsTo
     {
         return $this->belongsTo(Contrat::class);
@@ -242,5 +241,10 @@ class Facture extends Model implements Auditable
     public function paiements(): HasMany
     {
         return $this->hasMany(Paiement::class);
+    }
+
+    public function site(): HasOneThrough
+    {
+        return $this->hasOneThrough(Site::class, Contrat::class, 'id', 'id', 'contrat_id', 'site_id');
     }
 }

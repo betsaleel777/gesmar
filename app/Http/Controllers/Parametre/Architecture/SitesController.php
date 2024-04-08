@@ -14,12 +14,14 @@ class SitesController extends Controller
 {
     public function all(): JsonResponse
     {
+        $this->authorize('viewAny', Site::class);
         $marches = Site::bySiteAttribuate()->get();
         return response()->json(['marches' => SiteResource::collection($marches)]);
     }
 
     public function select(): JsonResponse
     {
+        $this->authorize('viewAny', Site::class);
         $marches = Site::select('id', 'nom')->bySiteAttribuate()->get();
         return response()->json(['marches' => SiteSelectResource::collection($marches)]);
     }
@@ -30,8 +32,7 @@ class SitesController extends Controller
         $request->validate(Site::RULES);
         $marche = new Site($request->all());
         $marche->save();
-        $message = "Le marché $request->nom a été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le marché $request->nom a été crée avec succès."]);
     }
 
     public function update(int $id, Request $request): JsonResponse
@@ -45,8 +46,7 @@ class SitesController extends Controller
         $marche->commune = $request->commune;
         $marche->postale = $request->postale;
         $marche->save();
-        $message = "Le marché $request->nom a été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le marché $request->nom a été crée avec succès."]);
     }
 
     public function push(Request $request): JsonResponse
@@ -55,13 +55,13 @@ class SitesController extends Controller
         $request->validate(Site::RULES);
         $marche = new Site($request->all());
         $marche->save();
-        $message = "Le marché $request->nom a été crée avec succès.";
         $freshMarche = $marche->fresh();
-        return response()->json(['message' => $message, 'marche' => $freshMarche]);
+        return response()->json(['message' => "Le marché $request->nom a été crée avec succès.", 'marche' => $freshMarche]);
     }
 
     public function trash(int $id): JsonResponse
     {
+        $this->authorize('delete', Site::class);
         $marche = Site::find($id);
         $marche->delete();
         return response()->json(['message' => "Le marché $marche->nom a été supprimé avec succès."]);
@@ -69,33 +69,35 @@ class SitesController extends Controller
 
     public function restore(int $id): JsonResponse
     {
+        $this->authorize('restore', Site::class);
         $marche = Site::withTrashed()->find($id);
-        $this->authorize('restore', $marche);
         $marche->restore();
-        $message = "Le marché $marche->nom a été restauré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le marché $marche->nom a été restauré avec succès."]);
     }
 
     public function trashed(): JsonResponse
     {
-        $marches = Site::onlyTrashed()->get();
+        $this->authorize('viewAny', Site::class);
+        $marches = Site::onlyTrashed()->bySiteAttribuate()->get();
         return response()->json(['marches' => $marches]);
     }
 
     public function show(int $id): JsonResponse
     {
+        $this->authorize('view', Site::class);
         $marche = Site::withTrashed()->find($id);
-        $this->authorize('view', $marche);
         return response()->json(['marche' => $marche]);
     }
 
     public function showStructure(int $id): JsonResponse
     {
+        $this->authorize('view', Site::class);
         return response()->json(['structure' => self::structurer($id)]);
     }
 
     public function structure(): JsonResponse
     {
+        $this->authorize('view', Site::class);
         return response()->json(['structure' => self::structurer()]);
     }
 

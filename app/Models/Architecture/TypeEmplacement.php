@@ -24,17 +24,8 @@ class TypeEmplacement extends Model implements Auditable
     protected $dates = ['created_at'];
     protected $auditExclude = ['code'];
 
-    /**
-     * les propriétés qui doivent être caster.
-     *
-     * @var array<string, string>
-     */
     protected $casts = ['equipable' => 'boolean', 'auto_valid' => 'boolean'];
 
-    /**
-     *
-     * @var array<int, string>
-     */
     public const RULES = [
         'nom' => 'required|max:150',
         'site_id' => 'required',
@@ -52,31 +43,11 @@ class TypeEmplacement extends Model implements Auditable
         return !empty($this->prefix) and !empty($this->code) ? $this->prefix . str((string) $this->attributes['code'])->padLeft(2, '0') : null;
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param  Builder<TypeEmplacement>  $query
-     * @return Builder<TypeEmplacement>
-     */
     public function scopeEquipables(Builder $query): Builder
     {
         return $query->where('equipable', true);
     }
 
-    /**
-     * Obtenir les emplacements appartenant à la liste de site accéssible
-     *
-     */
-    public function scopeInside(Builder $query, array $sites): Builder
-    {
-        return $query->whereIn('site_id', $sites);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return HasMany<Emplacement>
-     */
     public function emplacements(): HasMany
     {
         return $this->hasMany(Emplacement::class, 'type_emplacement_id');

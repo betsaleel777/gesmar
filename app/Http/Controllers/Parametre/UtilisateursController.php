@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
@@ -15,15 +16,17 @@ class UtilisateursController extends Controller
 {
     public function all(): JsonResponse
     {
-        $this->authorize('viewAny', User::class);
-        $users = User::with('avatar')->get();
+        $response = Gate::inspect('viewAny', User::class);
+        $query = User::with('avatar');
+        $users = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['users' => UserResource::collection($users)]);
     }
 
     public function trashed(): JsonResponse
     {
-        $this->authorize('viewAny', User::class);
-        $users = User::onlyTrashed()->get();
+        $response = Gate::inspect('viewAny', User::class);
+        $query = User::onlyTrashed();
+        $users = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['users' => UserResource::collection($users)]);
     }
 
@@ -47,8 +50,7 @@ class UtilisateursController extends Controller
         $role = Role::find($request->role_id);
         $user->assignRole($role);
         $user->addMediaFromRequest('avatar')->toMediaCollection('avatar');
-        $message = "L'utilisateur $request->name a été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'utilisateur $request->name a été crée avec succès."]);
     }
 
     public function profile(Request $request): JsonResponse
@@ -69,15 +71,13 @@ class UtilisateursController extends Controller
             if ($request->hasFile('image')) {
                 $user->addMediaFromRequest('image')->toMediaCollection('avatar');
             }
-            $message = "Utilisateur a été modifié avec succes.";
-            return response()->json(['message' => $message]);
+            return response()->json(['message' => "Utilisateur a été modifié avec succes."]);
         }
     }
 
-    public function notifications(Request $request): JsonResponse
+    public function notifications(): JsonResponse
     {
-        $message = '';
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => ""]);
     }
 
     public function security(Request $request): JsonResponse
@@ -89,15 +89,13 @@ class UtilisateursController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         } else {
             if (!Hash::check($request->oldPassword, $user->password)) {
-                $message = 'Ancien mot de passe incorrecte.';
-                return response()->json(['message' => $message], 400);
+                return response()->json(['message' => 'Ancien mot de passe incorrecte.'], 400);
             } else {
                 if (!empty($request->password)) {
                     $user->password = Hash::make($request->password);
                 }
                 $user->save();
-                $message = 'Utilisateur a été modifié avec succes.';
-                return response()->json(['message' => $message]);
+                return response()->json(['message' => 'Utilisateur a été modifié avec succes.']);
             }
         }
     }
@@ -107,8 +105,7 @@ class UtilisateursController extends Controller
         $user = User::findOrFail($id);
         $this->authorize('delete', $user);
         $user->delete();
-        $message = "L'utilisateur $user->name a été supprimé avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'utilisateur $user->name a été supprimé avec succès."]);
     }
 
     public function restore(int $id): JsonResponse
@@ -116,26 +113,31 @@ class UtilisateursController extends Controller
         $user = User::withTrashed()->find($id);
         $this->authorize('restore', $user);
         $user->restore();
-        $message = "L'utilisateur $user->name a été restauré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "L'utilisateur $user->name a été restauré avec succès."]);
     }
 
     public function uncommercials(): JsonResponse
     {
-        $users = User::doesntHave('commercial')->get();
+        $response = Gate::inspect('viewAny', User::class);
+        $query = User::doesntHave('commercial');
+        $users = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['users' => $users]);
     }
 
     public function uncashiers(): JsonResponse
     {
-        $users = User::doesntHave('caissier')->get();
+        $response = Gate::inspect('viewAny', User::class);
+        $query = User::doesntHave('caissier');
+        $users = $response->allowed() ? $query->get() : $query->owner()->get();
+
         return response()->json(['users' => $users]);
     }
 
     public function attribuer(Request $request): JsonResponse
     {
-        $request->validate(['role' => 'required|not_in:0']);
         $user = User::find($request->user);
+        $this->authorize('attribuate', $user);
+        $request->validate(['role' => 'required|not_in:0']);
         $role = Role::find($request->role);
         $user->assignRole($role);
         return response()->json(['message' => "Le rôle $role->name a été attribué à l'utilisateur $user->name"]);

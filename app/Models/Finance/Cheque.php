@@ -34,21 +34,11 @@ class Cheque extends Model implements Auditable
         static::addGlobalScope(new RecentScope);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return MorphOne<Encaissement>
-     */
     public function encaissement(): MorphOne
     {
         return $this->morphOne(Encaissement::class, 'payable');
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return BelongsTo<Banque, Cheque>
-     */
     public function banque(): BelongsTo
     {
         return $this->belongsTo(Banque::class);

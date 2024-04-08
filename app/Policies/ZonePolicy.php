@@ -7,100 +7,59 @@ use App\Models\User;
 use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
+use ReflectionClass;
 
 class ZonePolicy
 {
     use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
+    private static function userCheck(User $user, Zone $zone): bool
+    {
+        return $zone->load('shortAudit')->shortAudit->user_id === $user->id;
+    }
+
+    private static function checkPermissionWithOwner(User $user, Zone $zone, string $action): bool
+    {
+        $name = str((new ReflectionClass($zone))->getShortName())->lower();
+        if ($user->can(config("gate.$name.$action"))) {
+            return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $zone) : true;
+        } else {
+            return false;
+        }
+    }
+
     public function viewAny(User $user)
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        $user->can(config('gate.zone.list-global')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Zone $zone)
+    public function view(User $user, Zone $zone): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $zone, 'show');
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function create(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return $user->can(config('gate.zone.create')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Zone $zone)
+    public function update(User $user, Zone $zone): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $zone, 'edit');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Zone $zone)
+    public function delete(User $user, Zone $zone): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $zone, 'trash');
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Zone $zone)
+    public function restore(User $user, Zone $zone): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $zone, 'restore');
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Zone  $zone
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Zone $zone)
+    public function forceDelete(User $user, Zone $zone): bool
     {
-        //
+        return self::checkPermissionWithOwner($user, $zone, 'delete');
     }
 }

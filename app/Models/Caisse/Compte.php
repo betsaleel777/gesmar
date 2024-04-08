@@ -23,12 +23,6 @@ class Compte extends Model implements Auditable
     protected $dates = ['created_at'];
     protected $auditExclude = ['site_id', 'code'];
 
-    /**
-     *
-     * @var array<int, string>
-     */
-    protected $with = ['site'];
-
     const RULES = [
         'code' => 'required',
         'nom' => 'required|max:191',

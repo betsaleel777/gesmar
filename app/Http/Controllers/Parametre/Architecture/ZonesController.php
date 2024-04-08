@@ -7,7 +7,6 @@ use App\Http\Resources\Emplacement\ZoneListResource;
 use App\Http\Resources\Emplacement\ZoneSelectResource;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Niveau;
-use App\Models\Architecture\Site;
 use App\Models\Architecture\Zone;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -54,30 +53,22 @@ class ZonesController extends Controller implements StandardControllerInterface
     public function search(Request $request): JsonResource
     {
         $response = Gate::inspect('viewAny', Zone::class);
-        if ($response->allowed()) {
-            $zones = Zone::with('site:sites.id,sites.nom', 'pavillon:pavillons.id,pavillons.nom', 'niveau:niveaux.id,niveaux.nom')
-                ->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
-                ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))
-                ->orWhereHas('niveau', fn(Builder $query) => $query->where('niveaux.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $zones = Zone::with('site:sites.id,sites.nom', 'pavillon:pavillons.id,pavillons.nom', 'niveau:niveaux.id,niveaux.nom')
-                ->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%', true)
-                        ->whereIn('sites.id', $sites))
-                ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))
-                ->orWhereHas('niveau',
-                    fn(Builder $query) => $query->where('niveaux.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
-        }
+        $query = Zone::with('site:sites.id,sites.nom', 'pavillon:pavillons.id,pavillons.nom', 'niveau:niveaux.id,niveaux.nom')
+            ->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+            ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
+            ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))
+            ->orWhereHas('niveau', fn(Builder $query) => $query->where('niveaux.nom', 'LIKE', '%' . $request->query('search') . '%'));
+        $zones = $response->allowed() ? $query->get() : $query->owner()->get();
         return ZoneSelectResource::collection($zones);
     }
 
     public function getForAttribution(int $id): JsonResponse
     {
-        $zones = Zone::select('id', 'code', 'nom', 'niveau_id')->with('site:sites.id,sites.nom')
+        $response = Gate::inspect('viewAny', Zone::class);
+        $query = Zone::select('id', 'code', 'nom', 'niveau_id')->with('site:sites.id,sites.nom')
             ->whereHas('emplacements.type', fn(Builder $query): Builder => $query->where('auto_valid', true))
-            ->whereHas('site', fn(Builder $query): Builder => $query->where('sites.id', $id))->get();
+            ->whereHas('site', fn(Builder $query): Builder => $query->where('sites.id', $id));
+        $zones = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['zones' => ZoneSelectResource::collection($zones)]);
     }
 
@@ -93,8 +84,7 @@ class ZonesController extends Controller implements StandardControllerInterface
             $zone->code = (string) (Niveau::with('zones')->findOrFail($request->niveau_id)->zones->count() + 1);
             $zone->save();
         }
-        $message = "La zone $request->nom a été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "La zone $request->nom a été crée avec succès."]);
     }
 
     public function update(int $id, Request $request): JsonResponse
@@ -105,8 +95,7 @@ class ZonesController extends Controller implements StandardControllerInterface
         $zone->nom = $request->nom;
         $zone->niveau_id = $request->niveau_id;
         $zone->save();
-        $message = 'La zone a été modifié avec succès.';
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => 'La zone a été modifié avec succès.']);
     }
 
     public function trash(int $id): JsonResponse
@@ -114,8 +103,7 @@ class ZonesController extends Controller implements StandardControllerInterface
         $zone = Zone::findOrFail($id);
         $this->authorize('delete', $zone);
         $zone->delete();
-        $message = "La zone $zone->nom a été supprimé avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "La zone $zone->nom a été supprimé avec succès."]);
     }
 
     public function restore(int $id): JsonResponse
@@ -123,19 +111,14 @@ class ZonesController extends Controller implements StandardControllerInterface
         $zone = Zone::withTrashed()->find($id);
         $this->authorize('restore', $zone);
         $zone->restore();
-        $message = "La zone $zone->nom a été restauré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "La zone $zone->nom a été restauré avec succès."]);
     }
 
     public function trashed(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Zone::class);
-        if ($response->allowed()) {
-            $zones = Zone::with('niveau', 'pavillon', 'site')->onlyTrashed()->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $zones = Zone::with('niveau', 'pavillon', 'site')->onlyTrashed()->inside($sites)->get();
-        }
+        $query = Zone::with('niveau', 'pavillon', 'site')->onlyTrashed();
+        $zones = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['zones' => $zones]);
     }
 
@@ -149,7 +132,9 @@ class ZonesController extends Controller implements StandardControllerInterface
 
     public function getByMarche(int $id): JsonResponse
     {
-        $zones = Site::with('zones')->findOrFail($id)->zones;
+        $response = Gate::inspect('viewAny', Zone::class);
+        $query = Zone::whereHas('site', fn(Builder $query): Builder => $query->where('sites.id', $id));
+        $zones = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['zones' => $zones]);
     }
 }

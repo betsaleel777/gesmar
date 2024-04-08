@@ -11,9 +11,9 @@ class PermissionPolicy
 {
     use HandlesAuthorization, HasPolicyFilter;
 
-    public function viewAny(User $user)
+    public function viewAny(User $user): Response
     {
-        $user->can(config('gate.permission.list')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.permission.list')) ? Response::allow() : Response::deny();
     }
 
     public function update(User $user): bool

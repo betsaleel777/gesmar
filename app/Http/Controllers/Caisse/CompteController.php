@@ -14,7 +14,7 @@ class CompteController extends Controller
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Compte::class);
-        $comptes = $response->allowed() ? Compte::get() : Compte::owner()->get();
+        $comptes = $response->allowed() ? Compte::with('site')->get() : Compte::with('site')->owner()->get();
         return response()->json(['comptes' => CompteResource::collection($comptes)]);
     }
 
@@ -29,7 +29,7 @@ class CompteController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $compte = Compte::findOrFail($id);
+        $compte = Compte::with('site')->findOrFail($id);
         $this->authorize('view', $compte);
         return response()->json(['compte' => $compte]);
     }

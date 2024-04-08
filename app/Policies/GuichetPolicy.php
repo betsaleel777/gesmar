@@ -28,9 +28,9 @@ class GuichetPolicy
         }
     }
 
-    public function viewAny(User $user)
+    public function viewAny(User $user): Response
     {
-        $user->can(config('gate.guichet.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.guichet.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function view(User $user, Guichet $guichet): bool
