@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Parametre;
 
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use Illuminate\Http\JsonResponse;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class PermissionsController extends Controller

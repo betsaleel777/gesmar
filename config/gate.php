@@ -41,6 +41,7 @@ return [
         'list-own' => 'own-pavillon',
         'create' => 'create-pavillon',
         'trash' => 'trash-pavillon',
+        'restore' => 'restore-pavillon',
         'delete' => 'delete-pavillon',
         'edit' => 'edit-pavillon',
     ],
@@ -49,6 +50,7 @@ return [
         'list-own' => 'own-niveau',
         'create' => 'create-niveau',
         'trash' => 'trash-niveau',
+        'restore' => 'restore-niveau',
         'delete' => 'delete-niveau',
         'edit' => 'edit-niveau',
     ],
@@ -76,9 +78,10 @@ return [
         'list-own' => 'own-equipement',
         'create' => 'create-equipement',
         'trash' => 'trash-equipement',
-        'restore' => 'restore-equipement',
         'delete' => 'delete-equipement',
+        'restore' => 'restore-equipement',
         'edit' => 'edit-equipement',
+        'show' => 'show-equipement',
     ],
     'abonnement' => [
         'list-global' => 'global-abonnement',
@@ -87,9 +90,9 @@ return [
         'trash' => 'trash-abonnement',
         'delete' => 'delete-abonnement',
         'restore' => 'restore-abonnement',
-        'abort' => 'abort-abonnement',
         'edit' => 'edit-abonnement',
         'show' => 'show-abonnement',
+        'abort' => 'abort-abonnement',
     ],
     'type-equipement' => [
         'list-global' => 'global-type-equipement',
@@ -126,6 +129,7 @@ return [
         'restore' => 'restore-annexe',
         'delete' => 'delete-annexe',
         'edit' => 'edit-annexe',
+        'show' => 'show-annexe',
     ],
     'guichet' => [
         'list-global' => 'global-guichet',
@@ -135,6 +139,7 @@ return [
         'trash' => 'trash-guichet',
         'delete' => 'delete-guichet',
         'edit' => 'edit-guichet',
+        'show' => 'show-guichet',
     ],
     'caissier' => [
         'list-global' => 'global-caissier',
@@ -201,11 +206,6 @@ return [
         'restore' => 'restore-personne',
         'edit' => 'edit-personne',
         'show' => 'show-personne',
-    ],
-    'contrat-valide' => [
-        'list-global' => 'global-contrat-valide',
-        'list-own' => 'own-contrat-valide',
-        'show' => 'show-contrat-valide',
     ],
     'ordonnancement-dashboard' => [
         'list' => 'list-ordonnancement-dashboard',
@@ -281,7 +281,6 @@ return [
         'list-global' => 'global-encaissement',
         'list-own' => 'own-encaissement',
         'create' => 'create-encaissement',
-        'close' => 'close-encaissement',
         'show' => 'show-encaissement',
     ],
 ];
