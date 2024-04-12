@@ -170,8 +170,7 @@ return [
         'edit' => 'edit-application',
     ],
     'gabari-contrat' => [
-        'list-global' => 'global-gabari-contrat',
-        'list-own' => 'own-gabari-contrat',
+        'list' => 'list-gabari-contrat',
         'create' => 'create-gabari-contrat',
         'trash' => 'trash-gabari-contrat',
         'delete' => 'delete-gabari-contrat',
