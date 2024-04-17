@@ -32,6 +32,7 @@ return [
         'list-own' => 'own-site',
         'create' => 'create-site',
         'trash' => 'trash-site',
+        'restore' => 'restore-site',
         'delete' => 'delete-site',
         'edit' => 'edit-site',
         'show' => 'show-site',
