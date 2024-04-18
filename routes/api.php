@@ -238,10 +238,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
             Route::post('/store', 'store');
-            Route::get('{id}', 'show');
             Route::get('/pdf/{id}', 'pdf');
             Route::delete('{id}', 'trash');
-            Route::put('{id}', 'update');
             Route::patch('/restore/{id}', 'restore');
         });
     });
