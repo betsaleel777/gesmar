@@ -18,24 +18,24 @@ class NiveauPolicy
         return $niveau->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, Niveau $niveau, string $action): bool
+    private static function checkPermissionWithOwner(User $user, Niveau $niveau, string $action): bool | Response
     {
         $name = str((new ReflectionClass($niveau))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $niveau) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.niveau.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.niveau.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des niveaux.");
     }
 
     public function view(User $user, Niveau $niveau): bool
     {
-        return self::checkPermissionWithOwner($user, $niveau, 'show');
+        return self::checkPermissionWithOwner($user, $niveau, 'show') or self::checkPermissionWithOwner($user, $niveau, 'edit');
     }
 
     public function create(User $user): bool

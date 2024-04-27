@@ -18,24 +18,24 @@ class EmplacementPolicy
         return $emplacement->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, Emplacement $emplacement, string $action): bool
+    private static function checkPermissionWithOwner(User $user, Emplacement $emplacement, string $action): bool | Response
     {
         $name = str((new ReflectionClass($emplacement))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $emplacement) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.emplacement.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.emplacement.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des emplacements.");
     }
 
     public function view(User $user, Emplacement $emplacement): bool
     {
-        return self::checkPermissionWithOwner($user, $emplacement, 'show');
+        return self::checkPermissionWithOwner($user, $emplacement, 'show') or self::checkPermissionWithOwner($user, $emplacement, 'edit');
     }
 
     public function create(User $user): bool

@@ -18,23 +18,24 @@ class OrdonnancementPolicy
         return $ordonnancement->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, Ordonnancement $ordonnancement, string $action): bool
+    private static function checkPermissionWithOwner(User $user, Ordonnancement $ordonnancement, string $action): bool | Response
     {
         $name = str((new ReflectionClass($ordonnancement))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $ordonnancement) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.ordonnancement.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.ordonnancement.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des ordonnancements.");
     }
 
     public function view(User $user, Ordonnancement $ordonnancement): bool
     {
-        return self::checkPermissionWithOwner($user, $ordonnancement, 'show');
+        return self::checkPermissionWithOwner($user, $ordonnancement, 'show') or
+        self::checkPermissionWithOwner($user, $ordonnancement, 'edit');
     }
 }

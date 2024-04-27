@@ -18,24 +18,24 @@ class GuichetPolicy
         return $guichet->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, Guichet $guichet, string $action): bool
+    private static function checkPermissionWithOwner(User $user, Guichet $guichet, string $action): bool | Response
     {
         $name = str((new ReflectionClass($guichet))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $guichet) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.guichet.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.guichet.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des guichets.");
     }
 
     public function view(User $user, Guichet $guichet): bool
     {
-        return self::checkPermissionWithOwner($user, $guichet, 'show');
+        return self::checkPermissionWithOwner($user, $guichet, 'show') or self::checkPermissionWithOwner($user, $guichet, 'edit');
     }
 
     public function create(User $user): bool

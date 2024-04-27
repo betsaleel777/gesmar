@@ -19,17 +19,17 @@ class ContratPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.contrat.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.contrat.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des contrats et demandes.");
     }
 
     public function viewValidAny(User $user)
     {
-        $user->can(config('gate.contrat.list-valid-global')) ? Response::allow() : Response::deny();
+        $user->can(config('gate.contrat.list-valid-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des contrats et demandes valides.");
     }
 
     public function viewValid(User $user, Contrat $contrat): bool
     {
-        if ($user->can(config('gate.contrat.valid-show'))) {
+        if ($user->can(config('gate.contrat.valid-show')) or $user->can(config('gate.contrat.valid-show'))) {
             return $user->can(config('gate.contrat.list-valid-own')) ? self::userCheck($user, $contrat) : true;
         } else {
             return false;
@@ -38,7 +38,7 @@ class ContratPolicy
 
     public function view(User $user, Contrat $contrat): bool
     {
-        if ($user->can(config('gate.contrat.show'))) {
+        if ($user->can(config('gate.contrat.show')) or $user->can(config('gate.contrat.show'))) {
             return $user->can(config('gate.contrat.list-own')) ? self::userCheck($user, $contrat) : true;
         } else {
             return false;

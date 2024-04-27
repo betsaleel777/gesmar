@@ -18,24 +18,24 @@ class PersonnePolicy
         return $personne->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, Personne $personne, string $action): bool
+    private static function checkPermissionWithOwner(User $user, Personne $personne, string $action): bool | Response
     {
         $name = str((new ReflectionClass($personne))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $personne) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.personne.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.personne.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des prospects ou clients");
     }
 
     public function view(User $user, Personne $personne)
     {
-        return self::checkPermissionWithOwner($user, $personne, 'show');
+        return self::checkPermissionWithOwner($user, $personne, 'show') or self::checkPermissionWithOwner($user, $personne, 'edit');
     }
 
     public function create(User $user)

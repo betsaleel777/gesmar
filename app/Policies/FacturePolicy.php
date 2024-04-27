@@ -18,24 +18,25 @@ class FacturePolicy
         return $facture->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, Facture $facture, string $categorie, string $action): bool
+    private static function checkPermissionWithOwner(User $user, Facture $facture, string $categorie, string $action): bool | Response
     {
         $name = str((new ReflectionClass($facture))->getShortName())->lower();
         if ($user->can(config("gate.$name-$categorie.$action"))) {
             return $user->can(config("gate.$name-$categorie.list-own")) ? self::userCheck($user, $facture) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user, string $categorie): Response
     {
-        return $user->can(config("gate.facture-$categorie.list-global")) ? Response::allow() : Response::deny();
+        return $user->can(config("gate.facture-$categorie.list-global")) ? Response::allow() : Response::deny("Accès interdit à la liste des factures ($categorie).");
     }
 
     public function view(User $user, Facture $facture, string $categorie): bool
     {
-        return self::checkPermissionWithOwner($user, $facture, $categorie, 'show');
+        return self::checkPermissionWithOwner($user, $facture, $categorie, 'show') or
+        self::checkPermissionWithOwner($user, $facture, $categorie, 'edit');
     }
 
     public function create(User $user, string $categorie): bool

@@ -13,7 +13,8 @@ class PermissionPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.permission.list')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.permission.list')) ? Response::allow() :
+        Response::deny("Accès interdit à la liste des permissions.");
     }
 
     public function update(User $user): bool

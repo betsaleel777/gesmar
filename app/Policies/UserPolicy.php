@@ -17,24 +17,24 @@ class UserPolicy
         return $model->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, User $model, string $action): bool
+    private static function checkPermissionWithOwner(User $user, User $model, string $action): bool | Response
     {
         $name = str((new ReflectionClass($model))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $model) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user)
     {
-        $user->can(config('gate.user.list-global')) ? Response::allow() : Response::deny();
+        $user->can(config('gate.user.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des utilisateurs.");
     }
 
     public function view(User $user, User $model): bool
     {
-        return self::checkPermissionWithOwner($user, $model, 'show');
+        return self::checkPermissionWithOwner($user, $model, 'show') or self::checkPermissionWithOwner($user, $model, 'edit');
     }
 
     public function create(User $user): bool

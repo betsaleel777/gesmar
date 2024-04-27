@@ -18,24 +18,24 @@ class OuverturePolicy
         return $ouverture->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, Ouverture $ouverture, string $action): bool
+    private static function checkPermissionWithOwner(User $user, Ouverture $ouverture, string $action): bool | Response
     {
         $name = str((new ReflectionClass($ouverture))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $ouverture) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.ouverture.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.ouverture.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des ouvertures de caisse.");
     }
 
     public function view(User $user, Ouverture $ouverture)
     {
-        return self::checkPermissionWithOwner($user, $ouverture, 'show');
+        return self::checkPermissionWithOwner($user, $ouverture, 'show') or self::checkPermissionWithOwner($user, $ouverture, 'edit');
     }
 
     public function create(User $user): bool

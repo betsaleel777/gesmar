@@ -19,65 +19,66 @@ class AbonnementPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.abonnement.list-global')) ? Response::allow() : Response::deny("Accès interdit aux abonnements.");
+        return $user->can(config('gate.abonnement.list-global')) ? Response::allow() :
+        Response::deny("Accès interdit à la liste abonnements.");
     }
 
-    public function view(User $user, Abonnement $abonnement): bool
+    public function view(User $user, Abonnement $abonnement): bool | Response
     {
-        if ($user->can(config('gate.abonnement.show'))) {
+        if ($user->can(config('gate.abonnement.show')) or $user->can(config('gate.abonnement.edit'))) {
             return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
         } else {
-            return false;
+            return Response::deny("La visualisation des abonnements est non permise.");
         }
     }
 
-    public function create(User $user): bool
+    public function create(User $user): bool | Response
     {
-        return $user->can(config('gate.abonnement.create')) ? true : false;
+        return $user->can(config('gate.abonnement.create')) ? true : Response::deny("La création d'abonnement est non permise.");
     }
 
-    public function update(User $user, Abonnement $abonnement): bool
+    public function update(User $user, Abonnement $abonnement): bool | Response
     {
         if ($user->can(config('gate.abonnement.edit'))) {
             return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
         } else {
-            return false;
+            return Response::deny("La modification des abonnements est non permise.");
         }
     }
 
-    public function delete(User $user, Abonnement $abonnement): bool
+    public function delete(User $user, Abonnement $abonnement): bool | Response
     {
         if ($user->can(config('gate.abonnement.trash'))) {
             return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
         } else {
-            return false;
+            return Response::deny("L'archivage des abonnements est non permise.");
         }
     }
 
-    public function abort(User $user, Abonnement $abonnement): bool
+    public function abort(User $user, Abonnement $abonnement): bool | Response
     {
         if ($user->can(config('gate.abonnement.abort'))) {
             return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
         } else {
-            return false;
+            return Response::deny("La résiliation des abonnements est non permise.");
         }
     }
 
-    public function restore(User $user, Abonnement $abonnement): bool
+    public function restore(User $user, Abonnement $abonnement): bool | Response
     {
         if ($user->can(config('gate.abonnement.restore'))) {
             return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
         } else {
-            return false;
+            return Response::deny("La restauration des abonnements est non permise.");
         }
     }
 
-    public function forceDelete(User $user, Abonnement $abonnement): bool
+    public function forceDelete(User $user, Abonnement $abonnement): bool | Response
     {
         if ($user->can(config('gate.abonnement.delete'))) {
             return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;
         } else {
-            return false;
+            return Response::deny("La suppression définitive des abonnements est non permise.");
         }
     }
 }

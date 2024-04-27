@@ -19,12 +19,12 @@ class ComptePolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.compte.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.compte.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des comptes.");
     }
 
     public function view(User $user, Compte $compte)
     {
-        if ($user->can(config('gate.compte.show'))) {
+        if ($user->can(config('gate.compte.show')) or $user->can(config('gate.compte.edit'))) {
             return $user->can(config('gate.compte.list-own')) ? self::userCheck($user, $compte) : true;
         } else {
             return false;

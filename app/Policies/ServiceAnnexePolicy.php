@@ -18,24 +18,24 @@ class ServiceAnnexePolicy
         return $annexe->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, ServiceAnnexe $annexe, string $action): bool
+    private static function checkPermissionWithOwner(User $user, ServiceAnnexe $annexe, string $action): bool | Response
     {
         $name = str((new ReflectionClass($annexe))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $annexe) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.annexe.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.annexe.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des services annexes.");
     }
 
     public function view(User $user, ServiceAnnexe $serviceAnnexe)
     {
-        return self::checkPermissionWithOwner($user, $serviceAnnexe, 'show');
+        return self::checkPermissionWithOwner($user, $serviceAnnexe, 'show') or self::checkPermissionWithOwner($user, $serviceAnnexe, 'edit');
     }
 
     public function create(User $user): bool

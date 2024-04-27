@@ -18,24 +18,24 @@ class PavillonPolicy
         return $pavillon->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, Pavillon $pavillon, string $action): bool
+    private static function checkPermissionWithOwner(User $user, Pavillon $pavillon, string $action): bool | Response
     {
         $name = str((new ReflectionClass($pavillon))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $pavillon) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user): response
     {
-        return $user->can(config('gate.pavillon.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.pavillon.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des pavillons.");
     }
 
     public function view(User $user, Pavillon $pavillon)
     {
-        return self::checkPermissionWithOwner($user, $pavillon, 'show');
+        return self::checkPermissionWithOwner($user, $pavillon, 'show') or self::checkPermissionWithOwner($user, $pavillon, 'edit');
     }
 
     public function create(User $user): bool

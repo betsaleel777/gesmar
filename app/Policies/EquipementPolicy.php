@@ -18,24 +18,24 @@ class EquipementPolicy
         return $equipement->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    private static function checkPermissionWithOwner(User $user, Equipement $equipement, string $action): bool
+    private static function checkPermissionWithOwner(User $user, Equipement $equipement, string $action): bool | Response
     {
         $name = str((new ReflectionClass($equipement))->getShortName())->lower();
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $equipement) : true;
         } else {
-            return false;
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.equipement.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.equipement.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des équipements");
     }
 
     public function view(User $user, Equipement $equipement): bool
     {
-        return self::checkPermissionWithOwner($user, $equipement, 'show');
+        return self::checkPermissionWithOwner($user, $equipement, 'show') or self::checkPermissionWithOwner($user, $equipement, 'edit');
     }
 
     public function create(User $user)

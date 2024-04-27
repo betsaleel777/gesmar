@@ -103,9 +103,6 @@ class SitesController extends Controller
 
     /**
      * Undocumented function
-     *
-     * @param  int|null  $id
-     * @return Collection<int, mixed>
      */
     private static function structurer(int $id = null): Collection
     {

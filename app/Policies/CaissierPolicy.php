@@ -19,12 +19,17 @@ class CaissierPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.caissier.list-global')) ? Response::allow() : Response::deny();
+        return $user->can(config('gate.caissier.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des caissiers.");
     }
 
     public function view(User $user, Caissier $caissier): bool
     {
-        return $user->can(config('gate.caissier.list-own')) ? self::userCheck($user, $caissier) : true;
+        if ($user->can(config('gate.caissier.show')) or $user->can(config('gate.caissier.edit'))) {
+            return $user->can(config('gate.caissier.list-own')) ? self::userCheck($user, $caissier) : true;
+        } else {
+            return false;
+        }
+
     }
 
     public function create(User $user): bool
