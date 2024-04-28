@@ -9,7 +9,6 @@ use App\Http\Resources\Abonnement\AbonnementListResource;
 use App\Http\Resources\Abonnement\AbonnementSelectResource;
 use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
-use App\Models\Architecture\Site;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,10 +19,10 @@ class AbonnementsController extends Controller
 {
     private static function codeGenerate(int $site): string
     {
-        $site = Site::with('abonnements')->findOrFail($site);
-        $rang = $site->abonnements->count() + 1;
+        $abonnement = Abonnement::where('site_id', $site)->latest()->first();
+        $rang = empty($abonnement) ? 1 : $abonnement->id;
         $place = str_pad((string) $rang, 6, '0', STR_PAD_LEFT);
-        return 'AB' . str_pad((string) $site->id, 2, '0', STR_PAD_LEFT) . $place;
+        return 'AB' . str_pad((string) $site, 2, '0', STR_PAD_LEFT) . $place;
     }
 
     public function all(): JsonResponse
@@ -110,7 +109,6 @@ class AbonnementsController extends Controller
     {
         $equipement = null;
         $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->firstWhere('equipement_id', $id);
-        $this->authorize('view', $abonnement);
         if (empty($abonnement->index_depart)) {$equipement = Equipement::findOrFail($id);}
         return response()->json(['index' => $abonnement->index_fin ?? $abonnement->index_depart ?? $equipement?->index]);
     }

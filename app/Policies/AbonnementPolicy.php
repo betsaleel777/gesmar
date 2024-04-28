@@ -19,11 +19,10 @@ class AbonnementPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.abonnement.list-global')) ? Response::allow() :
-        Response::deny("Accès interdit à la liste abonnements.");
+        return $user->can(config('gate.abonnement.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Abonnement $abonnement): bool | Response
+    public function view(User $user, Abonnement $abonnement): bool
     {
         if ($user->can(config('gate.abonnement.show')) or $user->can(config('gate.abonnement.edit'))) {
             return $user->can(config('gate.abonnement.list-own')) ? self::userCheck($user, $abonnement) : true;

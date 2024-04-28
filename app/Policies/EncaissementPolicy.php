@@ -4,13 +4,14 @@ namespace App\Policies;
 
 use App\Models\Caisse\Encaissement;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Support\Facades\Response;
 use ReflectionClass;
 
 class EncaissementPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
     private static function userCheck(User $user, Encaissement $encaissement): bool
     {
@@ -29,10 +30,10 @@ class EncaissementPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.encaissement.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des encaissements.");
+        return $user->can(config('gate.encaissement.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Encaissement $encaissement)
+    public function view(User $user, Encaissement $encaissement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $encaissement, 'show');
     }

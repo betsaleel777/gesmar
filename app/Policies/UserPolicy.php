@@ -27,12 +27,12 @@ class UserPolicy
         }
     }
 
-    public function viewAny(User $user)
+    public function viewAny(User $user): Response
     {
-        $user->can(config('gate.user.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des utilisateurs.");
+        return $user->can(config('gate.user.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, User $model): bool
+    public function view(User $user, User $model): bool | Response
     {
         return self::checkPermissionWithOwner($user, $model, 'show') or self::checkPermissionWithOwner($user, $model, 'edit');
     }
@@ -42,27 +42,27 @@ class UserPolicy
         return $user->can(config('gate.user.create')) ? true : false;
     }
 
-    public function update(User $user, User $model): bool
+    public function update(User $user, User $model): bool | Response
     {
         return self::checkPermissionWithOwner($user, $model, 'edit');
     }
 
-    public function delete(User $user, User $model): bool
+    public function delete(User $user, User $model): bool | Response
     {
         return self::checkPermissionWithOwner($user, $model, 'trash');
     }
 
-    public function restore(User $user, User $model): bool
+    public function restore(User $user, User $model): bool | Response
     {
         return self::checkPermissionWithOwner($user, $model, 'restore');
     }
 
-    public function forceDelete(User $user, User $model): bool
+    public function forceDelete(User $user, User $model): bool | Response
     {
         return self::checkPermissionWithOwner($user, $model, 'delete');
     }
 
-    public function attribuate(User $user, User $model): bool
+    public function attribuate(User $user, User $model): bool | Response
     {
         return self::checkPermissionWithOwner($user, $model, 'attribuate-role');
     }

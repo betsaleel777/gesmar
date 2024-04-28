@@ -30,10 +30,10 @@ class GuichetPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.guichet.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des guichets.");
+        return $user->can(config('gate.guichet.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Guichet $guichet): bool
+    public function view(User $user, Guichet $guichet): bool | Response
     {
         return self::checkPermissionWithOwner($user, $guichet, 'show') or self::checkPermissionWithOwner($user, $guichet, 'edit');
     }
@@ -43,22 +43,22 @@ class GuichetPolicy
         return $user->can(config('gate.guichet.create')) ? true : false;
     }
 
-    public function update(User $user, Guichet $guichet): bool
+    public function update(User $user, Guichet $guichet): bool | Response
     {
         return self::checkPermissionWithOwner($user, $guichet, 'edit');
     }
 
-    public function delete(User $user, Guichet $guichet): bool
+    public function delete(User $user, Guichet $guichet): bool | Response
     {
         return self::checkPermissionWithOwner($user, $guichet, 'trash');
     }
 
-    public function restore(User $user, Guichet $guichet): bool
+    public function restore(User $user, Guichet $guichet): bool | Response
     {
         return self::checkPermissionWithOwner($user, $guichet, 'restore');
     }
 
-    public function forceDelete(User $user, Guichet $guichet): bool
+    public function forceDelete(User $user, Guichet $guichet): bool | Response
     {
         return self::checkPermissionWithOwner($user, $guichet, 'delete');
     }

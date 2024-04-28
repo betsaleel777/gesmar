@@ -30,10 +30,10 @@ class PavillonPolicy
 
     public function viewAny(User $user): response
     {
-        return $user->can(config('gate.pavillon.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des pavillons.");
+        return $user->can(config('gate.pavillon.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Pavillon $pavillon)
+    public function view(User $user, Pavillon $pavillon): bool | Response
     {
         return self::checkPermissionWithOwner($user, $pavillon, 'show') or self::checkPermissionWithOwner($user, $pavillon, 'edit');
     }
@@ -43,22 +43,22 @@ class PavillonPolicy
         return $user->can(config('gate.pavillon.create')) ? true : false;
     }
 
-    public function update(User $user, Pavillon $pavillon)
+    public function update(User $user, Pavillon $pavillon): bool | Response
     {
         return self::checkPermissionWithOwner($user, $pavillon, 'edit');
     }
 
-    public function delete(User $user, Pavillon $pavillon)
+    public function delete(User $user, Pavillon $pavillon): bool | Response
     {
         return self::checkPermissionWithOwner($user, $pavillon, 'trash');
     }
 
-    public function restore(User $user, Pavillon $pavillon)
+    public function restore(User $user, Pavillon $pavillon): bool | Response
     {
         return self::checkPermissionWithOwner($user, $pavillon, 'restore');
     }
 
-    public function forceDelete(User $user, Pavillon $pavillon)
+    public function forceDelete(User $user, Pavillon $pavillon): bool | Response
     {
         return self::checkPermissionWithOwner($user, $pavillon, 'delete');
     }

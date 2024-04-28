@@ -30,10 +30,10 @@ class OuverturePolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.ouverture.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des ouvertures de caisse.");
+        return $user->can(config('gate.ouverture.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Ouverture $ouverture)
+    public function view(User $user, Ouverture $ouverture): bool | Response
     {
         return self::checkPermissionWithOwner($user, $ouverture, 'show') or self::checkPermissionWithOwner($user, $ouverture, 'edit');
     }
@@ -43,7 +43,7 @@ class OuverturePolicy
         return $user->can(config('gate.ouverture.create')) ? true : false;
     }
 
-    public function update(User $user, Ouverture $ouverture)
+    public function update(User $user, Ouverture $ouverture): bool | Response
     {
         return self::checkPermissionWithOwner($user, $ouverture, 'edit');
     }

@@ -4,6 +4,8 @@ namespace App\Models\Architecture;
 
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +19,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  */
 class TypeEmplacement extends Model implements Auditable
 {
-    use HasFactory, HasSites, SoftDeletes;
+    use HasFactory, HasSites, HasResponsible, HasOwnerScope, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'equipable'];

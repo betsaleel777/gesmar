@@ -30,10 +30,10 @@ class FacturePolicy
 
     public function viewAny(User $user, string $categorie): Response
     {
-        return $user->can(config("gate.facture-$categorie.list-global")) ? Response::allow() : Response::deny("Accès interdit à la liste des factures ($categorie).");
+        return $user->can(config("gate.facture-$categorie.list-global")) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Facture $facture, string $categorie): bool
+    public function view(User $user, Facture $facture, string $categorie): bool | Response
     {
         return self::checkPermissionWithOwner($user, $facture, $categorie, 'show') or
         self::checkPermissionWithOwner($user, $facture, $categorie, 'edit');
@@ -44,7 +44,7 @@ class FacturePolicy
         return $user->can(config("gate.facture-$categorie.create")) ? true : false;
     }
 
-    public function update(User $user, Facture $facture, string $categorie): bool
+    public function update(User $user, Facture $facture, string $categorie): bool | Response
     {
         return self::checkPermissionWithOwner($user, $facture, $categorie, 'edit');
     }

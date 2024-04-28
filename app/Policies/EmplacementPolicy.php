@@ -30,10 +30,10 @@ class EmplacementPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.emplacement.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des emplacements.");
+        return $user->can(config('gate.emplacement.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Emplacement $emplacement): bool
+    public function view(User $user, Emplacement $emplacement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $emplacement, 'show') or self::checkPermissionWithOwner($user, $emplacement, 'edit');
     }
@@ -43,22 +43,22 @@ class EmplacementPolicy
         return $user->can(config('gate.emplacement.create')) ? true : false;
     }
 
-    public function update(User $user, Emplacement $emplacement)
+    public function update(User $user, Emplacement $emplacement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $emplacement, 'edit');
     }
 
-    public function delete(User $user, Emplacement $emplacement)
+    public function delete(User $user, Emplacement $emplacement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $emplacement, 'trash');
     }
 
-    public function restore(User $user, Emplacement $emplacement)
+    public function restore(User $user, Emplacement $emplacement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $emplacement, 'restore');
     }
 
-    public function forceDelete(User $user, Emplacement $emplacement)
+    public function forceDelete(User $user, Emplacement $emplacement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $emplacement, 'delete');
     }

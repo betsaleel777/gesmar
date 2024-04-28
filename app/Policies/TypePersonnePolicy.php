@@ -4,13 +4,14 @@ namespace App\Policies;
 
 use App\Models\Exploitation\TypePersonne;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Support\Facades\Response;
 use ReflectionClass;
 
 class TypePersonnePolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
     private static function userCheck(User $user, TypePersonne $type): bool
     {
@@ -19,7 +20,7 @@ class TypePersonnePolicy
 
     private static function checkPermissionWithOwner(User $user, TypePersonne $type, string $action): bool | Response
     {
-        $name = str((new ReflectionClass($type))->getShortName())->lower();
+        $name = str((new ReflectionClass($type))->getShortName())->snake('-');
         if ($user->can(config("gate.$name.$action"))) {
             return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $type) : true;
         } else {
@@ -29,12 +30,7 @@ class TypePersonnePolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.type-personne.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des types de prospect ou de client.");
-    }
-
-    public function view(User $user, TypePersonne $type): bool
-    {
-        return self::checkPermissionWithOwner($user, $type, 'show') or self::checkPermissionWithOwner($user, $type, 'edit');
+        return $user->can(config('gate.type-personne.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function create(User $user): bool
@@ -42,22 +38,22 @@ class TypePersonnePolicy
         return $user->can(config('gate.type-personne.create')) ? true : false;
     }
 
-    public function update(User $user, TypePersonne $type): bool
+    public function update(User $user, TypePersonne $type): bool | Response
     {
         return self::checkPermissionWithOwner($user, $type, 'edit');
     }
 
-    public function delete(User $user, TypePersonne $type): bool
+    public function delete(User $user, TypePersonne $type): bool | Response
     {
         return self::checkPermissionWithOwner($user, $type, 'trash');
     }
 
-    public function restore(User $user, TypePersonne $type): bool
+    public function restore(User $user, TypePersonne $type): bool | Response
     {
         return self::checkPermissionWithOwner($user, $type, 'restore');
     }
 
-    public function forceDelete(User $user, TypePersonne $type): bool
+    public function forceDelete(User $user, TypePersonne $type): bool | Response
     {
         return self::checkPermissionWithOwner($user, $type, 'delete');
     }

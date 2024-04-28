@@ -4,13 +4,14 @@ namespace App\Policies;
 
 use App\Models\Bordereau\Bordereau;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use ReflectionClass;
 use Response;
 
 class BordereauPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
     private static function userCheck(User $user, Bordereau $bordereau): bool
     {
@@ -29,7 +30,7 @@ class BordereauPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.bordereau.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des bordereaux");
+        return $user->can(config('gate.bordereau.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function view(User $user, Bordereau $bordereau): bool

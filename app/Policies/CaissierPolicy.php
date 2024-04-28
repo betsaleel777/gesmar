@@ -19,7 +19,7 @@ class CaissierPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.caissier.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des caissiers.");
+        return $user->can(config('gate.caissier.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function view(User $user, Caissier $caissier): bool
@@ -29,7 +29,6 @@ class CaissierPolicy
         } else {
             return false;
         }
-
     }
 
     public function create(User $user): bool

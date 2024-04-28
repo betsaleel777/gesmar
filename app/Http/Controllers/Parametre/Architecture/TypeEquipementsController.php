@@ -4,76 +4,67 @@ namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Abonnement\TypeEquipementListResource;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\TypeEquipement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
 
-class TypeEquipementsController extends Controller implements StandardControllerInterface
+class TypeEquipementsController extends Controller
 {
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', TypeEquipement::class);
-        if ($response->allowed()) {
-            $types = TypeEquipement::with('site')->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $types = TypeEquipement::with('site')->inside($sites)->get();
-        }
+        $query = TypeEquipement::with('site');
+        $types = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['types' => TypeEquipementListResource::collection($types)]);
     }
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', TypeEquipement::class);
         $request->validate(TypeEquipement::RULES);
         $type = new TypeEquipement($request->all());
         $type->save();
-        $message = "Le type d'équipement $request->nom a été enrgistré avec succès.";
-        return response()->json(['message' => $message, 'id' => $type->id]);
+        return response()->json(['message' => "Le type d'équipement $request->nom a été enrgistré avec succès.", 'id' => $type->id]);
     }
 
     public function update(int $id, Request $request): JsonResponse
     {
+        $type = TypeEquipement::find($id);
+        $this->authorize('update', $type);
         $request->validate(TypeEquipement::RULES);
-        $type = TypeEquipement::findOrFail($id);
         $type->update($request->all());
-        $message = "Type d'équipement a été modifié avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Type d'équipement a été modifié avec succès."]);
     }
 
     public function trash(int $id): JsonResponse
     {
         $type = TypeEquipement::findOrFail($id);
+        $this->authorize('delete', $type);
         $type->delete();
-        $message = "Le type d'équipement: $type->nom a été supprimé avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le type d'équipement: $type->nom a été supprimé avec succès."]);
     }
 
     public function restore(int $id): JsonResponse
     {
         $type = TypeEquipement::withTrashed()->find($id);
+        $this->authorize('restore', $type);
         $type->restore();
-        $message = "Le type d'équipement $type->nom a été restauré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le type d'équipement $type->nom a été restauré avec succès."]);
     }
 
     public function trashed(): JsonResponse
     {
         $response = Gate::inspect('viewAny', TypeEquipement::class);
-        if ($response->allowed()) {
-            $types = TypeEquipement::with('site')->onlyTrashed()->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $types = TypeEquipement::with('site')->inside($sites)->onlyTrashed()->get();
-        }
+        $query = TypeEquipement::with('site');
+        $types = $response->allowed() ? $query->get() : $query->owner()->onlyTrashed()->get();
         return response()->json(['types' => $types]);
     }
 
     public function show(int $id): JsonResponse
     {
         $type = TypeEquipement::with('site')->withTrashed()->find($id);
+        $this->authorize('update', $type);
         return response()->json(['type' => $type]);
     }
 }

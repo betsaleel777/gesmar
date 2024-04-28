@@ -214,6 +214,7 @@ return [
     'ordonnancement' => [
         'list-global' => 'global-ordonnancement',
         'list-own' => 'own-ordonnancement',
+        'create' => 'create-ordonnancement',
         'show' => 'show-ordonnancement',
     ],
     'facture-dashboard' => [

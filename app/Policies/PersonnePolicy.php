@@ -30,10 +30,10 @@ class PersonnePolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.personne.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des prospects ou clients");
+        return $user->can(config('gate.personne.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Personne $personne)
+    public function view(User $user, Personne $personne): bool | Response
     {
         return self::checkPermissionWithOwner($user, $personne, 'show') or self::checkPermissionWithOwner($user, $personne, 'edit');
     }
@@ -43,22 +43,22 @@ class PersonnePolicy
         return $user->can(config('gate.personne.create')) ? true : false;
     }
 
-    public function update(User $user, Personne $personne)
+    public function update(User $user, Personne $personne): bool | Response
     {
         return self::checkPermissionWithOwner($user, $personne, 'edit');
     }
 
-    public function delete(User $user, Personne $personne)
+    public function delete(User $user, Personne $personne): bool | Response
     {
         return self::checkPermissionWithOwner($user, $personne, 'trash');
     }
 
-    public function restore(User $user, Personne $personne)
+    public function restore(User $user, Personne $personne): bool | Response
     {
         return self::checkPermissionWithOwner($user, $personne, 'restore');
     }
 
-    public function forceDelete(User $user, Personne $personne)
+    public function forceDelete(User $user, Personne $personne): bool | Response
     {
         return self::checkPermissionWithOwner($user, $personne, 'delete');
     }

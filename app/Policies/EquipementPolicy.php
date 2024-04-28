@@ -30,10 +30,10 @@ class EquipementPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.equipement.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des équipements");
+        return $user->can(config('gate.equipement.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Equipement $equipement): bool
+    public function view(User $user, Equipement $equipement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $equipement, 'show') or self::checkPermissionWithOwner($user, $equipement, 'edit');
     }
@@ -43,22 +43,22 @@ class EquipementPolicy
         return $user->can(config('gate.equipement.create')) ? true : false;
     }
 
-    public function update(User $user, Equipement $equipement): bool
+    public function update(User $user, Equipement $equipement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $equipement, 'edit');
     }
 
-    public function delete(User $user, Equipement $equipement): bool
+    public function delete(User $user, Equipement $equipement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $equipement, 'trash');
     }
 
-    public function restore(User $user, Equipement $equipement): bool
+    public function restore(User $user, Equipement $equipement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $equipement, 'restore');
     }
 
-    public function forceDelete(User $user, Equipement $equipement): bool
+    public function forceDelete(User $user, Equipement $equipement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $equipement, 'delete');
     }

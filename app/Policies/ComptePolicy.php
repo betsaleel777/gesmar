@@ -19,7 +19,7 @@ class ComptePolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.compte.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des comptes.");
+        return $user->can(config('gate.compte.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function view(User $user, Compte $compte)

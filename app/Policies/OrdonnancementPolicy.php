@@ -30,10 +30,15 @@ class OrdonnancementPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.ordonnancement.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des ordonnancements.");
+        return $user->can(config('gate.ordonnancement.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Ordonnancement $ordonnancement): bool
+    public function create(User $user): bool
+    {
+        return $user->can(config('gate.ordonnancement.create')) ? true : false;
+    }
+
+    public function view(User $user, Ordonnancement $ordonnancement): bool | Response
     {
         return self::checkPermissionWithOwner($user, $ordonnancement, 'show') or
         self::checkPermissionWithOwner($user, $ordonnancement, 'edit');

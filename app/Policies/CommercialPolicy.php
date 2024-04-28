@@ -19,7 +19,7 @@ class CommercialPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.commercial.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des commerciaux");
+        return $user->can(config('gate.commercial.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function view(User $user, Commercial $commercial): bool

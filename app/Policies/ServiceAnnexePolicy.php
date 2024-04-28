@@ -30,10 +30,10 @@ class ServiceAnnexePolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.annexe.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des services annexes.");
+        return $user->can(config('gate.annexe.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, ServiceAnnexe $serviceAnnexe)
+    public function view(User $user, ServiceAnnexe $serviceAnnexe): bool | Response
     {
         return self::checkPermissionWithOwner($user, $serviceAnnexe, 'show') or self::checkPermissionWithOwner($user, $serviceAnnexe, 'edit');
     }
@@ -43,22 +43,22 @@ class ServiceAnnexePolicy
         return $user->can(config('gate.annexe.create')) ? true : false;
     }
 
-    public function update(User $user, ServiceAnnexe $serviceAnnexe)
+    public function update(User $user, ServiceAnnexe $serviceAnnexe): bool | Response
     {
         return self::checkPermissionWithOwner($user, $serviceAnnexe, 'edit');
     }
 
-    public function delete(User $user, ServiceAnnexe $serviceAnnexe)
+    public function delete(User $user, ServiceAnnexe $serviceAnnexe): bool | Response
     {
         return self::checkPermissionWithOwner($user, $serviceAnnexe, 'trash');
     }
 
-    public function restore(User $user, ServiceAnnexe $serviceAnnexe)
+    public function restore(User $user, ServiceAnnexe $serviceAnnexe): bool | Response
     {
         return self::checkPermissionWithOwner($user, $serviceAnnexe, 'restore');
     }
 
-    public function forceDelete(User $user, ServiceAnnexe $serviceAnnexe)
+    public function forceDelete(User $user, ServiceAnnexe $serviceAnnexe): bool | Response
     {
         return self::checkPermissionWithOwner($user, $serviceAnnexe, 'delete');
     }

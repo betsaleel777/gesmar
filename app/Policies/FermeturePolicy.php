@@ -30,10 +30,10 @@ class FermeturePolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.point-caisse.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des points de caisse.");
+        return $user->can(config('gate.point-caisse.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Fermeture $fermeture): bool
+    public function view(User $user, Fermeture $fermeture): bool | Response
     {
         return self::checkPermissionWithOwner($user, $fermeture, 'show') or
         self::checkPermissionWithOwner($user, $fermeture, 'edit');

@@ -19,12 +19,12 @@ class ContratPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.contrat.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des contrats et demandes.");
+        return $user->can(config('gate.contrat.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function viewValidAny(User $user)
+    public function viewValidAny(User $user): Response
     {
-        $user->can(config('gate.contrat.list-valid-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des contrats et demandes valides.");
+        return $user->can(config('gate.contrat.list-valid-global')) ? Response::allow() : Response::deny();
     }
 
     public function viewValid(User $user, Contrat $contrat): bool

@@ -19,7 +19,7 @@ class BanquePolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.banque.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des banques.");
+        return $user->can(config('gate.banque.list-global')) ? Response::allow() : Response::deny();
     }
 
     public function create(User $user): bool | Response

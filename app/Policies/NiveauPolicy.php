@@ -30,10 +30,10 @@ class NiveauPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can(config('gate.niveau.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des niveaux.");
+        return $user->can(config('gate.niveau.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Niveau $niveau): bool
+    public function view(User $user, Niveau $niveau): bool | Response
     {
         return self::checkPermissionWithOwner($user, $niveau, 'show') or self::checkPermissionWithOwner($user, $niveau, 'edit');
     }
@@ -43,17 +43,17 @@ class NiveauPolicy
         return $user->can(config('gate.niveau.create')) ? true : false;
     }
 
-    public function update(User $user, Niveau $niveau): bool
+    public function update(User $user, Niveau $niveau): bool | Response
     {
         return self::checkPermissionWithOwner($user, $niveau, 'edit');
     }
 
-    public function delete(User $user, Niveau $niveau): bool
+    public function delete(User $user, Niveau $niveau): bool | Response
     {
         return self::checkPermissionWithOwner($user, $niveau, 'trash');
     }
 
-    public function restore(User $user, Niveau $niveau): bool
+    public function restore(User $user, Niveau $niveau): bool | Response
     {
         return self::checkPermissionWithOwner($user, $niveau, 'restore');
     }

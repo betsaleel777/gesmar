@@ -28,12 +28,12 @@ class ZonePolicy
         }
     }
 
-    public function viewAny(User $user)
+    public function viewAny(User $user): Response
     {
-        $user->can(config('gate.zone.list-global')) ? Response::allow() : Response::deny("Accès interdit à la liste des zones.");
+        return $user->can(config('gate.zone.list-global')) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $user, Zone $zone): bool
+    public function view(User $user, Zone $zone): bool | Response
     {
         return self::checkPermissionWithOwner($user, $zone, 'show') or self::checkPermissionWithOwner($user, $zone, 'edit');
     }
@@ -43,22 +43,22 @@ class ZonePolicy
         return $user->can(config('gate.zone.create')) ? true : false;
     }
 
-    public function update(User $user, Zone $zone): bool
+    public function update(User $user, Zone $zone): bool | Response
     {
         return self::checkPermissionWithOwner($user, $zone, 'edit');
     }
 
-    public function delete(User $user, Zone $zone): bool
+    public function delete(User $user, Zone $zone): bool | Response
     {
         return self::checkPermissionWithOwner($user, $zone, 'trash');
     }
 
-    public function restore(User $user, Zone $zone): bool
+    public function restore(User $user, Zone $zone): bool | Response
     {
         return self::checkPermissionWithOwner($user, $zone, 'restore');
     }
 
-    public function forceDelete(User $user, Zone $zone): bool
+    public function forceDelete(User $user, Zone $zone): bool | Response
     {
         return self::checkPermissionWithOwner($user, $zone, 'delete');
     }

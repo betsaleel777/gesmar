@@ -181,6 +181,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'filter-facture-dashboard', 'description' => "filtrer le dashboard des factures"],
             ['name' => 'global-ordonnancement', 'description' => "afficher tout les ordonnancements"],
             ['name' => 'own-ordonnancement', 'description' => "afficher uniquement les ordonnancements crées par l'utilisateur connecté"],
+            ['name' => 'create-ordonnancement', 'description' => "créer un ordonnancement"],
             ['name' => 'show-ordonnancement', 'description' => "afficher les informations détaillées d'un ordonnancement"],
             ['name' => 'global-facture-initiale', 'description' => "afficher toutes les factures PDP"],
             ['name' => 'own-facture-initiale', 'description' => "afficher uniquement les factures PDP crées par l'utilisateur connecté"],
