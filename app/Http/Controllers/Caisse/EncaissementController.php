@@ -24,7 +24,7 @@ class EncaissementController extends Controller
         $encaissement = new Encaissement($request->all());
         $ouverture = Ouverture::using()->where('caissier_id', $request->caissier_id)->first();
         $encaissement->ouverture_id = $ouverture->id;
-        $espece = Espece::findOrFail($espece->id);
+        $espece = Espece::find($espece->id);
         $encaissement->payable()->associate($espece);
         $encaissement->save();
         EncaissementRegistred::dispatch($encaissement);
@@ -38,7 +38,7 @@ class EncaissementController extends Controller
         $encaissement = new Encaissement($request->all());
         $ouverture = Ouverture::using()->where('caissier_id', $request->caissier_id)->first();
         $encaissement->ouverture_id = $ouverture->id;
-        $cheque = Cheque::findOrFail($cheque->id);
+        $cheque = Cheque::find($cheque->id);
         $encaissement->payable()->associate($cheque);
         $encaissement->save();
         EncaissementRegistred::dispatch($encaissement);
@@ -55,7 +55,7 @@ class EncaissementController extends Controller
     public function show(int $id): JsonResponse
     {
         $encaissement = Encaissement::with('payable', 'caissier:id,user_id', 'caissier.user:id,name', 'ordonnancement:id,total,code',
-            'ordonnancement.emplacement:emplacements.id,emplacements.code', 'ordonnancement.personne', 'ouverture:id,guichet_id', 'ouverture.guichet:id,nom', 'bordereau:id,code')->find($id);
+            'ordonnancement.emplacement:emplacements.id,emplacements.code', 'ordonnancement.annexe:service_annexes.id,service_annexes.nom', 'ordonnancement.personne', 'ouverture:id,guichet_id', 'ouverture.guichet:id,nom', 'bordereau:id,code')->find($id);
         $this->authorize('view', $encaissement);
         return response()->json(['encaissement' => EncaissementResource::make($encaissement)]);
     }

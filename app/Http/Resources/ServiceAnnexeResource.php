@@ -2,24 +2,21 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Architecture\ServiceAnnexe;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property ServiceAnnexe $resource
+ */
 class ServiceAnnexeResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
-            'code' => $this->code,
-            'nom' => $this->nom,
-            'site_id' => $this->site_id,
-            'prix' => $this->prix,
-            'description' => $this->description,
+            'id' => $this->resource->id,
+            'code' => $this->whenNotNull($this->resource->code),
+            'nom' => $this->whenNotNull($this->resource->nom),
+            'description' => $this->whenNotNull($this->resource->description),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }

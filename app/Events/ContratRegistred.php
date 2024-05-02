@@ -9,7 +9,7 @@ class ContratRegistred
 {
     use Dispatchable;
 
-    public function __construct(public Contrat $contrat, public int $avance = 0)
+    public function __construct(public Contrat $contrat, public int $avance = 0, public int $montantAnnexe = 0)
     {
     }
 }

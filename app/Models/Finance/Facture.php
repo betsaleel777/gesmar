@@ -7,6 +7,7 @@ use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Architecture\Site;
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Paiement;
+use App\Models\Exploitation\Personne;
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasEquipement;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
@@ -45,9 +47,9 @@ class Facture extends Model implements Auditable
         'caution',
         'pas_porte',
         'periode',
+        'montant_annexe',
     ];
     protected $auditExclude = ['code'];
-    protected $with = ['contrat'];
     protected $appends = ['status'];
 
     protected $casts = [
@@ -56,9 +58,7 @@ class Facture extends Model implements Auditable
         'equipement_id' => 'integer', 'annexe_id' => 'integer',
     ];
 
-    public const RULES = [
-        'contrat_id' => 'required',
-    ];
+    public const RULES = ['contrat_id' => 'required'];
 
     protected static function booted()
     {
@@ -68,8 +68,8 @@ class Facture extends Model implements Auditable
 
     public function codeGenerate(string $prefix): void
     {
-        $rang = $this->count() + 1;
-        $this->attributes['code'] = $prefix . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
+        $this->attributes['code'] = $prefix . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
     /**
@@ -246,5 +246,10 @@ class Facture extends Model implements Auditable
     public function site(): HasOneThrough
     {
         return $this->hasOneThrough(Site::class, Contrat::class, 'id', 'id', 'contrat_id', 'site_id');
+    }
+
+    public function personne(): HasOneThrough
+    {
+        return $this->hasOneThrough(Personne::class, Contrat::class, 'id', 'id', 'contrat_id', 'personne_id');
     }
 }

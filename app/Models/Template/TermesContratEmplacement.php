@@ -36,7 +36,7 @@ class TermesContratEmplacement extends TermesContrat implements HasMedia
 
     public function codeGenerate(): void
     {
-        $rang = $this->count() + 1;
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
         $this->attributes['code'] = TEMPLATE_BAIL_PREFIXE . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
     }
 

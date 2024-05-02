@@ -2,28 +2,23 @@
 
 namespace App\Http\Resources\Facture;
 
+use App\Http\Resources\Contrat\ContratResource;
+use App\Http\Resources\Personne\PersonneResource;
+use App\Http\Resources\ServiceAnnexeResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class FactureAnnexeListResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
+            'code' => $this->whenNotNull($this->code),
             'status' => $this->whenAppended('status'),
-            'contrat_code' => $this->whenLoaded('contrat', fn() => $this->contrat->code),
-            'personne' => $this->when(
-                $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
-                fn() => $this->contrat->personne->getAlias()
-            ),
-            'annexe' => $this->whenLoaded('annexe', fn() => $this->annexe->nom),
-            'prix' => $this->whenLoaded('annexe', fn() => $this->annexe->prix),
+            'montant' => $this->whenNotNull($this->montant_annexe),
+            'contrat' => ContratResource::make($this->whenLoaded('contrat')),
+            'personne' => PersonneResource::make($this->whenLoaded('personne')),
+            'annexe' => ServiceAnnexeResource::make($this->whenLoaded('annexe')),
         ];
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 
 class EquipementsController extends Controller
@@ -25,7 +26,7 @@ class EquipementsController extends Controller
     private static function codeGenerate(int $site): array
     {
         $rang = (string) (Site::findOrFail($site)->equipements->count() + 1);
-        return ['code' => 'EQU' . str_pad($rang, 7, '0', STR_PAD_LEFT), 'rang' => $rang];
+        return ['code' => 'EQU' . str_pad($rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y'), 'rang' => $rang];
     }
 
     public function all(): JsonResponse

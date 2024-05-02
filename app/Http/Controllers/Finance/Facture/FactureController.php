@@ -13,7 +13,7 @@ use Illuminate\Http\JsonResponse;
 
 class FactureController extends Controller
 {
-    const RELATIONS = ['contrat' => ['personne', 'site', 'emplacement']];
+    const RELATIONS = ['contrat' => ['personne', 'site', 'emplacement', 'annexe']];
 
     public function all(): JsonResponse
     {

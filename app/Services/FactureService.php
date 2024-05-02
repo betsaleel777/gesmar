@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Exploitation\Contrat;
-use App\Models\Exploitation\Paiement;
 use App\Models\Finance\Facture;
 use Illuminate\Support\Collection;
 
@@ -14,10 +13,10 @@ class FactureService
     {
     }
 
-    private static function checkForAnnexe(Paiement $paiement): bool
-    {
-        return false;
-    }
+    // private static function checkForAnnexe(Paiement $paiement): void
+    // {
+    //     $paiement->facture;
+    // }
 
     private static function checkForBail(Collection $paiements): void
     {
@@ -27,7 +26,7 @@ class FactureService
             foreach ($paiements as $paiement) {
                 $facture = $paiement->facture;
                 if ($facture->isInitiale()) {
-                    $factureInitiale = Facture::with('paiements')->findOrFail($facture->id);
+                    $factureInitiale = Facture::with('paiements')->find($facture->id);
                     $total = $factureInitiale->paiements->sum('montant');
                     $siFactureSoldee = $facture->pas_porte + ($facture->caution + $facture->avance) * $emplacement->loyer === $total;
                     $siFactureSoldee ? $facture->payer() : null;
@@ -45,6 +44,6 @@ class FactureService
         foreach ($this->paiements as $paiement) {
             $paiement->facture->isAnnexe() ? $paiementAnnexe = $paiement : $paiementsBails->push($paiement);
         }
-        !empty($paiementAnnexe) ? self::checkForAnnexe($paiementAnnexe) : self::checkForBail($paiementsBails);
+        !empty($paiementAnnexe) ? $paiementAnnexe->facture->payer() : self::checkForBail($paiementsBails);
     }
 }

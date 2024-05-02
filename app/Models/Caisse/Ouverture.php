@@ -46,7 +46,7 @@ class Ouverture extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = $this->count() + 1;
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
         $this->attributes['code'] = OUVERTURE_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 

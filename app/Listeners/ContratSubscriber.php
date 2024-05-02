@@ -16,6 +16,7 @@ class ContratSubscriber
     {
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
+        $facture->montant_annexe = $event->montantAnnexe;
         $facture->codeGenerate(ANNEXE_FACTURE_PREFIXE);
         $facture->annexe_id = $event->contrat->annexe_id;
         $facture->save();

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 
 class AbonnementsController extends Controller
@@ -21,8 +22,8 @@ class AbonnementsController extends Controller
     {
         $abonnement = Abonnement::where('site_id', $site)->latest()->first();
         $rang = empty($abonnement) ? 1 : $abonnement->id;
-        $place = str_pad((string) $rang, 6, '0', STR_PAD_LEFT);
-        return 'AB' . str_pad((string) $site, 2, '0', STR_PAD_LEFT) . $place;
+        $place = str_pad((string) $rang, 4, '0', STR_PAD_LEFT);
+        return 'AB' . str_pad((string) $site, 2, '0', STR_PAD_LEFT) . $place . Carbon::now()->format('y');
     }
 
     public function all(): JsonResponse

@@ -18,6 +18,7 @@ class FactureAnnexeResource extends JsonResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'montant' => $this->whenNotNull($this->montant_annexe),
             'contrat_code' => $this->whenLoaded('contrat', fn() => $this->contrat->code),
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),
             'paiements' => PaiementResource::collection($this->whenLoaded('paiements')),

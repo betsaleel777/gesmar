@@ -41,7 +41,7 @@ class CaissierController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $caissier = Caissier::with('attributionsGuichet', 'user:id,name')->findOrFail($id);
+        $caissier = Caissier::with('attributionsGuichet', 'user:id,name')->find($id);
         $this->authorize('view', $caissier);
         return response()->json(['caissier' => CaissierResource::make($caissier)]);
     }

@@ -15,14 +15,8 @@ class TermesContratAnnexe extends TermesContrat implements HasMedia
     use InteractsWithMedia;
 
     protected $table = 'termes_contrats';
-
     private const TYPE = 'contrat annexe';
 
-    /**
-     * Undocumented function
-     *
-     * @param  array<string, mixed>  $attributes
-     */
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -36,7 +30,7 @@ class TermesContratAnnexe extends TermesContrat implements HasMedia
 
     public function codeGenerate(): void
     {
-        $rang = $this->count() + 1;
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
         $this->attributes['code'] = TEMPLATE_ANNEXE_PREFIXE . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
     }
 

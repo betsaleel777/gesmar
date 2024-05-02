@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('code', 10);
             $table->string('nom', 250);
-            $table->unsignedInteger('prix');
             $table->longText('description')->nullable();
             $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
             $table->softDeletes();

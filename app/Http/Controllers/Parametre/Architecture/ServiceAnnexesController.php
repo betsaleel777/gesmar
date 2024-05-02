@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ServiceAnnexeResource;
 use App\Models\Architecture\ServiceAnnexe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class ServiceAnnexesController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $annexe = ServiceAnnexe::with('site')->findOrFail($id);
+        $annexe = ServiceAnnexe::with('site')->find($id);
         $this->authorize('view', $annexe);
         return response()->json(['annexe' => $annexe]);
     }
@@ -36,7 +37,7 @@ class ServiceAnnexesController extends Controller
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $annexe = ServiceAnnexe::findOrFail($id);
+        $annexe = ServiceAnnexe::find($id);
         $this->authorize('update', $annexe);
         $request->validate(ServiceAnnexe::RULES);
         $annexe->update($request->all());
@@ -61,7 +62,7 @@ class ServiceAnnexesController extends Controller
 
     public function trash(int $id): JsonResponse
     {
-        $annexe = ServiceAnnexe::findOrFail($id);
+        $annexe = ServiceAnnexe::find($id);
         $this->authorize('delete', $annexe);
         $annexe->delete();
         return response()->json(['message' => "Le service annexe $annexe->nom a été supprimé avec succès."]);
@@ -70,8 +71,16 @@ class ServiceAnnexesController extends Controller
     public function getByMarche(int $id): JsonResponse
     {
         $response = Gate::inspect('viewAny', ServiceAnnexe::class);
-        $query = ServiceAnnexe::with('site')->where('site_id', $id);
+        $query = ServiceAnnexe::select('id', 'nom')->where('site_id', $id)->isFree();
         $annexes = $response->allowed() ? $query->get() : $query->owner()->get();
-        return response()->json(['annexes' => $annexes]);
+        return response()->json(['annexes' => ServiceAnnexeResource::collection($annexes)]);
+    }
+
+    public function getFree(): JsonResponse
+    {
+        $response = Gate::inspect('viewAny', ServiceAnnexe::class);
+        $query = ServiceAnnexe::select('id', 'nom')->isFree();
+        $annexes = $response->allowed() ? $query->get() : $query->owner()->get();
+        return response()->json(['annexes' => ServiceAnnexeResource::collection($annexes)]);
     }
 }
