@@ -75,7 +75,7 @@ class TypeEmplacementsController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $type = Type::find($id);
+        $type = Type::with('site:id,nom')->find($id);
         $this->authorize('update', $type);
         return response()->json(['type' => TypeEmplacementResource::make($type)]);
     }
