@@ -20,6 +20,7 @@ use App\Http\Controllers\Exploitation\Reception\OrdonnancementController;
 use App\Http\Controllers\Exploitation\Reception\PersonnesController;
 use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
+use App\Http\Controllers\FileDownloadManager;
 use App\Http\Controllers\Finance\ChequeController;
 use App\Http\Controllers\Finance\Facture\FactureAnnexeController;
 use App\Http\Controllers\Finance\Facture\FactureController;
@@ -61,6 +62,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
+Route::middleware('auth:sanctum')->get('/media', [FileDownloadManager::class, 'index']);
 Route::middleware('auth:sanctum')->controller(AuthController::class)->group(function (): void {
     Route::post('deconnecter', 'deconnecter');
     Route::post('logout', 'logout');
