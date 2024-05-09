@@ -15,12 +15,14 @@ class FactureInitialeListResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
+            'code' => $this->whenNotNull($this->code),
+            'status' => $this->whenAppended('status'),
             'avance' => $this->whenNotNull($this->avance, 0),
             'caution' => $this->whenNotNull($this->caution, 0),
-            'pas_porte' => $this->pas_porte,
-            'status' => $this->whenAppended('status'),
-            'contrat' => $this->whenLoaded('contrat', fn() => $this->contrat->code_contrat ?? $this->contrat->code),
+            'pas_porte' => $this->whenNotNull($this->pas_porte),
+            'frais_dossier' => $this->whenNotNull($this->frais_dossier),
+            'frais_amenagement' => $this->whenNotNull($this->frais_amenagement),
+            'contrat' => $this->whenLoaded('contrat', fn() => $this->contrat->codification()),
             'personne' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
                 $this->contrat->personne->nom . ' ' . $this->contrat->personne->prenom

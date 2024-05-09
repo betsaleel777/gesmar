@@ -17,8 +17,8 @@ return new class() extends Migration
             $table->id();
             $table->string('code', 10)->unique();
             $table->date('periode')->nullable();
-            $table->unsignedTinyInteger('avance')->nullable();
-            $table->unsignedTinyInteger('caution')->nullable();
+            $table->unsignedInteger('avance')->nullable();
+            $table->unsignedInteger('caution')->nullable();
             $table->unsignedInteger('pas_porte')->nullable();
             $table->foreignId('annexe_id')->nullable()->constrained('service_annexes')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('equipement_id')->nullable()->constrained('equipements')->onDelete('cascade')->onUpdate('cascade');

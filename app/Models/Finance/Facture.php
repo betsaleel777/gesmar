@@ -48,6 +48,8 @@ class Facture extends Model implements Auditable
         'pas_porte',
         'periode',
         'montant_annexe',
+        'frais_dossier',
+        'frais_amenagement',
     ];
     protected $auditExclude = ['code'];
     protected $appends = ['status'];
@@ -55,7 +57,8 @@ class Facture extends Model implements Auditable
     protected $casts = [
         'avance' => 'integer', 'caution' => 'integer', 'index_fin' => 'integer',
         'pas_porte' => 'integer', 'index_depart' => 'integer', 'contrat_id' => 'integer',
-        'equipement_id' => 'integer', 'annexe_id' => 'integer',
+        'equipement_id' => 'integer', 'annexe_id' => 'integer', 'frais_dossier' => 'integer',
+        'frais_amenagement' => 'integer',
     ];
 
     public const RULES = ['contrat_id' => 'required'];
@@ -112,6 +115,12 @@ class Facture extends Model implements Auditable
     public static function loyerRules(): array
     {
         return [ ...self::RULES, ...['periode' => 'required']];
+    }
+
+    public function getFactureInitialeTotalAmount(): int
+    {
+        return (int) $this?->pas_porte + (int) $this?->caution + (int) $this?->avance + (int) $this?->frais_dossier +
+        (int) $this?->frais_amenagement;
     }
 
     public function payer(): void

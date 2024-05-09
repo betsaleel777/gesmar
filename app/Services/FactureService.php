@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Exploitation\Contrat;
 use App\Models\Finance\Facture;
 use Illuminate\Support\Collection;
 
@@ -21,15 +20,12 @@ class FactureService
     private static function checkForBail(Collection $paiements): void
     {
         if (!$paiements->isEmpty()) {
-            $contrat = Contrat::with('emplacement')->findOrFail($paiements->first()->facture->contrat_id);
-            $emplacement = $contrat->emplacement;
             foreach ($paiements as $paiement) {
-                $facture = $paiement->facture;
+                $facture = $paiement->loadMissing('facture')->facture;
                 if ($facture->isInitiale()) {
-                    $factureInitiale = Facture::with('paiements')->find($facture->id);
-                    $total = $factureInitiale->paiements->sum('montant');
-                    $siFactureSoldee = $facture->pas_porte + ($facture->caution + $facture->avance) * $emplacement->loyer === $total;
-                    $siFactureSoldee ? $facture->payer() : null;
+                    $facture->loadMissing('paiements');
+                    // vérifier si la facture est soldée
+                    $facture->getFactureInitialeTotalAmount() === $facture->paiements->sum('montant') ? $facture->payer() : null;
                 } else {
                     $facture->payer();
                 }

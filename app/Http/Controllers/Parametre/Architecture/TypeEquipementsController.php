@@ -7,6 +7,7 @@ use App\Http\Resources\Abonnement\TypeEquipementListResource;
 use App\Models\Architecture\TypeEquipement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 
 class TypeEquipementsController extends Controller
@@ -17,6 +18,14 @@ class TypeEquipementsController extends Controller
         $query = TypeEquipement::with('site');
         $types = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['types' => TypeEquipementListResource::collection($types)]);
+    }
+
+    public function getBySite(Request $request): JsonResource
+    {
+        $response = Gate::inspect('viewAny', TypeEquipement::class);
+        $query = TypeEquipement::where('site_id', (int) $request->query('id'));
+        $types = $response->allowed() ? $query->get() : $query->owner()->get();
+        return TypeEquipementListResource::collection($types);
     }
 
     public function store(Request $request): JsonResponse
