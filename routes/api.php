@@ -205,6 +205,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     Route::controller(TypeEquipementsController::class)->prefix('equipement/types')->group(function (): void {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
+        Route::get('/site', 'getBySite');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
         Route::delete('{id}', 'trash');
@@ -441,7 +442,6 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
                 Route::get('/paginate', 'getPaginate');
                 Route::get('/search/{search}/paginate', 'getSearch');
                 Route::get('/trashed', 'trashed');
-                Route::post('/store', 'store');
                 Route::get('/marche/{id}', 'getByMarche');
                 Route::get('{id}', 'show');
                 Route::put('{id}', 'update');

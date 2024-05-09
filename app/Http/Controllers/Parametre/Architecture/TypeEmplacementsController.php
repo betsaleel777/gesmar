@@ -15,7 +15,7 @@ class TypeEmplacementsController extends Controller
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Type::class);
-        $query = Type::with('site');
+        $query = Type::with('site:id,nom');
         $types = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['types' => TypeEmplacementListResource::collection($types)]);
     }
@@ -32,7 +32,7 @@ class TypeEmplacementsController extends Controller
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $type = Type::findOrFail($id);
+        $type = Type::find($id);
         $this->authorize('update', $type);
         $request->validate(Type::RULES);
         $type->update($request->all());
@@ -68,7 +68,7 @@ class TypeEmplacementsController extends Controller
     public function trashed(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Type::class);
-        $query = Type::with('site')->onlyTrashed();
+        $query = Type::with('site:id,nom')->onlyTrashed();
         $types = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['types' => $types]);
     }

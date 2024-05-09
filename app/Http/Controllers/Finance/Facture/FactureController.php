@@ -41,7 +41,7 @@ class FactureController extends Controller
 
     public function payer(int $id): JsonResponse
     {
-        $facture = Facture::findOrFail($id);
+        $facture = Facture::find($id);
         $facture->payer();
         $facture->save();
         $message = "La facture $facture->code a été payée avec succès.";

@@ -66,20 +66,9 @@ class FactureInitialeController extends Controller
         return response()->json(['facture' => FactureInitialeListResource::make($facture)]);
     }
 
-    public function store(Request $request): JsonResponse
-    {
-        $this->authorize('create', [Facture::class, 'initiale']);
-        $request->validate(Facture::initialeRules());
-        $facture = new Facture($request->all());
-        $facture->codeGenerate(INITIALE_FACTURE_PREFIXE);
-        $facture->proforma();
-        $facture->save();
-        return response()->json(['message' => "La facture initiale: $facture->code a été crée avec succès."]);
-    }
-
     public function update(int $id, Request $request): JsonResponse
     {
-        $facture = Facture::findOrFail($id);
+        $facture = Facture::find($id);
         $this->authorize('update', [$facture, 'initiale']);
         $request->validate(Facture::INITIALE_EDIT_RULES);
         $facture->update($request->all());

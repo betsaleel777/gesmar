@@ -11,11 +11,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class TypeEmplacementResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
@@ -23,6 +18,8 @@ class TypeEmplacementResource extends JsonResource
             'code' => $this->when(!empty($this->getCode()), $this->getCode()),
             'nom' => $this->when(!empty($this->nom), str($this->nom)->lower()),
             'prefix' => $this->when(!empty($this->prefix), str($this->prefix)->upper()),
+            'frais_dossier' => $this->whenNotNull($this->frais_dossier),
+            'frais_amenagement' => $this->whenNotNull($this->frais_amenagement),
             'auto_valid' => $this->whenNotNull($this->auto_valid),
             'equipable' => $this->whenNotNull($this->equipable),
             'site' => SiteResource::make($this->whenLoaded('site')),
