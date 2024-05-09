@@ -13,16 +13,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class NiveauxController extends Controller implements StandardControllerInterface
 {
     /**
      * Undocumented function
-     *
-     * @param  int  $nombre
-     * @return void
      */
     private static function pusher(int $pavillon, int $nombre): void
     {
@@ -43,29 +39,17 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         $response = Gate::inspect('viewAny', Niveau::class);
         $request = Niveau::select('id', 'nom', 'pavillon_id', 'created_at')
             ->with('pavillon:pavillons.id,pavillons.nom', 'site:sites.id,sites.nom');
-        if ($response->allowed()) {
-            $niveaux = $request->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $niveaux = $request->inside($sites)->get();
-        }
+        $niveaux = $response->allowed() ? $request->get() : $request->owner()->get();
         return response()->json(['niveaux' => NiveauListResource::collection($niveaux)]);
     }
 
     public function search(Request $request): JsonResource
     {
         $response = Gate::inspect('viewAny', Niveau::class);
-        if ($response->allowed()) {
-            $niveaux = Niveau::with('site', 'pavillon')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
-                ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $niveaux = Niveau::with('site', 'pavillon')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%', true)
-                        ->whereIn('sites.id', $sites))
-                ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
-        }
+        $query = Niveau::with('site', 'pavillon')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+            ->orWhereHas('site', fn(Builder $query) => $query->where('sites.nom', 'LIKE', '%' . $request->query('search') . '%'))
+            ->orWhereHas('pavillon', fn(Builder $query) => $query->where('pavillons.nom', 'LIKE', '%' . $request->query('search') . '%'));
+        $niveaux = $response->allowed() ? $query->get() : $query->owner()->get();
         return NiveauSelectResource::collection($niveaux);
     }
 
@@ -82,8 +66,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
             $niveau->code = (string) ($pavillon->niveaux->count() + 1);
             $niveau->save();
         }
-        $message = "Le niveau $request->nom a été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le niveau $request->nom a été crée avec succès."]);
     }
 
     public function update(int $id, Request $request): JsonResponse
@@ -94,8 +77,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         $niveau->nom = $request->nom;
         $niveau->pavillon_id = $request->pavillon_id;
         $niveau->save();
-        $message = 'Le niveau a été modifié avec succès.';
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => 'Le niveau a été modifié avec succès.']);
     }
 
     public function trash(int $id): JsonResponse
@@ -103,8 +85,7 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         $niveau = Niveau::findOrFail($id);
         $this->authorize('delete', $niveau);
         $niveau->delete();
-        $message = "Le niveau $niveau->nom a été supprimé avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le niveau $niveau->nom a été supprimé avec succès."]);
     }
 
     public function restore(int $id): JsonResponse
@@ -112,19 +93,14 @@ class NiveauxController extends Controller implements StandardControllerInterfac
         $niveau = Niveau::withTrashed()->find($id);
         $this->authorize('restore', $niveau);
         $niveau->restore();
-        $message = "Le niveau $niveau->nom a été restauré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le niveau $niveau->nom a été restauré avec succès."]);
     }
 
     public function trashed(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Niveau::class);
-        if ($response->allowed()) {
-            $niveaux = Niveau::with('pavillon')->onlyTrashed()->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $niveaux = Niveau::with('pavillon')->inside($sites)->onlyTrashed()->get();
-        }
+        $query = Niveau::with('pavillon')->onlyTrashed();
+        $niveaux = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['niveaux' => $niveaux]);
     }
 
@@ -138,7 +114,8 @@ class NiveauxController extends Controller implements StandardControllerInterfac
 
     public function getByPavillon(int $id): JsonResponse
     {
-        $niveaux = Pavillon::findOrFail($id)->niveaux;
+        $response = Gate::inspect('viewAny', Niveau::class);
+        $niveaux = $response->allowed() ? Niveau::where('pavillon_id', $id)->get() : Niveau::where('pavillon_id', $id)->owner()->get();
         return response()->json(['niveaux' => $niveaux]);
     }
 }

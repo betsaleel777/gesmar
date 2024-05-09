@@ -2,101 +2,21 @@
 
 namespace App\Policies;
 
-use App\Models\Societe;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SocietePolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.application'))) {
-            return true;
-        }
+        return $user->can(config('gate.application.list')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Societe  $societe
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Societe $societe)
+    public function update(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.application'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
-    {
-        if ($user->can(config('gate.parametre.acces.application'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Societe  $societe
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Societe $societe)
-    {
-        if ($user->can(config('gate.parametre.acces.application'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Societe  $societe
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Societe $societe)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Societe  $societe
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Societe $societe)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Societe  $societe
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Societe $societe)
-    {
-        //
+        return $user->can(config('gate.application.edit')) ? true : false;
     }
 }

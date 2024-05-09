@@ -7,12 +7,14 @@ use App\Http\Resources\Caisse\CompteResource;
 use App\Models\Caisse\Compte;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CompteController extends Controller
 {
     public function all(): JsonResponse
     {
-        $comptes = Compte::get();
+        $response = Gate::inspect('viewAny', Compte::class);
+        $comptes = $response->allowed() ? Compte::with('site')->get() : Compte::with('site')->owner()->get();
         return response()->json(['comptes' => CompteResource::collection($comptes)]);
     }
 
@@ -22,13 +24,12 @@ class CompteController extends Controller
         $request->validate(Compte::RULES);
         $compte = new Compte($request->all());
         $compte->save();
-        $message = "Le compte: $compte->code a été enregistré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le compte: $compte->code a été enregistré avec succès."]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $compte = Compte::findOrFail($id);
+        $compte = Compte::with('site')->findOrFail($id);
         $this->authorize('view', $compte);
         return response()->json(['compte' => $compte]);
     }
@@ -39,7 +40,6 @@ class CompteController extends Controller
         $this->authorize('update', $compte);
         $request->validate(Compte::RULES);
         $compte->update($request->all());
-        $message = 'Le compte a été modifié avec succès.';
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => 'Le compte a été modifié avec succès.']);
     }
 }

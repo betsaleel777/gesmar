@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class PavillonsController extends Controller
@@ -35,29 +34,16 @@ class PavillonsController extends Controller
     {
         $response = Gate::inspect('viewAny', Pavillon::class);
         $requete = Pavillon::select('id', 'nom', 'site_id', 'created_at')->with('site:id,nom');
-        if ($response->allowed()) {
-            $pavillons = $requete->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $requete->inside($sites)->get();
-        }
+        $pavillons = $response->allowed() ? $requete->get() : $requete->owner()->get();
         return response()->json(['pavillons' => PavillonResource::collection($pavillons)]);
     }
 
     public function search(Request $request): JsonResource
     {
         $response = Gate::inspect('viewAny', Pavillon::class);
-        if ($response->allowed()) {
-            $pavillons = Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas('site', fn(Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%'))->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
-                ->orWhereHas('site',
-                    fn(Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%', true)
-                        ->whereIn('sites.id', $sites)
-                )->get();
-        }
+        $query = Pavillon::with('site')->where('nom', 'LIKE', '%' . $request->query('search') . '%')
+            ->orWhereHas('site', fn(Builder $query) => $query->where('nom', 'LIKE', '%' . $request->query('search') . '%'));
+        $pavillons = $response->allowed() ? $query->get() : $query->owner()->get();
         return PavillonSelectResource::collection($pavillons);
     }
 
@@ -85,8 +71,7 @@ class PavillonsController extends Controller
         $pavillon->nom = $request->nom;
         $pavillon->site_id = $request->site_id;
         $pavillon->save();
-        $message = 'Le pavillon a été modifié crée avec succès.';
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => 'Le pavillon a été modifié crée avec succès.']);
     }
 
     public function trash(int $id): JsonResponse
@@ -94,8 +79,7 @@ class PavillonsController extends Controller
         $pavillon = Pavillon::find($id);
         $this->authorize('delete', $pavillon);
         $pavillon->delete();
-        $message = "Le pavillon $pavillon->nom a été supprimé avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le pavillon $pavillon->nom a été supprimé avec succès."]);
     }
 
     public function restore(int $id): JsonResponse
@@ -103,20 +87,14 @@ class PavillonsController extends Controller
         $pavillon = Pavillon::withTrashed()->find($id);
         $this->authorize('restore', $pavillon);
         $pavillon->restore();
-        $message = "Le pavillon $pavillon->nom a été restauré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le pavillon $pavillon->nom a été restauré avec succès."]);
     }
 
     public function trashed(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Pavillon::class);
         $requete = Pavillon::select('id', 'nom', 'site_id', 'created_at')->with('site:id,nom');
-        if ($response->allowed()) {
-            $pavillons = $requete->onlyTrashed()->get();
-        } else {
-            $sites = Auth::user()->sites->modelkeys();
-            $pavillons = $requete->inside($sites)->onlyTrashed()->get();
-        }
+        $pavillons = $response->allowed() ? $requete->onlyTrashed()->get() : $requete->owner()->onlyTrashed()->get();
         return response()->json(['pavillons' => $pavillons]);
     }
 
@@ -129,7 +107,8 @@ class PavillonsController extends Controller
 
     public function getByMarche(int $id): JsonResponse
     {
-        $pavillons = Site::findOrFail($id)->pavillons;
+        $response = Gate::inspect('viewAny', Pavillon::class);
+        $pavillons = $response->allowed() ? Pavillon::where('site_id', $id)->get() : Pavillon::where('site_id', $id)->owner()->get();
         return response()->json(['pavillons' => PavillonResource::collection($pavillons)]);
     }
 }

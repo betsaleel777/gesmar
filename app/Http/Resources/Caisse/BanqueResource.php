@@ -19,7 +19,7 @@ class BanqueResource extends JsonResource
             'sigle' => $this->sigle,
             'nom' => $this->nom,
             'site_id' => $this->site_id,
-            'created_at' => $this->created_at->format('d-m-Y'),
+            'created_at' => $this->created_at?->format('d-m-Y'),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }

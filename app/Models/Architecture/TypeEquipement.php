@@ -5,6 +5,8 @@ namespace App\Models\Architecture;
 use App\Models\Exploitation\Contrat;
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,7 +22,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  */
 class TypeEquipement extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, HasSites;
+    use HasFactory, HasResponsible, HasOwnerScope, SoftDeletes, HasSites;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'site_id', 'frais_penalite', 'caution_abonnement'];

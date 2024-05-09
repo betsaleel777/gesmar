@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources\Abonnement;
 
+use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
 class TypeEquipementListResource extends JsonResource
 {
@@ -19,9 +19,9 @@ class TypeEquipementListResource extends JsonResource
             'nom' => $this->nom,
             'frais_penalite' => $this->frais_penalite,
             'caution_abonnement' => $this->caution_abonnement,
-            'created_at' => $this->created_at->format('d-m-Y'),
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
-            'site' => $this->whenLoaded('site', fn () => Str::lower($this->site->nom)),
+            'created_at' => $this->whenNotNull($this->created_at?->format('d-m-Y')),
+            'site_id' => $this->whenNotNull($this->site_id),
+            'site' => SiteResource::make($this->whenLoaded('site')),
         ];
     }
 }

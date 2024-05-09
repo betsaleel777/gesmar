@@ -20,6 +20,7 @@ use App\Http\Controllers\Exploitation\Reception\OrdonnancementController;
 use App\Http\Controllers\Exploitation\Reception\PersonnesController;
 use App\Http\Controllers\Exploitation\Reception\ProspectsController;
 use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
+use App\Http\Controllers\FileDownloadManager;
 use App\Http\Controllers\Finance\ChequeController;
 use App\Http\Controllers\Finance\Facture\FactureAnnexeController;
 use App\Http\Controllers\Finance\Facture\FactureController;
@@ -61,6 +62,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
+Route::middleware('auth:sanctum')->get('/media', [FileDownloadManager::class, 'index']);
 Route::middleware('auth:sanctum')->controller(AuthController::class)->group(function (): void {
     Route::post('deconnecter', 'deconnecter');
     Route::post('logout', 'logout');
@@ -178,6 +180,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     });
     Route::controller(ServiceAnnexesController::class)->prefix('annexes')->group(function (): void {
         Route::get('/', 'all');
+        Route::get('/free', 'getFree');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');
@@ -202,6 +205,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     Route::controller(TypeEquipementsController::class)->prefix('equipement/types')->group(function (): void {
         Route::get('/', 'all');
         Route::get('/trashed', 'trashed');
+        Route::get('/site', 'getBySite');
         Route::post('/store', 'store');
         Route::get('{id}', 'show');
         Route::delete('{id}', 'trash');
@@ -238,10 +242,8 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
             Route::get('/', 'all');
             Route::get('/trashed', 'trashed');
             Route::post('/store', 'store');
-            Route::get('{id}', 'show');
             Route::get('/pdf/{id}', 'pdf');
             Route::delete('{id}', 'trash');
-            Route::put('{id}', 'update');
             Route::patch('/restore/{id}', 'restore');
         });
     });
@@ -440,7 +442,6 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
                 Route::get('/paginate', 'getPaginate');
                 Route::get('/search/{search}/paginate', 'getSearch');
                 Route::get('/trashed', 'trashed');
-                Route::post('/store', 'store');
                 Route::get('/marche/{id}', 'getByMarche');
                 Route::get('{id}', 'show');
                 Route::put('{id}', 'update');

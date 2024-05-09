@@ -17,10 +17,12 @@ class FactureInitialeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
-            'avance' => $this->avance,
-            'caution' => $this->caution,
-            'pas_porte' => $this->pas_porte,
+            'code' => $this->whenNotNull($this->code),
+            'avance' => $this->whenNotNull($this->avance),
+            'caution' => $this->whenNotNull($this->caution),
+            'pas_porte' => $this->whenNotNull($this->pas_porte),
+            'frais_dossier' => $this->whenNotNull($this->frais_dossier),
+            'frais_amenagement' => $this->whenNotNull($this->frais_amenagement),
             'sommeVersee' => $this->sommeVersee ?? 0,
             'status' => $this->whenAppended('status'),
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),

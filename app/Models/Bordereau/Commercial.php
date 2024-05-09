@@ -45,21 +45,15 @@ class Commercial extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = $this->count() + 1;
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
         $this->attributes['code'] = COMMERCIAL_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
-    /**
-     * Obtenir l'utilisateur lié à un commercial
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Obtenir les bordereaux d'un commercial
-     */
     public function bordereaux(): HasMany
     {
         return $this->hasMany(Bordereau::class);

@@ -5,7 +5,12 @@ namespace App\Listeners;
 use App\Enums\StatusContrat;
 use App\Enums\StatusPersonne;
 use App\Events\EncaissementRegistred;
+use App\Events\FermetureRegistred;
+use App\Events\OuvertureRegistred;
 use App\Models\Bordereau\Bordereau;
+use App\Models\Caisse\Encaissement;
+use App\Models\Caisse\Guichet;
+use App\Models\Caisse\Ouverture;
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Ordonnancement;
 use App\Services\FactureService;
@@ -44,14 +49,25 @@ class EncaissementSubscriber
         $autresContratsEnAttente->map->delete();
     }
 
-    /**
-     * Register the listeners for the subscriber.
-     * @return array<class-name, string>
-     */
+    public function afterRegistredOuverture(OuvertureRegistred $event): void
+    {
+        Guichet::find($event->ouverture->id)->setOpen();
+    }
+
+    public function afterRegistredFermeture(FermetureRegistred $event): void
+    {
+        $ouverture = Ouverture::with('encaissements')->find($event->fermeture->ouverture_id);
+        $ouverture->setConfirmed();
+        $ouverture->encaissements->each(fn(Encaissement $encaissement) => $encaissement->setClose());
+        Guichet::find($ouverture->guichet_id)->setClose();
+    }
+
     public function subscribe(): array
     {
         return [
             EncaissementRegistred::class => 'updateDependenciesAfterCreate',
+            OuvertureRegistred::class => 'afterRegistredOuverture',
+            FermetureRegistred::class => 'afterRegistredFermeture',
         ];
     }
 }

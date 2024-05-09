@@ -4,102 +4,62 @@ namespace App\Policies;
 
 use App\Models\Architecture\Emplacement;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
+use ReflectionClass;
 
 class EmplacementPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function viewAny(User $user)
+    private static function userCheck(User $user, Emplacement $emplacement): bool
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        return $emplacement->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Emplacement  $emplacement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Emplacement $emplacement)
+    private static function checkPermissionWithOwner(User $user, Emplacement $emplacement, string $action): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
+        $name = str((new ReflectionClass($emplacement))->getShortName())->lower();
+        if ($user->can(config("gate.$name.$action"))) {
+            return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $emplacement) : true;
+        } else {
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function viewAny(User $user): Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return $user->can(config('gate.emplacement.list-global')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Emplacement  $emplacement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Emplacement $emplacement)
+    public function view(User $user, Emplacement $emplacement): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $emplacement, 'show') or self::checkPermissionWithOwner($user, $emplacement, 'edit');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Emplacement  $emplacement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Emplacement $emplacement)
+    public function create(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return $user->can(config('gate.emplacement.create')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Emplacement  $emplacement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Emplacement $emplacement)
+    public function update(User $user, Emplacement $emplacement): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $emplacement, 'edit');
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Emplacement  $emplacement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Emplacement $emplacement)
+    public function delete(User $user, Emplacement $emplacement): bool | Response
     {
-        //
+        return self::checkPermissionWithOwner($user, $emplacement, 'trash');
+    }
+
+    public function restore(User $user, Emplacement $emplacement): bool | Response
+    {
+        return self::checkPermissionWithOwner($user, $emplacement, 'restore');
+    }
+
+    public function forceDelete(User $user, Emplacement $emplacement): bool | Response
+    {
+        return self::checkPermissionWithOwner($user, $emplacement, 'delete');
     }
 }

@@ -2,8 +2,12 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Architecture\Site;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property Site $resource
+ */
 class SiteResource extends JsonResource
 {
     /**

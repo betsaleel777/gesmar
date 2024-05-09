@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('service_annexes', function (Blueprint $table) {
-            $table->string('mode', 20)->nullable();
+        Schema::table('factures', function (Blueprint $table) {
+            $table->unsignedInteger('frais_amenagement')->default(0);
+            $table->unsignedInteger('frais_dossier')->default(0);
         });
     }
 
@@ -25,8 +26,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('service_annexes', function (Blueprint $table) {
-            $table->dropColumn('mode');
+        Schema::table('factures', function (Blueprint $table) {
+            $table->dropColumn('frais_amenagement');
+            $table->dropColumn('frais_dossier');
         });
     }
 };

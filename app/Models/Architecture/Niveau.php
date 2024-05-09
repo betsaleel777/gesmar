@@ -4,7 +4,8 @@ namespace App\Models\Architecture;
 
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +21,8 @@ class Niveau extends Model implements Auditable
     use SoftDeletes;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use \OwenIt\Auditing\Auditable;
+    use HasResponsible;
+    use HasOwnerScope;
 
     protected $fillable = ['nom', 'code', 'pavillon_id'];
     const RULES = [
@@ -42,20 +45,6 @@ class Niveau extends Model implements Auditable
         static::addGlobalScope(new OwnSiteScope);
     }
 
-    /**
-     * Obtenir les niveau appartenant à la liste de site
-     *
-     */
-    public function scopeInside(Builder $query, array $sites): Builder
-    {
-        return $query->whereHas('sites', fn($query) => $query->whereIn('sites.id', $sites));
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return BelongsTo<Pavillon, Niveau>
-     */
     public function pavillon(): BelongsTo
     {
         return $this->belongsTo(Pavillon::class);
@@ -71,11 +60,6 @@ class Niveau extends Model implements Auditable
         );
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return HasMany<Zone>
-     */
     public function zones(): HasMany
     {
         return $this->hasMany(Zone::class);

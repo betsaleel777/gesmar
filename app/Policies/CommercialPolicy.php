@@ -2,93 +2,73 @@
 
 namespace App\Policies;
 
-use App\Models\Finance\Commercial;
+use App\Models\Bordereau\Commercial;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Support\Facades\Response;
 
 class CommercialPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function viewAny(User $user)
+    private static function userCheck(User $user, Commercial $commercial): bool
     {
-        //
+        return $commercial->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Commercial  $commercial
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Commercial $commercial)
+    public function viewAny(User $user): Response
     {
-        //
+        return $user->can(config('gate.commercial.list-global')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function view(User $user, Commercial $commercial): bool
     {
-        //
+        if ($user->can(config('gate.commercial.show')) or $user->can(config('gate.commercial.edit'))) {
+            return $user->can(config('gate.commercial.list-own')) ? self::userCheck($user, $commercial) : true;
+        } else {
+            return false;
+        }
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Commercial  $commercial
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Commercial $commercial)
+    public function create(User $user): bool
     {
-        //
+        return $user->can(config('gate.commercial.create')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Commercial  $commercial
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Commercial $commercial)
+    public function update(User $user, Commercial $commercial): bool
     {
-        //
+        if ($user->can(config('gate.commercial.edit'))) {
+            return $user->can(config('gate.commercial.list-own')) ? self::userCheck($user, $commercial) : true;
+        } else {
+            return false;
+        }
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Commercial  $commercial
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Commercial $commercial)
+    public function delete(User $user, Commercial $commercial): bool
     {
-        //
+        if ($user->can(config('gate.commercial.trash'))) {
+            return $user->can(config('gate.commercial.list-own')) ? self::userCheck($user, $commercial) : true;
+        } else {
+            return false;
+        }
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Commercial  $commercial
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Commercial $commercial)
+    public function restore(User $user, Commercial $commercial): bool
     {
-        //
+        if ($user->can(config('gate.commercial.restore'))) {
+            return $user->can(config('gate.commercial.list-own')) ? self::userCheck($user, $commercial) : true;
+        } else {
+            return false;
+        }
+    }
+
+    public function attribuate(User $user, Commercial $commercial): bool
+    {
+        if ($user->can(config('gate.commercial.attribuate'))) {
+            return $user->can(config('gate.commercial.list-own')) ? self::userCheck($user, $commercial) : true;
+        } else {
+            return false;
+        }
     }
 }

@@ -7,6 +7,8 @@ use App\Models\Architecture\Emplacement;
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\StateMachines\BordereauStateMachine;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use App\Traits\HasSites;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Carbon\Carbon;
@@ -17,9 +19,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperBordereau
+ */
 class Bordereau extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable, HasSites, HasStateMachines;
+    use \OwenIt\Auditing\Auditable, HasSites, HasStateMachines, HasResponsible, HasOwnerScope;
 
     protected $fillable = ['code', 'commercial_id', 'site_id', 'jour'];
     protected $dates = ['created_at'];
@@ -35,7 +40,7 @@ class Bordereau extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = $this->count() + 1;
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
         $this->attributes['code'] = BORDEREAU_CODE_PREFIXE . str((string) $rang)->padLeft(5, '0') . Carbon::now()->format('y');
     }
 

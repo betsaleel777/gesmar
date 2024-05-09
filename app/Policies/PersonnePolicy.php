@@ -4,113 +4,62 @@ namespace App\Policies;
 
 use App\Models\Exploitation\Personne;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Response;
+use ReflectionClass;
 
 class PersonnePolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function viewAny(User $user)
+    private static function userCheck(User $user, Personne $personne): bool
     {
+        return $personne->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Personne  $personne
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Personne $personne)
+    private static function checkPermissionWithOwner(User $user, Personne $personne, string $action): bool | Response
     {
-        if ($personne->checkProspect() and $user->can(config('gate.exploitation.reception.prospect.show'))) {
-            return true;
-        }
-        if ($personne->checkClient() and $user->can(config('gate.exploitation.reception.client.show'))) {
-            return true;
+        $name = str((new ReflectionClass($personne))->getShortName())->lower();
+        if ($user->can(config("gate.$name.$action"))) {
+            return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $personne) : true;
+        } else {
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
+    public function viewAny(User $user): Response
+    {
+        return $user->can(config('gate.personne.list-global')) ? Response::allow() : Response::deny();
+    }
+
+    public function view(User $user, Personne $personne): bool | Response
+    {
+        return self::checkPermissionWithOwner($user, $personne, 'show') or self::checkPermissionWithOwner($user, $personne, 'edit');
+    }
+
     public function create(User $user)
     {
-        if ($user->can(config('gate.exploitation.reception.prospect.create'))) {
-            return true;
-        }
+        return $user->can(config('gate.personne.create')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Personne  $personne
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Personne $personne)
+    public function update(User $user, Personne $personne): bool | Response
     {
-        if ($personne->checkProspect() and $user->can(config('gate.exploitation.reception.prospect.edit'))) {
-            return true;
-        }
-        if ($personne->checkClient() and $user->can(config('gate.exploitation.reception.client.edit'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $personne, 'edit');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Personne  $personne
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Personne $personne)
+    public function delete(User $user, Personne $personne): bool | Response
     {
-        if ($personne->checkProspect() and $user->can(config('gate.exploitation.reception.prospect.trash'))) {
-            return true;
-        }
-        if ($personne->checkClient() and $user->can(config('gate.exploitation.reception.client.trash'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $personne, 'trash');
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Personne  $personne
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Personne $personne)
+    public function restore(User $user, Personne $personne): bool | Response
     {
-        if ($personne->checkProspect() and $user->can(config('gate.exploitation.reception.prospect.restore'))) {
-            return true;
-        }
-        if ($personne->checkClient() and $user->can(config('gate.exploitation.reception.client.restore'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $personne, 'restore');
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User $user
-     * @param  \App\Models\Personne $personne
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Personne $personne)
+    public function forceDelete(User $user, Personne $personne): bool | Response
     {
-        //
+        return self::checkPermissionWithOwner($user, $personne, 'delete');
     }
 }

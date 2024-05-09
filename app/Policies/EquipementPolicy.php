@@ -4,102 +4,62 @@ namespace App\Policies;
 
 use App\Models\Architecture\Equipement;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
+use ReflectionClass;
 
 class EquipementPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function viewAny(User $user)
+    private static function userCheck(User $user, Equipement $equipement): bool
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        return $equipement->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Equipement  $equipement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Equipement $equipement)
+    private static function checkPermissionWithOwner(User $user, Equipement $equipement, string $action): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
+        $name = str((new ReflectionClass($equipement))->getShortName())->lower();
+        if ($user->can(config("gate.$name.$action"))) {
+            return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $equipement) : true;
+        } else {
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
+    public function viewAny(User $user): Response
+    {
+        return $user->can(config('gate.equipement.list-global')) ? Response::allow() : Response::deny();
+    }
+
+    public function view(User $user, Equipement $equipement): bool | Response
+    {
+        return self::checkPermissionWithOwner($user, $equipement, 'show') or self::checkPermissionWithOwner($user, $equipement, 'edit');
+    }
+
     public function create(User $user)
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return $user->can(config('gate.equipement.create')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Equipement  $equipement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Equipement $equipement)
+    public function update(User $user, Equipement $equipement): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $equipement, 'edit');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Equipement  $equipement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Equipement $equipement)
+    public function delete(User $user, Equipement $equipement): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $equipement, 'trash');
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Equipement  $equipement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Equipement $equipement)
+    public function restore(User $user, Equipement $equipement): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $equipement, 'restore');
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Equipement  $equipement
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Equipement $equipement)
+    public function forceDelete(User $user, Equipement $equipement): bool | Response
     {
-        //
+        return self::checkPermissionWithOwner($user, $equipement, 'delete');
     }
 }

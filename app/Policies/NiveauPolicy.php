@@ -4,102 +4,57 @@ namespace App\Policies;
 
 use App\Models\Architecture\Niveau;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
+use ReflectionClass;
 
 class NiveauPolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function viewAny(User $user)
+    private static function userCheck(User $user, Niveau $niveau): bool
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        return $niveau->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Niveau  $niveau
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Niveau $niveau)
+    private static function checkPermissionWithOwner(User $user, Niveau $niveau, string $action): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
+        $name = str((new ReflectionClass($niveau))->getShortName())->lower();
+        if ($user->can(config("gate.$name.$action"))) {
+            return $user->can(config("gate.$name.list-own")) ? self::userCheck($user, $niveau) : true;
+        } else {
+            return Response::deny("Action non permise sur cette ressource.");
         }
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function viewAny(User $user): Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return $user->can(config('gate.niveau.list-global')) ? Response::allow() : Response::deny();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Niveau  $niveau
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Niveau $niveau)
+    public function view(User $user, Niveau $niveau): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $niveau, 'show') or self::checkPermissionWithOwner($user, $niveau, 'edit');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Niveau  $niveau
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Niveau $niveau)
+    public function create(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return $user->can(config('gate.niveau.create')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Niveau  $niveau
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Niveau $niveau)
+    public function update(User $user, Niveau $niveau): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.configuration'))) {
-            return true;
-        }
+        return self::checkPermissionWithOwner($user, $niveau, 'edit');
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Niveau  $niveau
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Niveau $niveau)
+    public function delete(User $user, Niveau $niveau): bool | Response
     {
-        //
+        return self::checkPermissionWithOwner($user, $niveau, 'trash');
+    }
+
+    public function restore(User $user, Niveau $niveau): bool | Response
+    {
+        return self::checkPermissionWithOwner($user, $niveau, 'restore');
     }
 }

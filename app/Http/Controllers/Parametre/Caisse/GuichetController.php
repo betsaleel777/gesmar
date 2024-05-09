@@ -7,14 +7,16 @@ use App\Http\Resources\Caisse\GuichetListResource;
 use App\Http\Resources\Caisse\GuichetResource;
 use App\Interfaces\StandardControllerInterface;
 use App\Models\Caisse\Guichet;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class GuichetController extends Controller implements StandardControllerInterface
 {
     public function all(): JsonResponse
     {
-        $guichets = Guichet::get();
+        $response = Gate::inspect('viewAny', Guichet::class);
+        $guichets = $response->allowed() ? Guichet::get() : Guichet::owner()->get();
         return response()->json(['guichets' => GuichetListResource::collection($guichets)]);
     }
 
@@ -26,44 +28,40 @@ class GuichetController extends Controller implements StandardControllerInterfac
         $guichet->codeGenerate();
         $guichet->save();
         $guichet->setClose();
-        $message = "Le guichet $guichet->nom a été crée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le guichet $guichet->nom a été crée avec succès."]);
     }
 
     public function update(int $id, Request $request): JsonResponse
     {
-        $guichet = Guichet::findOrFail($id);
+        $guichet = Guichet::find($id);
         $this->authorize('update', $guichet);
         $request->validate(Guichet::RULES);
         $guichet->update($request->all());
-        $message = "Le guichet $guichet->code a été modifié avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le guichet $guichet->code a été modifié avec succès."]);
     }
 
     public function trash(int $id): JsonResponse
     {
-        $guichet = Guichet::findOrFail($id);
+        $guichet = Guichet::find($id);
         $this->authorize('delete', $guichet);
         $guichet->delete();
         $guichet->setClose();
-        $message = "Le guichet $guichet->code a été supprimé avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le guichet $guichet->code a été supprimé avec succès."]);
     }
 
     public function restore(int $id): JsonResponse
     {
-        $guichet = Guichet::findOrFail($id);
+        $guichet = Guichet::find($id);
         $this->authorize('restore', $guichet);
         $guichet->restore();
-        $message = "Le guichet $guichet->code a été restauré avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "Le guichet $guichet->code a été restauré avec succès."]);
     }
 
     public function trashed(): JsonResponse
     {
-        $this->authorize('viewAny', Guichet::class);
-        $guichet = Guichet::withTrashed()->get();
-        return response()->json(['guichet' => $guichet]);
+        $response = Gate::inspect('viewAny', Guichet::class);
+        $guichets = $response->allowed() ? Guichet::onlyTrashed()->get() : Guichet::onlyTrashed()->owner()->get();
+        return response()->json(['guichets' => $guichets]);
     }
 
     public function show(int $id): JsonResponse

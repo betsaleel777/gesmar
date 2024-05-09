@@ -8,6 +8,8 @@ use App\Models\Scopes\RecentScope;
 use App\States\Equipement\StatusAbonnementState;
 use App\States\Equipement\StatusLiaisonsState;
 use App\Traits\HasEmplacement;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use App\Traits\HasSites;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,7 +27,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  */
 class Equipement extends Model implements Auditable
 {
-    use HasFactory, SoftDeletes, HasStateMachines, HasSites, HasEmplacement;
+    use HasFactory, SoftDeletes, HasStateMachines, HasSites, HasEmplacement, HasResponsible, HasOwnerScope;
     use \OwenIt\Auditing\Auditable;
     /**
      *
@@ -118,14 +120,6 @@ class Equipement extends Model implements Auditable
     public function scopeUnlinked(Builder $query): Builder
     {
         return $query->where('liaison', StatusEquipement::UNLINKED->value);
-    }
-
-    /**
-     * Obtenir les equipements appartenant à la liste de site
-     */
-    public function scopeInside(Builder $query, array $sites): Builder
-    {
-        return $query->whereIn('site_id', $sites);
     }
 
     public function scopeFilterBetweenLiaisonDate(

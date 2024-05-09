@@ -4,6 +4,8 @@ namespace App\Models\Architecture;
 
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +19,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  */
 class Pavillon extends Model implements Auditable
 {
-    use SoftDeletes, HasSites;
+    use SoftDeletes, HasSites, HasOwnerScope, HasResponsible;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['nom', 'code', 'site_id'];

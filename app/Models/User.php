@@ -26,11 +26,7 @@ class User extends Authenticatable implements HasMedia, Auditable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, InteractsWithMedia, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+
     protected $fillable = [
         'name',
         'email',
@@ -55,12 +51,6 @@ class User extends Authenticatable implements HasMedia, Auditable
         'password' => 'required|min:6|confirmed',
     ];
 
-    /**
-     * Undocumented function
-     *
-     * @param  int  $id
-     * @return array<string, string>
-     */
     public static function infosRules(int $id): array
     {
         return [
@@ -68,6 +58,16 @@ class User extends Authenticatable implements HasMedia, Auditable
             'adresse' => 'required',
         ];
     }
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'connected' => 'boolean',
+    ];
 
     public function disconnect(): void
     {
@@ -79,39 +79,11 @@ class User extends Authenticatable implements HasMedia, Auditable
         $this->attributes['connected'] = true;
     }
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'connected' => 'boolean',
-    ];
-
-    /**
-     * Summary of commercial
-     * @return HasOne<Commercial>
-     */
     public function commercial(): HasOne
     {
         return $this->hasOne(Commercial::class);
     }
 
-    /**
-     * Summary of caissier
-     * @return HasOne<Caissier>
-     */
     public function caissier(): HasOne
     {
         return $this->hasOne(Caissier::class);

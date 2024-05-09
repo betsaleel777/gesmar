@@ -3,17 +3,23 @@
 namespace App\Models\Finance;
 
 use App\Enums\StatusFacture;
-use App\Models\Architecture\Emplacement;
 use App\Models\Architecture\ServiceAnnexe;
+use App\Models\Architecture\Site;
 use App\Models\Exploitation\Contrat;
 use App\Models\Exploitation\Paiement;
+use App\Models\Exploitation\Personne;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasEquipement;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
@@ -27,6 +33,8 @@ class Facture extends Model implements Auditable
     use HasStatuses;
     use HasEquipement;
     use \OwenIt\Auditing\Auditable;
+    use HasResponsible;
+    use HasOwnerScope;
 
     protected $fillable = [
         'code',
@@ -39,32 +47,32 @@ class Facture extends Model implements Auditable
         'caution',
         'pas_porte',
         'periode',
+        'montant_annexe',
+        'frais_dossier',
+        'frais_amenagement',
     ];
     protected $auditExclude = ['code'];
-
-    protected $with = ['contrat'];
-
     protected $appends = ['status'];
 
     protected $casts = [
         'avance' => 'integer', 'caution' => 'integer', 'index_fin' => 'integer',
         'pas_porte' => 'integer', 'index_depart' => 'integer', 'contrat_id' => 'integer',
-        'equipement_id' => 'integer', 'annexe_id' => 'integer',
+        'equipement_id' => 'integer', 'annexe_id' => 'integer', 'frais_dossier' => 'integer',
+        'frais_amenagement' => 'integer',
     ];
 
-    public const RULES = [
-        'contrat_id' => 'required',
-    ];
+    public const RULES = ['contrat_id' => 'required'];
 
     protected static function booted()
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     public function codeGenerate(string $prefix): void
     {
-        $rang = $this->count() + 1;
-        $this->attributes['code'] = $prefix . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
+        $this->attributes['code'] = $prefix . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
     /**
@@ -107,6 +115,12 @@ class Facture extends Model implements Auditable
     public static function loyerRules(): array
     {
         return [ ...self::RULES, ...['periode' => 'required']];
+    }
+
+    public function getFactureInitialeTotalAmount(): int
+    {
+        return (int) $this?->pas_porte + (int) $this?->caution + (int) $this?->avance + (int) $this?->frais_dossier +
+        (int) $this?->frais_amenagement;
     }
 
     public function payer(): void
@@ -220,17 +234,11 @@ class Facture extends Model implements Auditable
 
     // relations
 
-    /**
-     * Undocumented function
-     */
     public function annexe(): BelongsTo
     {
         return $this->belongsTo(ServiceAnnexe::class);
     }
 
-    /**
-     * Undocumented function
-     */
     public function contrat(): BelongsTo
     {
         return $this->belongsTo(Contrat::class);
@@ -242,5 +250,15 @@ class Facture extends Model implements Auditable
     public function paiements(): HasMany
     {
         return $this->hasMany(Paiement::class);
+    }
+
+    public function site(): HasOneThrough
+    {
+        return $this->hasOneThrough(Site::class, Contrat::class, 'id', 'id', 'contrat_id', 'site_id');
+    }
+
+    public function personne(): HasOneThrough
+    {
+        return $this->hasOneThrough(Personne::class, Contrat::class, 'id', 'id', 'contrat_id', 'personne_id');
     }
 }

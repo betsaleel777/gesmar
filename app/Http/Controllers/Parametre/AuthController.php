@@ -13,10 +13,7 @@ class AuthController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required',
-            'password' => 'required',
-        ]);
+        $request->validate(['email' => 'required', 'password' => 'required']);
         $credentials = $request->only(['email', 'password']);
         if (Auth::attempt($credentials)) {
             $user = User::firstWhere('email', $request->email);
@@ -25,15 +22,12 @@ class AuthController extends Controller
             $request->session()->regenerate();
             return response()->json(['message' => 'Bienvenue Dans Gesmar !!']);
         } else {
-            return response()->json(['message' => 'Adresse ou mot de passe incorrecte', 'credentials' => $credentials], 401);
+            return response()->json(['message' => 'Adresse email ou mot de passe incorrecte', 'success' => false], 401);
         }
     }
 
     /**
      * Undocumented function
-     *
-     * @param  Request  $request
-     * @return void
      */
     public function deconnecter(Request $request): void
     {
@@ -44,9 +38,6 @@ class AuthController extends Controller
 
     /**
      * Undocumented function
-     *
-     * @param  Request  $request
-     * @return void
      */
     public function logout(Request $request): void
     {

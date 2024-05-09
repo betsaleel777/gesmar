@@ -3,14 +3,19 @@
 namespace App\Models\Caisse;
 
 use App\Enums\StatusEncaissement;
+use App\Models\Architecture\Site;
 use App\Models\Bordereau\Bordereau;
 use App\Models\Exploitation\Ordonnancement;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
+use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
 
 /**
  * @mixin IdeHelperEncaissement
@@ -20,6 +25,8 @@ class Encaissement extends Model implements Auditable
     use HasStatuses;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use \OwenIt\Auditing\Auditable;
+    use HasResponsible;
+    use HasOwnerScope;
 
     protected $fillable = ['ordonnancement_id', 'bordereau_id', 'payable_id', 'caissier_id', 'ouverture_id'];
     protected $dates = ['created_at'];
@@ -29,6 +36,7 @@ class Encaissement extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     public function setClose(): void
@@ -75,5 +83,15 @@ class Encaissement extends Model implements Auditable
     public function ouverture(): BelongsTo
     {
         return $this->belongsTo(Ouverture::class);
+    }
+
+    public function site(): HasOneDeep
+    {
+        return $this->hasOneDeep(
+            Site::class,
+            [Ouverture::class, Guichet::class],
+            ['id', 'id', 'id'],
+            ['ouverture_id', 'guichet_id', 'site_id'],
+        );
     }
 }

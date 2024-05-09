@@ -2,107 +2,41 @@
 
 namespace App\Policies;
 
-use Spatie\Permission\Models\Role;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RolePolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.list')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Role  $role
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Role $role)
+    public function create(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.create')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function update(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.edit')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Role  $role
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Role $role)
+    public function delete(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.trash')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Role  $role
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Role $role)
+    public function restore(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.restore')) ? true : false;
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Role  $role
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Role $role)
+    public function forceDelete(User $user): bool
     {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \Spatie\Permission\Models\Role  $role
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Role $role)
-    {
-        if ($user->can(config('gate.parametre.acces.utilisateur'))) {
-            return true;
-        }
+        return $user->can(config('gate.role.delete')) ? true : false;
     }
 }

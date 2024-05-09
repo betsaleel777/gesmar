@@ -7,6 +7,8 @@ use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasEmplacement;
 use App\Traits\HasEquipement;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +21,7 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Abonnement extends Model implements Auditable
 {
-    use HasStatuses, HasSites, HasEquipement, HasEmplacement;
+    use HasStatuses, HasSites, HasEquipement, HasEmplacement, HasResponsible, HasOwnerScope;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'site_id'];
@@ -34,9 +36,7 @@ class Abonnement extends Model implements Auditable
         'site_id' => 'required',
     ];
 
-    public const FINISH_RULES = [
-        'index_fin' => 'required|numeric',
-    ];
+    public const FINISH_RULES = ['index_fin' => 'required|numeric'];
 
     /**
      * The "booted" method of the model.
@@ -93,14 +93,6 @@ class Abonnement extends Model implements Auditable
     public function scopeWithoutError(Builder $query): Builder
     {
         return $query->otherCurrentStatus(StatusAbonnement::ERROR->value);
-    }
-
-    /**
-     * Obtenir les pavillons appartenant à la liste de site accéssible à l'utilisateur courant
-     */
-    public function scopeInside(Builder $query, array $sites): Builder
-    {
-        return $query->whereIn('site_id', $sites);
     }
 
     public function equipement(): BelongsTo

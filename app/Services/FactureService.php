@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Exploitation\Contrat;
-use App\Models\Exploitation\Paiement;
 use App\Models\Finance\Facture;
 use Illuminate\Support\Collection;
 
@@ -14,23 +12,20 @@ class FactureService
     {
     }
 
-    private static function checkForAnnexe(Paiement $paiement): bool
-    {
-        return false;
-    }
+    // private static function checkForAnnexe(Paiement $paiement): void
+    // {
+    //     $paiement->facture;
+    // }
 
     private static function checkForBail(Collection $paiements): void
     {
         if (!$paiements->isEmpty()) {
-            $contrat = Contrat::with('emplacement')->findOrFail($paiements->first()->facture->contrat_id);
-            $emplacement = $contrat->emplacement;
             foreach ($paiements as $paiement) {
-                $facture = $paiement->facture;
+                $facture = $paiement->loadMissing('facture')->facture;
                 if ($facture->isInitiale()) {
-                    $factureInitiale = Facture::with('paiements')->findOrFail($facture->id);
-                    $total = $factureInitiale->paiements->sum('montant');
-                    $siFactureSoldee = $facture->pas_porte + ($facture->caution + $facture->avance) * $emplacement->loyer === $total;
-                    $siFactureSoldee ? $facture->payer() : null;
+                    $facture->loadMissing('paiements');
+                    // vérifier si la facture est soldée
+                    $facture->getFactureInitialeTotalAmount() === $facture->paiements->sum('montant') ? $facture->payer() : null;
                 } else {
                     $facture->payer();
                 }
@@ -45,6 +40,6 @@ class FactureService
         foreach ($this->paiements as $paiement) {
             $paiement->facture->isAnnexe() ? $paiementAnnexe = $paiement : $paiementsBails->push($paiement);
         }
-        !empty($paiementAnnexe) ? self::checkForAnnexe($paiementAnnexe) : self::checkForBail($paiementsBails);
+        !empty($paiementAnnexe) ? $paiementAnnexe->facture->payer() : self::checkForBail($paiementsBails);
     }
 }

@@ -13,7 +13,7 @@ use Illuminate\Http\JsonResponse;
 
 class FactureController extends Controller
 {
-    const RELATIONS = ['contrat' => ['personne', 'site', 'emplacement']];
+    const RELATIONS = ['contrat' => ['personne', 'site', 'emplacement', 'annexe']];
 
     public function all(): JsonResponse
     {
@@ -41,7 +41,7 @@ class FactureController extends Controller
 
     public function payer(int $id): JsonResponse
     {
-        $facture = Facture::findOrFail($id);
+        $facture = Facture::find($id);
         $facture->payer();
         $facture->save();
         $message = "La facture $facture->code a été payée avec succès.";

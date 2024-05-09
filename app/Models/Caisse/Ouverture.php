@@ -3,11 +3,16 @@
 namespace App\Models\Caisse;
 
 use App\Enums\StatusOuverture;
+use App\Models\Architecture\Site;
+use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
 
@@ -18,6 +23,8 @@ class Ouverture extends Model implements Auditable
 {
     use HasStatuses, \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use \OwenIt\Auditing\Auditable;
+    use HasResponsible;
+    use HasOwnerScope;
 
     protected $fillable = ['guichet_id', 'caissier_id', 'date', 'code', 'montant'];
     protected $auditExclude = ['code'];
@@ -34,15 +41,12 @@ class Ouverture extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
-
-        static::created(function (Ouverture $ouverture) {
-            Guichet::find($ouverture->guichet_id)->setOpen();
-        });
+        static::addGlobalScope(new OwnSiteScope);
     }
 
     public function codeGenerate(): void
     {
-        $rang = $this->count() + 1;
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
         $this->attributes['code'] = OUVERTURE_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 
@@ -79,5 +83,10 @@ class Ouverture extends Model implements Auditable
     public function encaissements(): HasMany
     {
         return $this->hasMany(Encaissement::class);
+    }
+
+    public function site(): HasOneThrough
+    {
+        return $this->hasOneThrough(Site::class, Guichet::class, 'id', 'id', 'guichet_id', 'site_id');
     }
 }

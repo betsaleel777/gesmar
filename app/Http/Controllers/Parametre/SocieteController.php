@@ -12,6 +12,7 @@ class SocieteController extends Controller
 {
     public function all(): JsonResponse
     {
+        $this->authorize('viewAny', Societe::class);
         $societe = Societe::first();
         $retour = empty($societe) ?: SocieteResource::make($societe);
         return response()->json(['societe' => $retour]);
@@ -19,7 +20,6 @@ class SocieteController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize('create', Societe::class);
         $request->validate(Societe::RULES);
         $societe = Societe::make($request->all());
         $societe->save();
@@ -29,8 +29,8 @@ class SocieteController extends Controller
 
     public function update(int $id, Request $request)
     {
+        $this->authorize('update', Societe::class);
         $societe = Societe::findOrFail($id);
-        $this->authorize('update', $societe);
         $request->validate(Societe::EDIT_RULES);
         $societe->update($request->all());
         if ($request->hasFile('logo')) {
@@ -41,8 +41,8 @@ class SocieteController extends Controller
 
     public function show(int $id): JsonResponse
     {
+        $this->authorize('viewAny', Societe::class);
         $societe = Societe::find($id);
-        $this->authorize('view', $societe);
         return response()->json(['societe' => SocieteResource::make($societe)]);
     }
 }

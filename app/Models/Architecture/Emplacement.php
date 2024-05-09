@@ -10,6 +10,8 @@ use App\Models\Scopes\RecentScope;
 use App\States\Emplacement\StatusDisponibiliteState;
 use App\States\Emplacement\StatusLiaisonsState;
 use App\Traits\HasContrats;
+use App\Traits\HasOwnerScope;
+use App\Traits\HasResponsible;
 use Asantibanez\LaravelEloquentStateMachines\Traits\HasStateMachines;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,9 +34,11 @@ class Emplacement extends Model implements Auditable
 {
     use SoftDeletes;
     use HasStateMachines;
-    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+    use HasResponsible;
+    use HasOwnerScope;
     use HasContrats;
     use \OwenIt\Auditing\Auditable;
+    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
     /**
      * Summary of stateMachines
@@ -45,7 +49,10 @@ class Emplacement extends Model implements Auditable
     protected $appends = ['auto'];
 
     protected $casts = [
-        'superficie' => 'integer', 'loyer' => 'integer', 'pas_porte' => 'integer', 'caution' => 'integer',
+        'superficie' => 'integer',
+        'loyer' => 'integer',
+        'pas_porte' => 'integer',
+        'caution' => 'integer',
     ];
 
     public const RULES = [
@@ -142,19 +149,19 @@ class Emplacement extends Model implements Auditable
     }
 
     /**
+     * Obtenir les emplacements d'un marché ou site précis
+     */
+    public function scopeBySite(Builder $query, int $id): Builder
+    {
+        return $query->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id));
+    }
+
+    /**
      * Obtenir les emplacements qui dont les contrat se valide sans passer par l'ordonnancement
      */
     public function scopeWithoutSchedule(Builder $query): Builder
     {
         return $query->whereHas('type', fn(Builder $query) => $query->where('auto_valid', true));
-    }
-
-    /**
-     * Obtenir les emplacements appartenant à la liste de site accéssible
-     */
-    public function scopeInside(Builder $query, array $sites): Builder
-    {
-        return $query->whereHas('sites', fn($query) => $query->whereIn('sites.id', $sites));
     }
 
     public function scopeRemoveAlreadyAssignedToBordereau(Builder $query, int $site, string $jour): Builder
@@ -187,7 +194,8 @@ class Emplacement extends Model implements Auditable
         Builder $query, ?array $dates, string $status = StatusEmplacement::FREE->value): Builder {
         [$start, $end] = $dates;
         return $query->when($dates, fn(Builder $query): Builder =>
-            $query->whereHasDisponibilite(fn(Builder $query): Builder => $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
+            $query->whereHasDisponibilite(fn(Builder $query): Builder =>
+                $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
     }
 
     public function scopeFilterBetweenLiaisonDate(

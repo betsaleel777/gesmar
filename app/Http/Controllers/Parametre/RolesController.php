@@ -11,6 +11,7 @@ class RolesController extends Controller
 {
     public function all(): JsonResponse
     {
+        $this->authorize('viewAny', Role::class);
         $roles = Role::get();
         return response()->json(['roles' => $roles]);
     }
@@ -18,7 +19,7 @@ class RolesController extends Controller
     public function show(int $id): JsonResponse
     {
         $role = Role::with('permissions')->findOrFail($id);
-        $this->authorize('view', $role);
+        $this->authorize('view', Role::class);
         return response()->json(['role' => $role]);
     }
 
@@ -37,8 +38,8 @@ class RolesController extends Controller
 
     public function update(int $id, Request $request): JsonResponse
     {
+        $this->authorize('update', Role::class);
         $role = Role::findOrFail($id);
-        $this->authorize('update', $role);
         $rules = ['name' => 'required|unique:roles,name,' . $id, 'permissions' => 'required|array'];
         $this->validate($request, $rules);
         $role->name = $request->name;

@@ -4,104 +4,62 @@ namespace App\Policies;
 
 use App\Models\Caisse\Banque;
 use App\Models\User;
+use App\Traits\HasPolicyFilter;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 
 class BanquePolicy
 {
-    use HandlesAuthorization;
+    use HandlesAuthorization, HasPolicyFilter;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function viewAny(User $user)
+    private static function userCheck(User $user, Banque $banque): bool
     {
-        $user->hasRole(SUPERROLE) ? Response::allow() : Response::deny();
+        return $banque->load('shortAudit')->shortAudit->user_id === $user->id;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Banque $banque)
+    public function viewAny(User $user): Response
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        return $user->can(config('gate.banque.list-global')) ? Response::allow() : Response::deny();
+    }
+
+    public function create(User $user): bool | Response
+    {
+        return $user->can(config('gate.banque.create')) ? true : Response::deny("La création de la banque est non permise.");
+    }
+
+    public function update(User $user, Banque $banque): bool | Response
+    {
+        if ($user->can(config('gate.banque.edit'))) {
+            return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
+        } else {
+            return Response::deny("La modification de la banque est non permise.");
         }
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function delete(User $user, Banque $banque): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        if ($user->can(config('gate.banque.trash'))) {
+            return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
+        } else {
+            return Response::deny("L'archivage de la banque est non permise.");
         }
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, Banque $banque)
+    public function restore(User $user, Banque $banque): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        if ($user->can(config('gate.banque.restore'))) {
+            return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
+        } else {
+            return Response::deny("La restauration de la banque est non permise.");
         }
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, Banque $banque)
+    public function forceDelete(User $user, Banque $banque): bool | Response
     {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, Banque $banque)
-    {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Caisse\Banque  $banque
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, Banque $banque)
-    {
-        if ($user->can(config('gate.parametre.acces.caisse'))) {
-            return true;
+        if ($user->can(config('gate.banque.delete'))) {
+            return $user->can(config('gate.banque.list-own')) ? self::userCheck($user, $banque) : true;
+        } else {
+            return Response::deny("La suppression définitive de la banque est non permise.");
         }
     }
 }

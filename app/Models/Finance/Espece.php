@@ -28,11 +28,6 @@ class Espece extends Model implements Auditable
         static::addGlobalScope(new RecentScope);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return MorphOne<Encaissement>
-     */
     public function encaissement(): MorphOne
     {
         return $this->morphOne(Encaissement::class, 'payable');
