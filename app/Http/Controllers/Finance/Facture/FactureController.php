@@ -44,8 +44,7 @@ class FactureController extends Controller
         $facture = Facture::find($id);
         $facture->payer();
         $facture->save();
-        $message = "La facture $facture->code a été payée avec succès.";
-        return response()->json(['message' => $message]);
+        return response()->json(['message' => "La facture $facture->code a été payée avec succès."]);
     }
 
     public function getByContrat(int $id): JsonResponse

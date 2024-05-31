@@ -23,19 +23,12 @@ class Commercial extends Model implements Auditable
     protected $fillable = ['code', 'user_id', 'site_id'];
     protected $auditExclude = ['code'];
     protected $dates = ['created_at'];
-    /**
-     *
-     * @var array<int, string>
-     */
     const RULES = [
         'user_id' => 'required|numeric',
         'site_id' => 'required|numeric',
     ];
 
-    const ATTRIBUTION_RULES = [
-        'jour' => 'required',
-        'zones' => 'required',
-    ];
+    const ATTRIBUTION_RULES = ['jour' => 'required', 'zones' => 'required'];
 
     protected static function booted(): void
     {
@@ -45,7 +38,7 @@ class Commercial extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id + 1;
         $this->attributes['code'] = COMMERCIAL_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
     }
 

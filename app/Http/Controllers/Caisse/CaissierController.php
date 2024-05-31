@@ -8,6 +8,7 @@ use App\Http\Resources\Caisse\CaissierResource;
 use App\Models\Caisse\Caissier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
@@ -19,6 +20,35 @@ class CaissierController extends Controller
         $query = Caissier::with('user:id,name');
         $caissiers = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['caissiers' => CaissierListResouce::collection($caissiers)]);
+    }
+
+    public function getFree(): JsonResource
+    {
+        $response = Gate::inspect('viewAny', Caissier::class);
+        $query = Caissier::with('user:id,name')->free();
+        $caissiers = $response->allowed() ? $query->get() : $query->owner()->get();
+        return CaissierListResouce::collection($caissiers);
+    }
+
+    public function getBusy(): JsonResource
+    {
+        $response = Gate::inspect('viewAny', Caissier::class);
+        $query = Caissier::with('user:id,name')->busy();
+        $caissiers = $response->allowed() ? $query->get() : $query->owner()->get();
+        return CaissierListResouce::collection($caissiers);
+    }
+
+    public function getHalfFree(): JsonResource
+    {
+        $response = Gate::inspect('viewAny', Caissier::class);
+        $query = Caissier::with('user:id,name')->halfFree();
+        $caissiers = $response->allowed() ? $query->get() : $query->owner()->get();
+        return CaissierListResouce::collection($caissiers);
+    }
+
+    public function checkFree(Request $request): JsonResponse
+    {
+        return response()->json(Caissier::where('id', (int) $request->query('id'))->free()->exists());
     }
 
     public function store(Request $request): JsonResponse

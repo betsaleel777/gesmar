@@ -6,6 +6,7 @@ use App\Enums\StatusContrat;
 use App\Enums\StatusPersonne;
 use App\Events\EncaissementRegistred;
 use App\Events\FermetureRegistred;
+use App\Events\FermetureValidated;
 use App\Events\OuvertureRegistred;
 use App\Models\Bordereau\Bordereau;
 use App\Models\Caisse\Encaissement;
@@ -51,15 +52,28 @@ class EncaissementSubscriber
 
     public function afterRegistredOuverture(OuvertureRegistred $event): void
     {
-        Guichet::find($event->ouverture->id)->setOpen();
+        Guichet::find($event->ouverture->guichet_id)->setOpen();
     }
 
     public function afterRegistredFermeture(FermetureRegistred $event): void
     {
         $ouverture = Ouverture::with('encaissements')->find($event->fermeture->ouverture_id);
-        $ouverture->setConfirmed();
+        $ouverture->setChecking();
         $ouverture->encaissements->each(fn(Encaissement $encaissement) => $encaissement->setClose());
         Guichet::find($ouverture->guichet_id)->setClose();
+    }
+
+    public function afterValidatedFermeture(FermetureValidated $event): void
+    {
+        $event->fermeture->perte = $event->payload->perte;
+        if ($event->fermeture->isDirty('perte')) {
+            $event->fermeture->save();
+            $event->fermeture->setWithLoss($event->payload->raison);
+        } else {
+            $event->fermeture->setWithoutLoss();
+        }
+        $event->fermeture->loadMissing('ouverture');
+        $event->fermeture->ouverture->setConfirmed();
     }
 
     public function subscribe(): array
@@ -68,6 +82,7 @@ class EncaissementSubscriber
             EncaissementRegistred::class => 'updateDependenciesAfterCreate',
             OuvertureRegistred::class => 'afterRegistredOuverture',
             FermetureRegistred::class => 'afterRegistredFermeture',
+            FermetureValidated::class => 'afterValidatedFermeture',
         ];
     }
 }

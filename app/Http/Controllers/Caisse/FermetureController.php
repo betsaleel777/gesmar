@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Caisse;
 
 use App\Events\FermetureRegistred;
+use App\Events\FermetureValidated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FermetureValidationRequest;
 use App\Http\Resources\Caisse\FermetureListResource;
 use App\Http\Resources\Caisse\FermetureResource;
 use App\Models\Caisse\Fermeture;
@@ -50,12 +52,22 @@ class FermetureController extends Controller
         $fermeture = Fermeture::make($request->all());
         $fermeture->codeGenerate();
         $fermeture->save();
+        $fermeture->setPending();
         FermetureRegistred::dispatch($fermeture);
         $fermeture->load('ouverture.encaissements.payable');
         return response()->json([
             'message' => "La caisse a été fermée avec succès.",
             'fermeture' => FermetureResource::make($fermeture),
         ]);
+    }
+
+    public function valider(FermetureValidationRequest $request): JsonResponse
+    {
+        $request->validated();
+        $fermeture = Fermeture::find($request->id);
+        FermetureValidated::dispatch($fermeture, $request->only('perte', 'raison'));
+        $message = (int) $request->perte === 0 ? "Le point de caisse $fermeture->code a été validé sans perte" : "Le point de caisse $fermeture->code a été validé avec une perte de $request->perte FCFA";
+        return response()->json(['message' => $message]);
     }
 
     public function show(int $id): JsonResponse

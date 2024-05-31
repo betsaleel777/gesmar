@@ -4,13 +4,11 @@ namespace App\Http\Resources\Facture;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property Fatcure
+ */
 class FactureInitialeListResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
@@ -23,6 +21,7 @@ class FactureInitialeListResource extends JsonResource
             'frais_dossier' => $this->whenNotNull($this->frais_dossier),
             'frais_amenagement' => $this->whenNotNull($this->frais_amenagement),
             'contrat' => $this->whenLoaded('contrat', fn() => $this->contrat->codification()),
+            'modifiable' => $this->whenNotNull($this->modifiable),
             'personne' => $this->when(
                 $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
                 $this->contrat->personne->nom . ' ' . $this->contrat->personne->prenom

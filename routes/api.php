@@ -262,6 +262,10 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     });
     Route::controller(CaissierController::class)->prefix('caissiers')->group(function (): void {
         Route::get('/', 'all');
+        Route::get('/free', 'getFree');
+        Route::get('/busy', 'getBusy');
+        Route::get('/half-free', 'getHalfFree');
+        Route::get('/check-free', 'checkFree');
         Route::get('/trashed', 'trashed');
         Route::post('/store', 'store');
         Route::post('/attribuer', 'attribuate');
@@ -538,6 +542,7 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
             Route::get('/search/{search}/paginate', 'getSearch');
             Route::post('/store', 'store');
             Route::get('{id}', 'show');
+            Route::patch('valider', 'valider');
         });
         Route::controller(EncaissementController::class)->prefix('encaissements')->group(function (): void {
             Route::get('/', 'all');

@@ -18,7 +18,8 @@ class FermetureListResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'total' => $this->total,
+            'total' => $this->whenNotNull($this->total),
+            'status' => $this->whenNotNull($this->status),
             'created_at' => $this->whenNotNull($this->created_at?->format('d-m-Y')),
             'guichet' => GuichetResource::make($this->whenLoaded('guichet')),
             'caissier' => CaissierResource::make($this->whenLoaded('caissier')),

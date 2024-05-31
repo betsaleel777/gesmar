@@ -8,6 +8,7 @@ use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasOwnerScope;
 use App\Traits\HasResponsible;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -46,13 +47,18 @@ class Ouverture extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
-        $this->attributes['code'] = OUVERTURE_CODE_PREFIXE . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id + 1;
+        $this->attributes['code'] = OUVERTURE_CODE_PREFIXE . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
     public function setConfirmed(): void
     {
         $this->setStatus(StatusOuverture::CONFIRMED->value);
+    }
+
+    public function setChecking(): void
+    {
+        $this->setStatus(StatusOuverture::CHECKING->value);
     }
 
     public function setUsing(): void
@@ -63,6 +69,11 @@ class Ouverture extends Model implements Auditable
     public function scopeConfirmed(Builder $query): Builder
     {
         return $query->currentStatus(StatusOuverture::CONFIRMED->value);
+    }
+
+    public function scopeChecked(Builder $query): Builder
+    {
+        return $query->currentStatus(StatusOuverture::CHECKING->value);
     }
 
     public function scopeUsing(Builder $query): Builder

@@ -6,10 +6,12 @@ use App\Models\Scopes\RecentScope;
 use App\Models\User;
 use App\Traits\HasOwnerScope;
 use App\Traits\HasResponsible;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -40,8 +42,23 @@ class Caissier extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id;
+        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id + 1;
         $this->attributes['code'] = CAISSIER_CODE_PREFIXE . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
+    }
+
+    public function scopeFree(Builder $query): Builder
+    {
+        return $query->whereDoesntHave('ouvertures', fn(Builder $query): Builder => $query->checked())
+            ->whereDoesntHave('ouvertures', fn(Builder $query): Builder => $query->using());
+    }
+    public function scopeBusy(Builder $query): Builder
+    {
+        return $query->whereHas('ouvertures', fn(Builder $query): Builder => $query->using());
+    }
+
+    public function scopeHalfFree($query): Builder
+    {
+        return $query->whereHas('ouvertures', fn(Builder $query): Builder => $query->checked());
     }
 
     /**
@@ -50,6 +67,11 @@ class Caissier extends Model implements Auditable
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function ouvertures(): HasMany
+    {
+        return $this->hasMany(Ouverture::class);
     }
 
     /**
