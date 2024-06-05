@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Facture\FactureInitialeListResource;
+use App\Http\Resources\Facture\FactureInitialeResource;
 use App\Models\Finance\Facture;
 use Gate;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,7 +28,7 @@ class FactureInitialeController extends Controller
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'initiale']);
         // not exists
-        $query = Facture::withExists('paiements as modifiable')->with(['contrat' => ['personne', 'emplacement']])->isSuperMarket()->isInitiale()->isFacture();
+        $query = Facture::withExists('paiements as unmodifiable')->with(['contrat' => ['personne', 'emplacement']])->isSuperMarket()->isInitiale()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureInitialeListResource::collection($factures);
     }
@@ -36,9 +37,9 @@ class FactureInitialeController extends Controller
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'initiale']);
         $query = Facture::withExists('paiements as modifiable')->with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
             ->isSuperMarket()->isInitiale()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureInitialeListResource::collection($factures);
@@ -62,9 +63,9 @@ class FactureInitialeController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with(self::RELATIONS)->isSuperMarket()->isInitiale()->find($id);
+        $facture = Facture::with('personne', 'contrat.emplacement.type')->isSuperMarket()->isInitiale()->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'initiale']);
-        return response()->json(['facture' => FactureInitialeListResource::make($facture)]);
+        return response()->json(['facture' => FactureInitialeResource::make($facture)]);
     }
 
     public function update(int $id, Request $request): JsonResponse

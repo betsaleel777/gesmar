@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Resources\Facture\FactureAnnexeListResource;
+use App\Http\Resources\Facture\FactureAnnexeResource;
 use App\Models\Finance\Facture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -25,8 +26,11 @@ class FactureAnnexeController extends FactureController
     public function getPaginate(): JsonResource
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'annexe']);
-        $query = Facture::with('personne:personnes.id,personnes.code,personnes.nom,prenom', 'annexe:id,nom',
-            'contrat:contrats.id,contrats.code,contrats.code_contrat')->isAnnexe()->isFacture();
+        $query = Facture::with(
+            'personne:personnes.id,personnes.code,personnes.nom,prenom',
+            'annexe:id,nom',
+            'contrat:contrats.id,contrats.code,contrats.code_contrat'
+        )->isAnnexe()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureAnnexeListResource::collection($factures);
     }
@@ -34,13 +38,16 @@ class FactureAnnexeController extends FactureController
     public function getSearch(string $search): JsonResource
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'annexe']);
-        $query = Facture::with('personne:personnes.id,personnes.code,personnes.nom,prenom', 'annexe:id,nom',
-            'contrat:contrats.id,contrats.code,contrats.code_contrat')
+        $query = Facture::with(
+            'personne:personnes.id,personnes.code,personnes.nom,prenom',
+            'annexe:id,nom',
+            'contrat:contrats.id,contrats.code,contrats.code_contrat'
+        )
             ->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->orWhereHas('personne', fn(Builder $query): Builder =>
-                $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('annexe', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('personne', fn (Builder $query): Builder =>
+            $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('annexe', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
             ->isAnnexe()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureAnnexeListResource::collection($factures);
@@ -64,9 +71,9 @@ class FactureAnnexeController extends FactureController
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with(self::RELATIONS)->isAnnexe()->find($id);
+        $facture = Facture::with('personne', 'annexe')->isAnnexe()->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'annexe']);
-        return response()->json(['facture' => $facture]);
+        return response()->json(['facture' => FactureAnnexeResource::make($facture)]);
     }
 
     public function store(Request $request): JsonResponse

@@ -14,7 +14,6 @@ use App\Traits\HasEquipement;
 use App\Traits\HasOwnerScope;
 use App\Traits\HasResponsible;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -29,7 +28,6 @@ use Spatie\ModelStatus\HasStatuses;
  */
 class Facture extends Model implements Auditable
 {
-    use HasFactory;
     use HasStatuses;
     use HasEquipement;
     use \OwenIt\Auditing\Auditable;
@@ -81,7 +79,7 @@ class Facture extends Model implements Auditable
     public static function initialeRules(): array
     {
         return [
-             ...self::RULES, ...[
+            ...self::RULES, ...[
                 'avance' => 'required|numeric',
                 'caution' => 'required|numeric',
                 'pas_porte' => 'required|numeric',
@@ -101,7 +99,7 @@ class Facture extends Model implements Auditable
     public static function gearRules(): array
     {
         return [
-             ...self::RULES, ...[
+            ...self::RULES, ...[
                 'equipement_id' => 'required|numeric',
                 'index_depart' => 'required|numeric',
                 'index_fin' => 'required|numeric',
@@ -114,13 +112,13 @@ class Facture extends Model implements Auditable
      */
     public static function loyerRules(): array
     {
-        return [ ...self::RULES, ...['periode' => 'required']];
+        return [...self::RULES, ...['periode' => 'required']];
     }
 
     public function getFactureInitialeTotalAmount(): int
     {
         return (int) $this?->pas_porte + (int) $this?->caution + (int) $this?->avance + (int) $this?->frais_dossier +
-        (int) $this?->frais_amenagement;
+            (int) $this?->frais_amenagement;
     }
 
     public function payer(): void
@@ -229,7 +227,7 @@ class Facture extends Model implements Auditable
      */
     public function scopeIsSuperMarket(Builder $query): Builder
     {
-        return $query->whereHas('contrat', fn(Builder $query) => $query->where('auto_valid', false));
+        return $query->whereHas('contrat', fn (Builder $query) => $query->where('auto_valid', false));
     }
 
     // relations
