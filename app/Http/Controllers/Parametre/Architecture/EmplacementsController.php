@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
+use Log;
 
 class EmplacementsController extends Controller
 {
@@ -63,10 +64,14 @@ class EmplacementsController extends Controller
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
         $query = Emplacement::select('id', 'code', 'zone_id', 'type_emplacement_id')
-            ->with('zone:zones.id,zones.nom,niveau_id', 'niveau:niveaux.id,niveaux.nom,pavillon_id',
-                'pavillon:pavillons.id,pavillons.nom,site_id', 'site:sites.id,sites.nom')
+            ->with(
+                'zone:zones.id,zones.nom,niveau_id',
+                'niveau:niveaux.id,niveaux.nom,pavillon_id',
+                'pavillon:pavillons.id,pavillons.nom,site_id',
+                'site:sites.id,sites.nom'
+            )
             ->removeOtherAlreadyAssignedToBordereau($request->integer('site'), $request->integer('commercial'), $request->jour)
-            ->whereHas('site', fn(Builder $query): Builder => $query->where('sites.id', $request->site))
+            ->whereHas('site', fn (Builder $query): Builder => $query->where('sites.id', $request->site))
             ->removeAlreadyCollected($request->jour)->withoutSchedule();
         $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();
         return EmplacementListResource::collection($emplacements);
@@ -75,7 +80,7 @@ class EmplacementsController extends Controller
     public function equipables(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
-        $query = Emplacement::with('type:id,nom')->whereHas('type', fn(Builder $query): Builder => $query->where('equipable', true));
+        $query = Emplacement::with('type:id,nom')->whereHas('type', fn (Builder $query): Builder => $query->where('equipable', true));
         $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['emplacements' => $emplacements]);
     }
@@ -184,7 +189,7 @@ class EmplacementsController extends Controller
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
         $query = Emplacement::with('equipements.type:id,nom')
-            ->whereHas('contrats', fn(Builder $query) => $query->notAborted())->bySite($id);
+            ->whereHas('contrats', fn (Builder $query) => $query->notAborted())->bySite($id);
         $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
     }
@@ -226,8 +231,8 @@ class EmplacementsController extends Controller
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
         $query = Emplacement::with(['contratActuel' => ['facturesLoyers', 'personne']])
-            ->whereHas('contratActuel', fn(Builder $query) => $query->where('auto_valid', false))
-            ->whereDoesntHave('contratActuel.facturesLoyers', fn(Builder $query) => $query->where('periode', $date));
+            ->whereHas('contratActuel', fn (Builder $query) => $query->where('auto_valid', false)->leadExceeded($date))
+            ->whereDoesntHave('contratActuel.facturesLoyers', fn (Builder $query) => $query->where('periode', $date));
         $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['emplacements' => EmplacementFactureLoyerResource::collection($emplacements)]);
     }
@@ -236,10 +241,14 @@ class EmplacementsController extends Controller
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
         $query = Emplacement::select('id', 'code', 'zone_id', 'type_emplacement_id')
-            ->with('zone:zones.id,zones.nom,niveau_id', 'niveau:niveaux.id,niveaux.nom,pavillon_id',
-                'pavillon:pavillons.id,pavillons.nom,site_id', 'site:sites.id,sites.nom')
-            ->with(['type' => fn($query) => $query->select('type_emplacements.id', 'type_emplacements.nom')])
-            ->whereHas('zone', fn($query) => $query->whereIn('zones.id', $request->query('zones')))
+            ->with(
+                'zone:zones.id,zones.nom,niveau_id',
+                'niveau:niveaux.id,niveaux.nom,pavillon_id',
+                'pavillon:pavillons.id,pavillons.nom,site_id',
+                'site:sites.id,sites.nom'
+            )
+            ->with(['type' => fn ($query) => $query->select('type_emplacements.id', 'type_emplacements.nom')])
+            ->whereHas('zone', fn ($query) => $query->whereIn('zones.id', $request->query('zones')))
             ->removeAlreadyAssignedToBordereau($request->integer('site'), $request->jour)
             ->removeAlreadyCollected($request->jour)->withoutSchedule();
         $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();

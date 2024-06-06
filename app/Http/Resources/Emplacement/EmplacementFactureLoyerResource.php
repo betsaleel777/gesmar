@@ -10,11 +10,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class EmplacementFactureLoyerResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
@@ -24,7 +19,7 @@ class EmplacementFactureLoyerResource extends JsonResource
             'contrat_id' => $this->whenLoaded('contratActuel', $this->resource->contratActuel->id),
             'client' => $this->when(
                 $this->resource->relationLoaded('contratActuel') and $this->resource->contratActuel->relationLoaded('personne'),
-                fn() => $this->resource->contratActuel?->personne?->nomComplet
+                fn () => $this->resource->contratActuel?->personne?->getFullname()
             ),
         ];
     }
