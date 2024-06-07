@@ -71,7 +71,7 @@ class Facture extends Model implements Auditable
 
     public function codeGenerate(string $prefix): void
     {
-        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id + 1;
+        $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
         $this->attributes['code'] = $prefix . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 

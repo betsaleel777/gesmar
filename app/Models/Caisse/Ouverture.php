@@ -47,7 +47,7 @@ class Ouverture extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id + 1;
+        $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
         $this->attributes['code'] = OUVERTURE_CODE_PREFIXE . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
@@ -83,7 +83,7 @@ class Ouverture extends Model implements Auditable
 
     public function caissier(): BelongsTo
     {
-        return $this->belongsTo(Caissier::class, );
+        return $this->belongsTo(Caissier::class,);
     }
 
     public function guichet(): BelongsTo

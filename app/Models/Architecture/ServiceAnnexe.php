@@ -35,18 +35,18 @@ class ServiceAnnexe extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = empty($this->latest()->first()) ? 1 : $this->latest()->first()->id + 1;
+        $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
         $this->attributes['code'] = ANNEXE_CODE_PREFIXE . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
     public function scopeIsBusy(Builder $query): Builder
     {
-        return $query->whereHas('contrats', fn(Builder $query): Builder => $query->validated());
+        return $query->whereHas('contrats', fn (Builder $query): Builder => $query->validated());
     }
 
     public function scopeIsFree(Builder $query): Builder
     {
-        return $query->whereHas('contrats', fn(Builder $query): Builder => $query->aborted(), '=')->orDoesntHave('contrats');
+        return $query->whereHas('contrats', fn (Builder $query): Builder => $query->aborted(), '=')->orDoesntHave('contrats');
     }
 
     public function contrats(): HasMany
