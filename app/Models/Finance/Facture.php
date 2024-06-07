@@ -46,6 +46,8 @@ class Facture extends Model implements Auditable
         'pas_porte',
         'periode',
         'montant_annexe',
+        'montant_loyer',
+        'montant_equipement',
         'frais_dossier',
         'frais_amenagement',
     ];
@@ -56,7 +58,7 @@ class Facture extends Model implements Auditable
         'avance' => 'integer', 'caution' => 'integer', 'index_fin' => 'integer',
         'pas_porte' => 'integer', 'index_depart' => 'integer', 'contrat_id' => 'integer',
         'equipement_id' => 'integer', 'annexe_id' => 'integer', 'frais_dossier' => 'integer',
-        'frais_amenagement' => 'integer',
+        'frais_amenagement' => 'integer', 'montant_loyer' => 'integer', 'montant_equipement' => 'integer'
     ];
 
     public const RULES = ['contrat_id' => 'required'];
