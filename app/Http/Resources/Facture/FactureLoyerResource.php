@@ -13,6 +13,7 @@ class FactureLoyerResource extends JsonResource
             'id' => $this->id,
             'code' => $this->code,
             'status' => $this->whenAppended('status'),
+            'loyer' => $this->whenNotNull($this->montant_loyer),
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),
         ];
     }

@@ -123,6 +123,16 @@ class Facture extends Model implements Auditable
             (int) $this?->frais_amenagement;
     }
 
+    public function getType(): string
+    {
+        return match (true) {
+            boolval($this->annexe_id) => 'annexe',
+            boolval($this->equipement_id) => 'equipement',
+            boolval($this->periode) => 'loyer',
+            default => 'initiale'
+        };
+    }
+
     public function payer(): void
     {
         $this->setStatus(StatusFacture::PAID->value);

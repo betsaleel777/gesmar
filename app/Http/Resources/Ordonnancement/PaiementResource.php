@@ -19,7 +19,7 @@ class PaiementResource extends JsonResource
             'ordonnancement_id' => $this->ordonnancement_id,
             'facture_id' => $this->facture_id,
             'created_at' => $this->created_at,
-            'montant' => $this->montant,
+            'montant' => $this->whenNotNull($this->montant),
             'facture' => FactureResource::make($this->whenLoaded('facture')),
             'ordonnancement' => OrdonnancementResource::make($this->whenLoaded('ordonnancement')),
         ];
