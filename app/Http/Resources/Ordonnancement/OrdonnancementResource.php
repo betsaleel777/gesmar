@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Ordonnancement;
 
+use App\Http\Resources\AuditResource;
 use App\Http\Resources\Contrat\ContratResource;
 use App\Http\Resources\Emplacement\EmplacementResource;
 use App\Http\Resources\Personne\PersonneResource;
@@ -28,6 +29,7 @@ class OrdonnancementResource extends JsonResource
             'emplacement' => EmplacementResource::make($this->whenLoaded('emplacement')),
             'annexe' => ServiceAnnexeResource::make($this->whenLoaded('annexe')),
             'personne' => PersonneResource::make($this->whenLoaded('personne')),
+            'audit' => AuditResource::make($this->whenLoaded('audit')),
         ];
     }
 }
