@@ -216,6 +216,7 @@ return [
         'list-own' => 'own-ordonnancement',
         'create' => 'create-ordonnancement',
         'show' => 'show-ordonnancement',
+        'edit' => 'edit-ordonnancement',
     ],
     'facture-dashboard' => [
         'list' => 'list-facture-dashboard',

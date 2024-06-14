@@ -183,6 +183,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'own-ordonnancement', 'description' => "afficher uniquement les ordonnancements crées par l'utilisateur connecté"],
             ['name' => 'create-ordonnancement', 'description' => "créer un ordonnancement"],
             ['name' => 'show-ordonnancement', 'description' => "afficher les informations détaillées d'un ordonnancement"],
+            ['name' => 'edit-ordonnancement', 'description' => "modifié un ordre de recette encore impayé"],
             ['name' => 'global-facture-initiale', 'description' => "afficher toutes les factures PDP"],
             ['name' => 'own-facture-initiale', 'description' => "afficher uniquement les factures PDP crées par l'utilisateur connecté"],
             ['name' => 'show-facture-initiale', 'description' => "afficher les informations détaillées d'une facture PDP"],
@@ -217,6 +218,6 @@ class PermissionSeeder extends Seeder
             ['name' => 'create-encaissement', 'description' => "créer un encaissement"],
             ['name' => 'show-encaissement', 'description' => "afficher les informations détaillées d'un point de caisse"],
         ]);
-        $permissions->each(fn($permission) => Permission::create($permission));
+        $permissions->each(fn ($permission) => Permission::create($permission));
     }
 }
