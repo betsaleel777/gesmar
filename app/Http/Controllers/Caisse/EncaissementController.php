@@ -54,8 +54,21 @@ class EncaissementController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $encaissement = Encaissement::with('payable', 'caissier:id,user_id', 'caissier.user:id,name', 'ordonnancement:id,total,code',
-            'ordonnancement.emplacement:emplacements.id,emplacements.code', 'ordonnancement.annexe:service_annexes.id,service_annexes.nom', 'ordonnancement.personne', 'ouverture:id,guichet_id', 'ouverture.guichet:id,nom', 'bordereau:id,code')->find($id);
+        $encaissement = Encaissement::with(
+            'payable',
+            'caissier:id,user_id',
+            'caissier.user:id,name',
+            'ordonnancement:id,total,code',
+            'ordonnancement.emplacement.type',
+            'ordonnancement.emplacement:emplacements.id,emplacements.code,type_emplacement_id',
+            'ordonnancement.annexe:service_annexes.id,service_annexes.nom',
+            'ordonnancement.contrat:contrats.id,ordonnancement_id,contrats.code,contrats.code_contrat',
+            'ordonnancement.personne',
+            'ordonnancement.paiements.facture',
+            'ouverture:id,guichet_id',
+            'ouverture.guichet:id,nom',
+            'bordereau:id,code'
+        )->find($id);
         $this->authorize('view', $encaissement);
         return response()->json(['encaissement' => EncaissementResource::make($encaissement)]);
     }
