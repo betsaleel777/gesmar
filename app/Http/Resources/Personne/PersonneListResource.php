@@ -6,13 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PersonneListResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             'id' => $this->id,
@@ -20,7 +14,7 @@ class PersonneListResource extends JsonResource
             'prenom' => $this->prenom,
             'ville' => $this->ville,
             'contact' => $this->contact,
-            'dossier' => $this->whenAppended('complet'),
+            'dossier' => $this->whenNotNull($this->getComplet()),
             'site' => $this->whenLoaded('site', fn () => $this->site->nom),
         ];
     }

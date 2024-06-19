@@ -71,7 +71,7 @@ class FactureAnnexeController extends FactureController
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with('personne', 'annexe')->isAnnexe()->withNameResponsible()->find($id);
+        $facture = Facture::with('personne', 'annexe', 'contrat')->isAnnexe()->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'annexe']);
         return response()->json(['facture' => FactureAnnexeResource::make($facture)]);
     }

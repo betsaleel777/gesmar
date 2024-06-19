@@ -5,15 +5,14 @@ namespace App\Http\Resources\Abonnement;
 use App\Http\Resources\Emplacement\EmplacementResource;
 use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\Architecture\Abonnement;
 
+/**
+ * @property Abonnement $resource
+ */
 class AbonnementResource extends JsonResource
 {
     public static $wrap = "abonnement";
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
@@ -26,7 +25,6 @@ class AbonnementResource extends JsonResource
             'index_depart' => $this->index_depart,
             'index_fin' => $this->index_fin,
             'status' => $this->whenAppended('status'),
-            'site_id' => $this->whenLoaded('site', fn () => $this->site->id),
             'site' => SiteResource::make($this->whenLoaded('site')),
             'emplacement' => EmplacementResource::make($this->whenLoaded('emplacement')),
             'equipement' => EquipementResource::make($this->whenLoaded('equipement')),

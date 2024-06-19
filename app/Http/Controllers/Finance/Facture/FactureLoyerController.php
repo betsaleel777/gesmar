@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Facture\FactureLoyerListResource;
+use App\Http\Resources\Facture\FactureLoyerResource;
 use App\Models\Architecture\Emplacement;
 use App\Models\Finance\Facture;
 use Illuminate\Database\Eloquent\Builder;
@@ -62,9 +63,9 @@ class FactureLoyerController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with(self::RELATIONS)->isLoyer()->find($id);
+        $facture = Facture::with('contrat.emplacement', 'personne')->isLoyer()->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'loyer']);
-        return response()->json(['facture' => $facture]);
+        return response()->json(['facture' => FactureLoyerResource::make($facture)]);
     }
 
     public function store(Request $request): JsonResponse

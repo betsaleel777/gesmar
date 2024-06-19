@@ -6,6 +6,7 @@ use App\Events\AbonnementRegistred;
 use App\Events\AbonnementResilied;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Abonnement\AbonnementListResource;
+use App\Http\Resources\Abonnement\AbonnementResource;
 use App\Http\Resources\Abonnement\AbonnementSelectResource;
 use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
@@ -46,8 +47,8 @@ class AbonnementsController extends Controller
     {
         $response = Gate::inspect('viewAny', Abonnement::class);
         $query = Abonnement::with('emplacement', 'equipement')->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->orWhereHas('equipement', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"));
+            ->orWhereHas('emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('equipement', fn (Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"));
         $abonnements = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return AbonnementListResource::collection($abonnements);
     }
@@ -110,7 +111,9 @@ class AbonnementsController extends Controller
     {
         $equipement = null;
         $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->firstWhere('equipement_id', $id);
-        if (empty($abonnement->index_depart)) {$equipement = Equipement::findOrFail($id);}
+        if (empty($abonnement->index_depart)) {
+            $equipement = Equipement::findOrFail($id);
+        }
         return response()->json(['index' => $abonnement->index_fin ?? $abonnement->index_depart ?? $equipement?->index]);
     }
 
@@ -130,10 +133,10 @@ class AbonnementsController extends Controller
     {
         $nestedRelation = 'emplacement.contratActuel.facturesEquipements';
         $requete = Abonnement::with(['equipement', 'emplacement.contratActuel' => ['personne', 'facturesEquipements']])
-            ->progressing()->whereHas('emplacement.contratActuel', fn(Builder $query) => $query->where('auto_valid', false));
-        $abonnements = $requete->whereDoesntHave($nestedRelation, fn(Builder $query) => $query->where('periode', $date))->get();
-        $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn(Builder $query) => $query->where('periode', $date)->isUnpaid())->get();
-        $abonnements->merge($abonnementsFactureUnpaid)->filter();
-        return response()->json(['abonnements' => $abonnements]);
+            ->progressing()->whereHas('emplacement.contratActuel', fn (Builder $query) => $query->where('auto_valid', false));
+        $abonnements = $requete->whereDoesntHave($nestedRelation, fn (Builder $query) => $query->where('periode', $date))->get();
+        // $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn(Builder $query) => $query->where('periode', $date)->isUnpaid())->get();
+        // $abonnements->merge($abonnementsFactureUnpaid)->filter();
+        return response()->json(['abonnements' => AbonnementResource::collection($abonnements)]);
     }
 }
