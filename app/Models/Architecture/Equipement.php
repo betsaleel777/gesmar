@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -29,17 +31,15 @@ class Equipement extends Model implements Auditable
 {
     use HasFactory, SoftDeletes, HasStateMachines, HasSites, HasEmplacement, HasResponsible, HasOwnerScope;
     use \OwenIt\Auditing\Auditable;
-    /**
-     *
-     * @var array<string, class-string>
-     */
     public $stateMachines = [
         'abonnement' => StatusAbonnementState::class,
         'liaison' => StatusLiaisonsState::class,
     ];
     protected $auditExclude = ['site_id'];
-    protected $fillable = ['nom', 'code', 'prix_unitaire', 'prix_fixe', 'frais_facture', 'index', 'type_equipement_id',
-        'site_id', 'emplacement_id'];
+    protected $fillable = [
+        'nom', 'code', 'prix_unitaire', 'prix_fixe', 'frais_facture', 'index', 'type_equipement_id',
+        'site_id', 'emplacement_id'
+    ];
     protected $casts = ['prix_unitaire' => 'integer', 'prix_fixe' => 'integer', 'frais_facture' => 'integer'];
     protected $dates = ['created_at'];
 
@@ -64,7 +64,7 @@ class Equipement extends Model implements Auditable
     protected function alias(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->attributes['code'] . ' ' . $this->type->nom,
+            get: fn () => $this->attributes['code'] . ' ' . $this->type->nom,
         );
     }
 
@@ -122,12 +122,12 @@ class Equipement extends Model implements Auditable
         return $query->where('liaison', StatusEquipement::UNLINKED->value);
     }
 
-    public function scopeFilterBetweenLiaisonDate(
-        Builder $query, ?array $dates, string $status = StatusEquipement::LINKED->value): Builder {
+    public function scopeFilterBetweenLiaisonDate(Builder $query, ?array $dates, string $status = StatusEquipement::LINKED->value): Builder
+    {
         [$start, $end] = $dates;
-        return $query->when($dates, fn(Builder $query): Builder =>
-            $query->whereHasLiaison(fn(Builder $query): Builder =>
-                $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
+        return $query->when($dates, fn (Builder $query): Builder =>
+        $query->whereHasLiaison(fn (Builder $query): Builder =>
+        $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
     }
 
     /**
@@ -136,5 +136,15 @@ class Equipement extends Model implements Auditable
     public function type(): BelongsTo
     {
         return $this->belongsTo(TypeEquipement::class, 'type_equipement_id');
+    }
+
+    public function abonnements(): HasMany
+    {
+        return $this->hasMany(Abonnement::class);
+    }
+
+    public function abonnementActuel(): HasOne
+    {
+        return $this->hasOne(Abonnement::class)->progressing();
     }
 }

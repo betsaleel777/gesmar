@@ -26,7 +26,7 @@ class FactureEquipementController extends Controller
     public function getPaginate(): JsonResource
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
-        $query = Facture::with(self::RELATIONS)->isEquipement()->isFacture();
+        $query = Facture::with(['contrat' => ['emplacement', 'personne'], 'equipement.abonnementActuel'])->isEquipement()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureEquipementListResource::collection($factures);
     }
@@ -34,10 +34,10 @@ class FactureEquipementController extends Controller
     public function getSearch(string $search): JsonResource
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
-        $query = Facture::with(self::RELATIONS)->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+        $query = Facture::with(['contrat' => ['emplacement', 'personne'], 'equipement.abonnementActuel'])->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
             ->isEquipement()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureEquipementListResource::collection($factures);

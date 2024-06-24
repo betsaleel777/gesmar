@@ -85,6 +85,9 @@ class AbonnementsController extends Controller
         $equipement = Equipement::with('type')->find((int) $request->equipement_id);
         $abonnement = new Abonnement($request->all());
         $abonnement->site_id = $equipement->site_id;
+        $abonnement->prix_fixe = $equipement->prix_fixe;
+        $abonnement->prix_unitaire = $equipement->prix_unitaire;
+        $abonnement->frais_facture = $equipement->frais_facture;
         $abonnement->code = self::codeGenerate($equipement->site_id);
         $abonnement->save();
         AbonnementRegistred::dispatch($abonnement);
@@ -132,9 +135,9 @@ class AbonnementsController extends Controller
     public function getRentalbyMonthGear(string $date): JsonResponse
     {
         $nestedRelation = 'emplacement.contratActuel.facturesEquipements';
-        $requete = Abonnement::with(['equipement', 'emplacement.contratActuel' => ['personne', 'facturesEquipements']])
-            ->progressing()->whereHas('emplacement.contratActuel', fn (Builder $query) => $query->where('auto_valid', false));
-        $abonnements = $requete->whereDoesntHave($nestedRelation, fn (Builder $query) => $query->where('periode', $date))->get();
+        $abonnements = Abonnement::with(['equipement', 'emplacement.contratActuel' => ['personne', 'facturesEquipements']])
+            ->progressing()->whereHas('emplacement.contratActuel', fn (Builder $query) => $query->where('auto_valid', false))
+            ->whereDoesntHave($nestedRelation, fn (Builder $query) => $query->where('periode', $date))->get();
         // $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn(Builder $query) => $query->where('periode', $date)->isUnpaid())->get();
         // $abonnements->merge($abonnementsFactureUnpaid)->filter();
         return response()->json(['abonnements' => AbonnementResource::collection($abonnements)]);

@@ -3,6 +3,8 @@
 namespace App\Models\Finance;
 
 use App\Enums\StatusFacture;
+use App\Models\Architecture\Abonnement;
+use App\Models\Architecture\Equipement;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Architecture\Site;
 use App\Models\Exploitation\Contrat;
@@ -252,6 +254,11 @@ class Facture extends Model implements Auditable
     public function contrat(): BelongsTo
     {
         return $this->belongsTo(Contrat::class);
+    }
+
+    public function equipement(): BelongsTo
+    {
+        return $this->belongsTo(Equipement::class);
     }
 
     /**

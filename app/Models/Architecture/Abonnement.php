@@ -24,9 +24,15 @@ class Abonnement extends Model implements Auditable
     use HasStatuses, HasSites, HasEquipement, HasEmplacement, HasResponsible, HasOwnerScope;
     use \OwenIt\Auditing\Auditable;
 
-    protected $fillable = ['code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre', 'site_id'];
+    protected $fillable = [
+        'code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre',
+        'prix_fixe', 'prix_unitaire', 'frais_facture', 'site_id'
+    ];
     protected $table = 'abonnements';
-    protected $casts = ['index_depart' => 'integer', 'index_fin' => 'integer', 'index_autre' => 'integer'];
+    protected $casts = [
+        'index_depart' => 'integer', 'index_fin' => 'integer',
+        'index_autre' => 'integer', 'prix_fixe' => 'integer', 'prix_unitaire' => 'integer', 'frais_facture' => 'integer'
+    ];
     protected $dates = ['created_at'];
     protected $auditExclude = ['code', 'site_id'];
     protected $appends = ['status'];
@@ -41,7 +47,7 @@ class Abonnement extends Model implements Auditable
     /**
      * The "booted" method of the model.
      */
-    protected static function booted()
+    protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
         static::addGlobalScope(new OwnSiteScope);

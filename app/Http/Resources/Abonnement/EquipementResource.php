@@ -8,7 +8,7 @@ use App\Models\Architecture\Equipement;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property Equipement resource
+ * @property Equipement $resource
  */
 class EquipementResource extends JsonResource
 {
@@ -24,7 +24,7 @@ class EquipementResource extends JsonResource
             'id' => $this->id,
             'code' => $this->whenNotNull($this->code),
             'nom' => $this->when(!empty($this->nom), str($this->nom)->lower()),
-            'alias' => $this->whenLoaded('type', fn() => $this->code . ' ' . $this->type->nom),
+            'alias' => $this->whenLoaded('type', fn () => $this->code . ' ' . $this->type->nom),
             'prix_unitaire' => $this->whenNotNull($this->prix_unitaire),
             'prix_fixe' => $this->whenNotNull($this->prix_fixe),
             'frais_facture' => $this->whenNotNull($this->frais_facture),
@@ -33,6 +33,8 @@ class EquipementResource extends JsonResource
             'emplacement_id' => $this->whenNotNull($this->emplacement_id),
             'site_id' => $this->whenNotNull($this->site_id),
             'abonnement' => $this->whenNotNull($this->abonnement),
+            'abonnementActuel' => AbonnementResource::make($this->whenLoaded('abonnementActuel')),
+            'abonnements' => AbonnementResource::collection($this->whenLoaded('abonnements')),
             'emplacement' => EmplacementResource::make($this->whenLoaded('emplacement')),
             'site' => SiteResource::make($this->whenLoaded('site')),
             'type' => TypeEquipementResource::make($this->whenLoaded('type')),
