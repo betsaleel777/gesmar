@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Facture\FactureEquipementListResource;
+use App\Http\Resources\Facture\FactureEquipementResource;
+use App\Http\Resources\Facture\FactureResource;
 use App\Models\Finance\Facture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -61,9 +63,10 @@ class FactureEquipementController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with(['contrat.site', 'equipement'])->isEquipement()->find($id);
+        $facture = Facture::with(['contrat.emplacement', 'equipement' => ['type', 'abonnementActuel'], 'personne'])->isEquipement()
+            ->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'equiepement']);
-        return response()->json(['facture' => $facture]);
+        return response()->json(['facture' => FactureEquipementResource::make($facture)]);
     }
 
     public function store(Request $request): JsonResponse

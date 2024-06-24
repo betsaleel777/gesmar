@@ -13,11 +13,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class EquipementResource extends JsonResource
 {
     public static $wrap = "equipement";
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
