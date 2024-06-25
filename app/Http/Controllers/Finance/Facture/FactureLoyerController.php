@@ -74,7 +74,7 @@ class FactureLoyerController extends Controller
         foreach ($request->all() as $data) {
             $facture = new Facture($data);
             $facture->montant_loyer = Emplacement::whereHas('contratActuel', fn (Builder $query): Builder => $query->where('id', $facture->contrat_id))->first()->loyer;
-            $facture->codeGenerate(LOYER_FACTURE_PREFIXE);
+            $facture->codeGenerate(config('constants.LOYER_FACTURE_PREFIXE'));
             $facture->save();
             $facture->facturable();
         }

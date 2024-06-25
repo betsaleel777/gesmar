@@ -23,7 +23,7 @@ class SocieteController extends Controller
         $request->validate(Societe::RULES);
         $societe = Societe::make($request->all());
         $societe->save();
-        $societe->addMediaFromRequest('logo')->toMediaCollection(COLLECTION_MEDIA_LOGO);
+        $societe->addMediaFromRequest('logo')->toMediaCollection(config('constants.COLLECTION_MEDIA_LOGO'));
         return response()->json(['message' => "La société $request->nom a été crée avec succès."]);
     }
 
@@ -34,7 +34,7 @@ class SocieteController extends Controller
         $request->validate(Societe::EDIT_RULES);
         $societe->update($request->all());
         if ($request->hasFile('logo')) {
-            $societe->addMediaFromRequest('logo')->toMediaCollection(COLLECTION_MEDIA_LOGO);
+            $societe->addMediaFromRequest('logo')->toMediaCollection(config('constants.COLLECTION_MEDIA_LOGO'));
         }
         return response()->json(['message' => "La société a été modifiée avec succès."]);
     }

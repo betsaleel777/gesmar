@@ -39,7 +39,7 @@ class Guichet extends Model implements Auditable
     public function codeGenerate(): void
     {
         $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
-        $this->attributes['code'] = GUICHET_CODE_PREFIXE . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
+        $this->attributes['code'] = config('constants.GUICHET_CODE_PREFIXE') . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
     public function setClose(): void

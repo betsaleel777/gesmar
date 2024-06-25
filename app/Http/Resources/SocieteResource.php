@@ -23,7 +23,7 @@ class SocieteResource extends JsonResource
             'phone' => $this->phone,
             'email' => $this->email,
             'created_at' => $this->created_at,
-            'logo' => $this->whenLoaded(COLLECTION_MEDIA_LOGO, fn () => $this->logo->getUrl()),
+            'logo' => $this->whenLoaded(config('constants.COLLECTION_MEDIA_LOGO'), fn () => $this->logo->getUrl()),
         ];
     }
 }

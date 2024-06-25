@@ -41,7 +41,7 @@ class Bordereau extends Model implements Auditable
     public function codeGenerate(): void
     {
         $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
-        $this->attributes['code'] = BORDEREAU_CODE_PREFIXE . str((string) $rang)->padLeft(5, '0') . Carbon::now()->format('y');
+        $this->attributes['code'] = config('constants.BORDEREAU_CODE_PREFIXE') . str((string) $rang)->padLeft(5, '0') . Carbon::now()->format('y');
     }
 
     public function setCashed(): void

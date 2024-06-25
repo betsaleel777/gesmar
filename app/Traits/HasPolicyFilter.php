@@ -8,7 +8,9 @@ trait HasPolicyFilter
 {
     public function before(User $user): bool | null
     {
-        if ($user->hasRole(SUPERROLE)) {return true;}
+        if ($user->hasRole(config('constants.SUPERROLE'))) {
+            return true;
+        }
         return null;
     }
 }

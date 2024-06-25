@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Finance\Facture;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Facture\FactureEquipementListResource;
 use App\Http\Resources\Facture\FactureEquipementResource;
-use App\Http\Resources\Facture\FactureResource;
 use App\Models\Finance\Facture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -74,7 +73,7 @@ class FactureEquipementController extends Controller
         $this->authorize('create', [Facture::class, 'equipement']);
         foreach ($request->all() as $ligne) {
             $facture = new Facture($ligne);
-            $facture->codeGenerate(EQUIPEMENT_FACTURE_PREFIXE);
+            $facture->codeGenerate(config('constants.EQUIPEMENT_FACTURE_PREFIXE'));
             $facture->save();
             $facture->facturable();
         }

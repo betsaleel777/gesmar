@@ -31,11 +31,11 @@ class TermesContratAnnexe extends TermesContrat implements HasMedia
     public function codeGenerate(): void
     {
         $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
-        $this->attributes['code'] = TEMPLATE_ANNEXE_PREFIXE . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
+        $this->attributes['code'] = config('constants.TEMPLATE_ANNEXE_PREFIXE') . str_pad((string) $rang, 2, '0', STR_PAD_LEFT) . Carbon::now()->format('my');
     }
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection(COLLECTION_MEDIA_CONTRAT_ANNEXE)->singleFile();
+        $this->addMediaCollection(config('constants.COLLECTION_MEDIA_CONTRAT_ANNEXE'))->singleFile();
     }
 }

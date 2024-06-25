@@ -13,14 +13,14 @@ class TermeContratSubscriber
     public function afterGabariAnnexeRegistred(TermeContratAnnexeRegistred $event): void
     {
         $path = createPDF('exampleContratAnnexe.pdf', $event->terme->contenu);
-        $event->terme->addMedia($path)->toMediaCollection(COLLECTION_MEDIA_CONTRAT_ANNEXE);
+        $event->terme->addMedia($path)->toMediaCollection(config('constants.COLLECTION_MEDIA_CONTRAT_ANNEXE'));
     }
 
 
     public function afterGabariBailRegistred(TermeContratBailRegistred $event): void
     {
         $path = createPDF('exampleContratBail.pdf', $event->terme->contenu);
-        $event->terme->addMedia($path)->toMediaCollection(COLLECTION_MEDIA_CONTRAT_BAIL);
+        $event->terme->addMedia($path)->toMediaCollection(config('constants.COLLECTION_MEDIA_CONTRAT_BAIL'));
     }
 
     public function beforeGabariAnnexeRegistred(): void

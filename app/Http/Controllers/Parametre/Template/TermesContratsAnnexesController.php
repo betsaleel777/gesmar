@@ -52,6 +52,6 @@ class TermesContratsAnnexesController extends TermesContratsController
     public function pdf(int $id)
     {
         $terme = TermesContratAnnexe::findOrFail($id);
-        return response()->json(['path' => $terme->getFirstMedia(COLLECTION_MEDIA_CONTRAT_ANNEXE)->getUrl()]);
+        return response()->json(['path' => $terme->getFirstMedia(config('constants.COLLECTION_MEDIA_CONTRAT_ANNEXE'))->getUrl()]);
     }
 }

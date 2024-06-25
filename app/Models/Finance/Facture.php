@@ -152,22 +152,22 @@ class Facture extends Model implements Auditable
 
     public function isAnnexe(): bool
     {
-        return Str::substr($this->attributes['code'], 0, 3) === ANNEXE_FACTURE_PREFIXE;
+        return Str::substr($this->attributes['code'], 0, 3) === config('constants.ANNEXE_FACTURE_PREFIXE');
     }
 
     public function isEquipement(): bool
     {
-        return Str::substr($this->attributes['code'], 0, 3) === EQUIPEMENT_FACTURE_PREFIXE;
+        return Str::substr($this->attributes['code'], 0, 3) === config('constants.EQUIPEMENT_FACTURE_PREFIXE');
     }
 
     public function isInitiale(): bool
     {
-        return Str::substr($this->attributes['code'], 0, 3) === INITIALE_FACTURE_PREFIXE;
+        return Str::substr($this->attributes['code'], 0, 3) === config('constants.INITIALE_FACTURE_PREFIXE');
     }
 
     public function isLoyer(): bool
     {
-        return Str::substr($this->attributes['code'], 0, 3) === LOYER_FACTURE_PREFIXE;
+        return Str::substr($this->attributes['code'], 0, 3) === config('constants.LOYER_FACTURE_PREFIXE');
     }
 
     // scopes

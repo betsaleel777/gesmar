@@ -21,7 +21,7 @@ class Societe extends Model implements HasMedia, Auditable
     protected $fillable = ['nom', 'sigle', 'siege', 'capital', 'smartphone', 'email', 'phone'];
 
     protected $casts = ['capital' => 'integer'];
-    protected $with = [COLLECTION_MEDIA_LOGO];
+    protected $with = ['logo'];
 
     const RULES = [
         'nom' => 'required',
@@ -50,11 +50,11 @@ class Societe extends Model implements HasMedia, Auditable
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection(COLLECTION_MEDIA_LOGO)->singleFile();
+        $this->addMediaCollection(config('constants.COLLECTION_MEDIA_LOGO'))->singleFile();
     }
 
     public function logo(): MorphOne
     {
-        return $this->morphOne(Media::class, 'model')->where('collection_name', '=', COLLECTION_MEDIA_LOGO);
+        return $this->morphOne(Media::class, 'model')->where('collection_name', '=', config('constants.COLLECTION_MEDIA_LOGO'));
     }
 }

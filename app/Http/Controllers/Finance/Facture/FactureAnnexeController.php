@@ -82,7 +82,7 @@ class FactureAnnexeController extends FactureController
         $request->validate(Facture::RULES);
         $facture = new Facture($request->all());
         $facture->proforma();
-        $facture->codeGenerate(ANNEXE_FACTURE_PREFIXE);
+        $facture->codeGenerate(config('constants.ANNEXE_FACTURE_PREFIXE'));
         $facture->save();
         return response()->json(['message' => "La facture annexe: $facture->code a été crée avec succès."]);
     }

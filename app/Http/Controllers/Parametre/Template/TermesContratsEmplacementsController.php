@@ -50,6 +50,6 @@ class TermesContratsEmplacementsController extends TermesContratsController
     public function pdf(int $id)
     {
         $terme = TermesContratEmplacement::findOrFail($id);
-        return response()->json(['path' => $terme->getFirstMedia(COLLECTION_MEDIA_CONTRAT_BAIL)->getUrl()]);
+        return response()->json(['path' => $terme->getFirstMedia(config('constants.COLLECTION_MEDIA_CONTRAT_BAIL'))->getUrl()]);
     }
 }

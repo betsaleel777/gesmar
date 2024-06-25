@@ -56,8 +56,8 @@ class Site extends Model implements Auditable
     public function scopeBySiteAttribuate(Builder $query): Builder
     {
         $user = User::with('sites')->find(auth()->user()->id);
-        return $query->when(!$user->hasRole(SUPERROLE), fn(Builder $query): Builder =>
-            $query->whereIn("sites.id", $user->sites->modelkeys()));
+        return $query->when(!$user->hasRole(config('constants.SUPERROLE')), fn (Builder $query): Builder =>
+        $query->whereIn("sites.id", $user->sites->modelkeys()));
     }
 
     public function pavillons(): HasMany

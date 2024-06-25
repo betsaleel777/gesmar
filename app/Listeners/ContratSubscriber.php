@@ -17,7 +17,7 @@ class ContratSubscriber
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
         $facture->montant_annexe = $event->montantAnnexe;
-        $facture->codeGenerate(ANNEXE_FACTURE_PREFIXE);
+        $facture->codeGenerate(config('constants.ANNEXE_FACTURE_PREFIXE'));
         $facture->annexe_id = $event->contrat->annexe_id;
         $facture->save();
         $facture->proforma();
@@ -28,7 +28,7 @@ class ContratSubscriber
         $emplacement = Emplacement::with('type')->find($event->contrat->emplacement_id);
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
-        $facture->codeGenerate(INITIALE_FACTURE_PREFIXE);
+        $facture->codeGenerate(config('constants.INITIALE_FACTURE_PREFIXE'));
         $facture->caution = $emplacement->caution * $emplacement->loyer;
         $facture->avance = $event->avance * $emplacement->loyer;
         $facture->frais_dossier = $emplacement->type->frais_dossier;

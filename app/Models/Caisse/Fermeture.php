@@ -58,7 +58,7 @@ class Fermeture extends Model implements ContractAuditable
     public function codeGenerate(): void
     {
         $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
-        $this->attributes['code'] = FERMETURE_CODE_PREFIXE . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
+        $this->attributes['code'] = config('constants.FERMETURE_CODE_PREFIXE') . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
     public function scopePending(Builder $query): Builder
