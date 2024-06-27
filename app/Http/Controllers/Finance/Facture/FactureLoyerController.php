@@ -63,7 +63,7 @@ class FactureLoyerController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with('contrat.emplacement', 'personne')->isLoyer()->withNameResponsible()->find($id);
+        $facture = Facture::with('contrat.emplacement.type', 'personne')->isLoyer()->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'loyer']);
         return response()->json(['facture' => FactureLoyerResource::make($facture)]);
     }
