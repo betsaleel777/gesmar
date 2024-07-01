@@ -9,6 +9,7 @@ use App\Events\FactureStatusChange;
 use App\Models\Architecture\Emplacement;
 use App\Models\Exploitation\Personne;
 use App\Models\Finance\Facture;
+use Log;
 
 class ContratSubscriber
 {
@@ -40,7 +41,7 @@ class ContratSubscriber
 
     public function validerSansSigner(ContratScheduled $event): void
     {
-        $event->contrat->validated();
+        $event->contrat->validate();
         $event->contrat->codeContratGenerate();
         $event->contrat->save();
         $personne = Personne::findOrFail($event->contrat->personne_id);

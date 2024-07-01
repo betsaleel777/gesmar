@@ -63,7 +63,8 @@ class FactureInitialeController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with('personne', 'contrat.emplacement.type')->isSuperMarket()->isInitiale()->withNameResponsible()->find($id);
+        $facture = Facture::withSum('paiements as sommeVersee', 'montant')->with('personne', 'contrat.emplacement.type')
+            ->isSuperMarket()->isInitiale()->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'initiale']);
         return response()->json(['facture' => FactureInitialeResource::make($facture)]);
     }
