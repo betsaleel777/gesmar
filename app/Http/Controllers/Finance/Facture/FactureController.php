@@ -9,7 +9,9 @@ use App\Http\Resources\Facture\FactureInitialeResource;
 use App\Http\Resources\Facture\FactureLoyerResource;
 use App\Http\Resources\Facture\FactureResource;
 use App\Models\Finance\Facture;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class FactureController extends Controller
 {
@@ -21,16 +23,26 @@ class FactureController extends Controller
         return response()->json(['factures' => FactureResource::collection($factures)]);
     }
 
-    public function facturesValidees(): JsonResponse
+    public function getSoldeesSearch(string $search): JsonResource
     {
-        $factures = Facture::with(self::RELATIONS)->isPaid()->get();
-        return response()->json(['factures' => $factures]);
+        $factures = Facture::with(['contrat' => ['personne', 'emplacement', 'annexe']])->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code_contrat', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.annexe', fn (Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))->isPaid()->paginate(10);
+        return FactureResource::collection($factures);
     }
 
-    public function facturesNonValidees(): JsonResponse
+    public function getSoldeesPaginate(): JsonResource
     {
-        $factures = Facture::with(self::RELATIONS)->isUnpaid()->get();
-        return response()->json(['factures' => $factures]);
+        $factures = Facture::with(['contrat' => ['personne', 'emplacement', 'annexe']])->isPaid()->paginate(10);
+        return FactureResource::collection($factures);
+    }
+
+    public function getNonSoldeesPaginate(): JsonResource
+    {
+        $factures = Facture::with(['contrat' => ['personne', 'emplacement', 'annexe']])->isUnpaid()->paginate(10);
+        return FactureResource::collection($factures);
     }
 
     public function show(int $id): JsonResponse

@@ -27,7 +27,6 @@ class FactureInitialeController extends Controller
     public function getPaginate(): JsonResource
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'initiale']);
-        // not exists
         $query = Facture::withExists('paiements as unmodifiable')->with(['contrat' => ['personne', 'emplacement']])->isSuperMarket()->isInitiale()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureInitialeListResource::collection($factures);
