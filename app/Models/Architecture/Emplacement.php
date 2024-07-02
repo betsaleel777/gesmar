@@ -83,7 +83,7 @@ class Emplacement extends Model implements Auditable
     protected function auto(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->relationLoaded('type') and !empty($this->type->auto_valid) ? $this->type->auto_valid : null,
+            get: fn () => $this->relationLoaded('type') and !empty($this->type->auto_valid) ? $this->type->auto_valid : null,
         );
     }
 
@@ -149,11 +149,19 @@ class Emplacement extends Model implements Auditable
     }
 
     /**
-     * Obtenir les emplacements d'un marché ou site précis
+     * Obtenir les emplacements d'un marché selon un site précis
      */
     public function scopeBySite(Builder $query, int $id): Builder
     {
-        return $query->whereHas('site', fn(Builder $query) => $query->where('sites.id', $id));
+        return $query->whereHas('site', fn (Builder $query) => $query->where('sites.id', $id));
+    }
+    /**
+     * Obtenir les emplacements une personne 
+     * en retirant les emplacement pour lesquels une demande existe déjà
+     */
+    public function scopeByPersonneWithoutPending(Builder $query, int $id): Builder
+    {
+        return $query->whereDoesntHave('contrats', fn (Builder $query) => $query->where('contrats.personne_id', $id)->enAttente());
     }
 
     /**
@@ -161,56 +169,62 @@ class Emplacement extends Model implements Auditable
      */
     public function scopeWithoutSchedule(Builder $query): Builder
     {
-        return $query->whereHas('type', fn(Builder $query) => $query->where('auto_valid', true));
+        return $query->whereHas('type', fn (Builder $query) => $query->where('auto_valid', true));
     }
 
     public function scopeRemoveAlreadyAssignedToBordereau(Builder $query, int $site, string $jour): Builder
     {
-        return $query->whereNotIn('id', fn($query) => $query->select('emplacements.id')->from('emplacements')
-                ->join('bordereau_emplacement', 'bordereau_emplacement.emplacement_id', '=', 'emplacements.id')
-                ->join('bordereaux', 'bordereaux.id', '=', 'bordereau_emplacement.bordereau_id')
-                ->where('bordereaux.site_id', $site)
-                ->where('bordereaux.jour', Carbon::parse($jour)->format('Y-m-d')));
+        return $query->whereNotIn('id', fn ($query) => $query->select('emplacements.id')->from('emplacements')
+            ->join('bordereau_emplacement', 'bordereau_emplacement.emplacement_id', '=', 'emplacements.id')
+            ->join('bordereaux', 'bordereaux.id', '=', 'bordereau_emplacement.bordereau_id')
+            ->where('bordereaux.site_id', $site)
+            ->where('bordereaux.jour', Carbon::parse($jour)->format('Y-m-d')));
     }
 
     public function scopeRemoveOtherAlreadyAssignedToBordereau(Builder $query, int $site, int $commercial, string $jour): Builder
     {
-        return $query->whereNotIn('id', fn($query) => $query->select('emplacements.id')->from('emplacements')
-                ->join('bordereau_emplacement', 'bordereau_emplacement.emplacement_id', '=', 'emplacements.id')
-                ->join('bordereaux', 'bordereaux.id', '=', 'bordereau_emplacement.bordereau_id')
-                ->where('bordereaux.site_id', $site)
-                ->where('bordereaux.commercial_id', '!=', $commercial)
-                ->where('bordereaux.jour', Carbon::parse($jour)->format('Y-m-d')));
+        return $query->whereNotIn('id', fn ($query) => $query->select('emplacements.id')->from('emplacements')
+            ->join('bordereau_emplacement', 'bordereau_emplacement.emplacement_id', '=', 'emplacements.id')
+            ->join('bordereaux', 'bordereaux.id', '=', 'bordereau_emplacement.bordereau_id')
+            ->where('bordereaux.site_id', $site)
+            ->where('bordereaux.commercial_id', '!=', $commercial)
+            ->where('bordereaux.jour', Carbon::parse($jour)->format('Y-m-d')));
     }
 
     public function scopeRemoveAlreadyCollected(Builder $query, string $jour): Builder
     {
-        return $query->whereNotIn('emplacements.id', fn($query) => $query->select('emplacements.id')->from('emplacements')
-                ->join('collectes', 'collectes.emplacement_id', '=', 'emplacements.id')
-                ->where('collectes.jour', Carbon::parse($jour)->format('Y-m-d')));
+        return $query->whereNotIn('emplacements.id', fn ($query) => $query->select('emplacements.id')->from('emplacements')
+            ->join('collectes', 'collectes.emplacement_id', '=', 'emplacements.id')
+            ->where('collectes.jour', Carbon::parse($jour)->format('Y-m-d')));
     }
 
     public function scopeFilterBetweenDisponibilityDate(
-        Builder $query, ?array $dates, string $status = StatusEmplacement::FREE->value): Builder {
+        Builder $query,
+        ?array $dates,
+        string $status = StatusEmplacement::FREE->value
+    ): Builder {
         [$start, $end] = $dates;
-        return $query->when($dates, fn(Builder $query): Builder =>
-            $query->whereHasDisponibilite(fn(Builder $query): Builder =>
-                $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
+        return $query->when($dates, fn (Builder $query): Builder =>
+        $query->whereHasDisponibilite(fn (Builder $query): Builder =>
+        $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
     }
 
     public function scopeFilterBetweenLiaisonDate(
-        Builder $query, ?array $dates, string $status = StatusEmplacement::LINKED->value): Builder {
+        Builder $query,
+        ?array $dates,
+        string $status = StatusEmplacement::LINKED->value
+    ): Builder {
         [$start, $end] = $dates;
-        return $query->when($dates, fn(Builder $query): Builder =>
-            $query->whereHasLiaison(fn(Builder $query): Builder => $query->transitionedTo($status)
-                    ->whereBetween('created_at', [$start, $end])));
+        return $query->when($dates, fn (Builder $query): Builder =>
+        $query->whereHasLiaison(fn (Builder $query): Builder => $query->transitionedTo($status)
+            ->whereBetween('created_at', [$start, $end])));
     }
 
     public function scopeFilterBetweenSubscribeDate(Builder $query, ?array $dates, bool $subscribed = true): Builder
     {
         [$start, $end] = $dates;
-        $hasBetween = $subscribed ? fn(Builder $query) => $query->whereHas('abonnementsActuels', fn(Builder $query) : Builder => $query->whereBetween('created_at', [$start, $end])): $query->whereDoesntHave('abonnementsActuels', fn(Builder $query): Builder => $query->whereBetween('created_at', [$start, $end]));
-        return $query->when($dates, fn(Builder $query): Builder => $hasBetween($query));
+        $hasBetween = $subscribed ? fn (Builder $query) => $query->whereHas('abonnementsActuels', fn (Builder $query): Builder => $query->whereBetween('created_at', [$start, $end])) : $query->whereDoesntHave('abonnementsActuels', fn (Builder $query): Builder => $query->whereBetween('created_at', [$start, $end]));
+        return $query->when($dates, fn (Builder $query): Builder => $hasBetween($query));
     }
 
     //relations

@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class EmplacementsController extends Controller
 {
@@ -211,6 +212,19 @@ class EmplacementsController extends Controller
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
         $query = Emplacement::isFree()->bySite($id);
+        $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();
+        return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
+    }
+
+    /**
+     * Récupère les emplacements libre selon le site et la personne
+     */
+    public function getFreeByMarchePersonne(int $marche, int $personne): JsonResponse
+    {
+        Log::alert($marche);
+        Log::alert($personne);
+        $response = Gate::inspect('viewAny', Emplacement::class);
+        $query = Emplacement::isFree()->bySite($marche)->byPersonneWithoutPending($personne);
         $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
     }

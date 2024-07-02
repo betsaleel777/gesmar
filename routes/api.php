@@ -150,6 +150,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
         Route::get('/trashed', 'trashed');
         Route::get('/rental/{date}', 'getRentalbyMonthLoyer');
         Route::get('/marche/{id}', 'getByMarche');
+        Route::get('/marche/{marche}/personne/{personne}/free', 'getFreeByMarchePersonne');
         Route::get('/marche-select/{id}', 'getByMarcheSelect');
         Route::get('/marche/gears/{id}', 'getByMarcheWithGearsAndContracts');
         Route::get('/marche/unlinked/{id}', 'getUnlinkedByMarche');
