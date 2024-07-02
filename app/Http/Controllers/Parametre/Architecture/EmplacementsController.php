@@ -221,8 +221,6 @@ class EmplacementsController extends Controller
      */
     public function getFreeByMarchePersonne(int $marche, int $personne): JsonResponse
     {
-        Log::alert($marche);
-        Log::alert($personne);
         $response = Gate::inspect('viewAny', Emplacement::class);
         $query = Emplacement::isFree()->bySite($marche)->byPersonneWithoutPending($personne);
         $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();
