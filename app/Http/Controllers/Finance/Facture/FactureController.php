@@ -33,9 +33,24 @@ class FactureController extends Controller
         return FactureResource::collection($factures);
     }
 
+    public function getPersonneSearch(int $id, string $search): JsonResource
+    {
+        $factures = Facture::with(['contrat' => ['emplacement', 'annexe']])->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code_contrat', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.annexe', fn (Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"))->byPersonne($id)->paginate(10);
+        return FactureResource::collection($factures);
+    }
+
     public function getSoldeesPaginate(): JsonResource
     {
         $factures = Facture::with(['contrat' => ['personne', 'emplacement', 'annexe']])->isPaid()->paginate(10);
+        return FactureResource::collection($factures);
+    }
+
+    public function getPersonnePaginate(int $id): JsonResource
+    {
+        $factures = Facture::with(['contrat' => ['emplacement', 'annexe']])->byPersonne($id)->paginate(10);
         return FactureResource::collection($factures);
     }
 
@@ -61,8 +76,8 @@ class FactureController extends Controller
 
     public function getByContrat(int $id): JsonResponse
     {
-        $facturesInitiales = Facture::withSum('paiements as sommeVersee', 'montant')->with(['contrat.emplacement'])
-            ->where('contrat_id', $id)->isInitiale()->isFacture()->isSuperMarket()->get();
+        $facturesInitiales = Facture::withSum('paiements as sommeVersee', 'montant')->with(['contrat.emplacement'])->where('contrat_id', $id)
+            ->isInitiale()->isFacture()->isSuperMarket()->get();
         $facturesAnnexes = Facture::with('contrat.annexe')->where('contrat_id', $id)->isAnnexe()->isFacture()->get();
         $facturesLoyers = Facture::with('contrat.emplacement')->where('contrat_id', $id)->isLoyer()->isFacture()->get();
         $facturesEquipements = Facture::with('contrat', 'equipement')->where('contrat_id', $id)->isEquipement()->isFacture()->get();

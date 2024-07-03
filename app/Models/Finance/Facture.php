@@ -3,7 +3,6 @@
 namespace App\Models\Finance;
 
 use App\Enums\StatusFacture;
-use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Architecture\Site;
@@ -65,7 +64,7 @@ class Facture extends Model implements Auditable
 
     public const RULES = ['contrat_id' => 'required'];
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::addGlobalScope(new RecentScope);
         static::addGlobalScope(new OwnSiteScope);
@@ -242,6 +241,13 @@ class Facture extends Model implements Auditable
     public function scopeIsSuperMarket(Builder $query): Builder
     {
         return $query->whereHas('contrat', fn (Builder $query) => $query->where('auto_valid', false));
+    }
+    /**
+     * Obtenir les factures d'un client donné
+     */
+    public function scopeByPersonne(Builder $query, int $id): Builder
+    {
+        return $query->whereHas('contrat', fn (Builder $query) => $query->where('personne_id', $id));
     }
 
     // relations

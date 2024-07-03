@@ -415,6 +415,8 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
         Route::get('/', [FactureController::class, 'all']);
         Route::get('/soldees/paginate', [FactureController::class, 'getSoldeesPaginate']);
         Route::get('/soldees/search/{search}/paginate', [FactureController::class, 'getSoldeesSearch']);
+        Route::get('/personne/{id}/paginate', [FactureController::class, 'getPersonnePaginate']);
+        Route::get('/personne/{id}/search/{search}/paginate', [FactureController::class, 'getPersonneSearch']);
         Route::get('/contrat/{id}', [FactureController::class, 'getByContrat']);
         Route::controller(FactureAnnexeController::class)->prefix('annexes')->group(
             function (): void {
