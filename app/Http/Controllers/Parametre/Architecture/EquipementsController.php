@@ -17,12 +17,6 @@ use Illuminate\Support\Facades\Gate;
 
 class EquipementsController extends Controller
 {
-    /**
-     * Undocumented function
-     *
-     * @param  int  $site
-     * @return array<string, string>
-     */
     private static function codeGenerate(int $site): array
     {
         $rang = (string) (Site::findOrFail($site)->equipements->count() + 1);
@@ -48,10 +42,19 @@ class EquipementsController extends Controller
     public function getSearch(string $search): JsonResource
     {
         $response = Gate::inspect('viewAny', Equipement::class);
-        $query = Equipement::select('nom', 'code', 'prix_unitaire', 'prix_fixe', 'type_equipement_id',
-            'site_id', 'emplacement_id', 'abonnement', 'liaison')->with('site:id,nom', 'type:id,nom')
+        $query = Equipement::select(
+            'nom',
+            'code',
+            'prix_unitaire',
+            'prix_fixe',
+            'type_equipement_id',
+            'site_id',
+            'emplacement_id',
+            'abonnement',
+            'liaison'
+        )->with('site:id,nom', 'type:id,nom')
             ->where('code', 'LIKE', "%$search%")->orWhere('nom', 'LIKE', "%$search%")
-            ->orWhereHas('type', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"));
+            ->orWhereHas('type', fn (Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"));
         $equipements = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return EquipementListResource::collection($equipements);
     }

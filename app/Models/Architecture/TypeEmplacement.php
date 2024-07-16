@@ -22,9 +22,8 @@ class TypeEmplacement extends Model implements Auditable
     use HasFactory, HasSites, HasResponsible, HasOwnerScope, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
-    protected $fillable = ['nom', 'site_id', 'prefix', 'code', 'auto_valid', 'frais_dossier', 'frais_amenagement', 'equipable'];
+    protected $fillable = ['nom', 'site_id', 'prefix', 'auto_valid', 'frais_dossier', 'frais_amenagement', 'equipable'];
     protected $dates = ['created_at'];
-    protected $auditExclude = ['code'];
 
     protected $casts = [
         'equipable' => 'boolean',

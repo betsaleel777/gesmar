@@ -25,7 +25,6 @@ class TypeEmplacementsController extends Controller
         $this->authorize('create', Type::class);
         $request->validate(Type::RULES);
         $type = new Type($request->all());
-        $type->code = (string) (Type::count() + 1);
         $type->save();
         return response()->json(['message' => "Le type d'emplacement $request->nom a été crée avec succès.", 'id' => $type->id]);
     }
