@@ -3,6 +3,7 @@
 namespace App\Models\Architecture;
 
 use App\Enums\StatusAbonnement;
+use App\Models\Exploitation\Contrat;
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasEmplacement;
@@ -26,7 +27,7 @@ class Abonnement extends Model implements Auditable
 
     protected $fillable = [
         'code', 'equipement_id', 'emplacement_id', 'index_depart', 'index_fin', 'index_autre',
-        'prix_fixe', 'prix_unitaire', 'frais_facture', 'site_id'
+        'prix_fixe', 'prix_unitaire', 'frais_facture', 'site_id', 'contrat_id'
     ];
     protected $table = 'abonnements';
     protected $casts = [
@@ -37,10 +38,7 @@ class Abonnement extends Model implements Auditable
     protected $auditExclude = ['code', 'site_id'];
     protected $appends = ['status'];
 
-    public const RULES = [
-        'emplacement_id' => 'required',
-        'site_id' => 'required',
-    ];
+    public const RULES = ['contrat_id' => 'required'];
 
     public const FINISH_RULES = ['index_fin' => 'required|numeric'];
 
@@ -104,5 +102,10 @@ class Abonnement extends Model implements Auditable
     public function equipement(): BelongsTo
     {
         return $this->belongsTo(Equipement::class);
+    }
+
+    public function contrat(): BelongsTo
+    {
+        return $this->belongsTo(Contrat::class);
     }
 }

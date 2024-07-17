@@ -65,7 +65,7 @@ class AbonnementsController extends Controller
     {
         $this->authorize('create', Abonnement::class);
         $request->validate(Abonnement::RULES);
-        $abonnement = new Abonnement;
+        $abonnement = new Abonnement($request->only('contrat_id'));
         foreach ($request->equipements as $equipement) {
             $abonnement->fill($request->all());
             $abonnement->code = self::codeGenerate($request->site_id);
@@ -138,8 +138,6 @@ class AbonnementsController extends Controller
         $abonnements = Abonnement::with(['equipement', 'emplacement.contratActuel' => ['personne', 'facturesEquipements']])
             ->progressing()->whereHas('emplacement.contratActuel', fn (Builder $query) => $query->where('auto_valid', false))
             ->whereDoesntHave($nestedRelation, fn (Builder $query) => $query->where('periode', $date))->get();
-        // $abonnementsFactureUnpaid = $requete->whereHas($nestedRelation, fn(Builder $query) => $query->where('periode', $date)->isUnpaid())->get();
-        // $abonnements->merge($abonnementsFactureUnpaid)->filter();
         return response()->json(['abonnements' => AbonnementResource::collection($abonnements)]);
     }
 }

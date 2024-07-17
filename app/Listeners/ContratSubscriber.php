@@ -9,7 +9,6 @@ use App\Events\FactureStatusChange;
 use App\Models\Architecture\Emplacement;
 use App\Models\Exploitation\Personne;
 use App\Models\Finance\Facture;
-use Log;
 
 class ContratSubscriber
 {
@@ -66,10 +65,6 @@ class ContratSubscriber
         }
     }
 
-    /**
-     * Register the listeners for the subscriber.
-     *@return array<class-name, string>
-     */
     public function subscribe(): array
     {
         return [
