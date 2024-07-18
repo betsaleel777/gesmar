@@ -6,6 +6,7 @@ use App\Events\EquipementRegistred;
 use App\Events\EquipementRemoved;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Abonnement\EquipementListResource;
+use App\Http\Resources\Abonnement\EquipementResource;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\Site;
 use Illuminate\Database\Eloquent\Builder;
@@ -117,10 +118,9 @@ class EquipementsController extends Controller
         return response()->json(['equipement' => $equipement]);
     }
 
-    public function getUnlinkedsubscribed(): JsonResponse
+    public function getUnlinkedsubscribed(): JsonResource
     {
-        $equipements = Equipement::unlinked()->unsubscribed()->get();
-        return response()->json(['equipements' => $equipements]);
+        return EquipementResource::collection(Equipement::unlinked()->unsubscribed()->get());
     }
 
     /**
