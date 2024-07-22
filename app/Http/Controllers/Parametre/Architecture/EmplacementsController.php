@@ -267,7 +267,7 @@ class EmplacementsController extends Controller
 
     public function getForSubscribeView(int $id): JsonResource
     {
-        $emplacement = Emplacement::select('id', 'code', 'nom')->with(['equipements:id,nom,code,abonnement,type_equipement_id,emplacement_id'
+        $emplacement = Emplacement::select('id', 'code', 'nom')->with(['equipements:id,nom,code,abonnement,type_equipement_id,emplacement_id,site_id'
         => ['type:id,nom']])->find($id);
         return EmplacementResource::make($emplacement);
     }

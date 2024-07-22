@@ -19,12 +19,12 @@ use Illuminate\Support\Facades\Gate;
 
 class AbonnementsController extends Controller
 {
-    private static function codeGenerate(int $site): string
+    private static function codeGenerate(): string
     {
-        $abonnement = Abonnement::where('site_id', $site)->latest()->first();
+        $abonnement = Abonnement::latest()->first();
         $rang = empty($abonnement) ? 1 : $abonnement->id;
-        $place = str_pad((string) $rang, 4, '0', STR_PAD_LEFT);
-        return 'AB' . str_pad((string) $site, 2, '0', STR_PAD_LEFT) . $place . Carbon::now()->format('y');
+        $place = str_pad((string) $rang, 6, '0', STR_PAD_LEFT);
+        return 'AB' . $place . Carbon::now()->format('y');
     }
 
     public function all(): JsonResponse
@@ -65,13 +65,14 @@ class AbonnementsController extends Controller
     {
         $this->authorize('create', Abonnement::class);
         $request->validate(Abonnement::RULES);
-        $abonnement = new Abonnement($request->only('contrat_id'));
+        $abonnement = new Abonnement;
         foreach ($request->equipements as $equipement) {
             $abonnement->fill($request->all());
-            $abonnement->code = self::codeGenerate($request->site_id);
+            $abonnement->code = self::codeGenerate();
             $abonnement->index_depart = $equipement['index_depart'];
             $abonnement->index_autre = $equipement['index_autre'];
             $abonnement->equipement_id = $equipement['id'];
+            $abonnement->site_id = $equipement['site_id'];
             $abonnement->save();
             AbonnementRegistred::dispatch($abonnement);
         }
