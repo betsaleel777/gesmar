@@ -283,6 +283,7 @@ class Emplacement extends Model implements Auditable
 
     /**
      * Obtenir les abonnements en cours pour un emplacement
+     * TODO: vérifier si le contrat lié à l'abonnement est en cours pour l'emplacement en question
      */
     public function abonnementsActuels(): hasMany
     {

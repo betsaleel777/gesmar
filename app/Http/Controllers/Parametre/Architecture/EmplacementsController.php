@@ -264,4 +264,11 @@ class EmplacementsController extends Controller
         $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['emplacements' => EmplacementListResource::collection($emplacements)]);
     }
+
+    public function getForSubscribeView(int $id): JsonResource
+    {
+        $emplacement = Emplacement::select('id', 'code', 'nom')->with(['equipements:id,nom,code,abonnement,type_equipement_id,emplacement_id,site_id'
+        => ['type:id,nom']])->find($id);
+        return EmplacementResource::make($emplacement);
+    }
 }

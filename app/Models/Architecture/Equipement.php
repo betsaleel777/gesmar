@@ -107,6 +107,14 @@ class Equipement extends Model implements Auditable
     }
 
     /**
+     * Obtenir les equipements qui n'ont pas d'abonnement en cours mais déjà lié à un emplacement {id}
+     */
+    public function scopeUnsubscribedOf(Builder $query, int $id): Builder
+    {
+        return $query->unsubscribed()->where('emplacement_id', $id);
+    }
+
+    /**
      * Obtenir les equipements qui sont liés à un emplacement
      */
     public function scopeLinked(Builder $query): Builder
@@ -120,6 +128,15 @@ class Equipement extends Model implements Auditable
     public function scopeUnlinked(Builder $query): Builder
     {
         return $query->where('liaison', StatusEquipement::UNLINKED->value);
+    }
+
+    /**
+     * Obtenir les equipements qui n'ont pas d'abonnement en cours mais déjà lié à un emplacement {id} 
+     * et ceux qui ne sont pas lié à l'emplacement {id} mais non lié et non abonné
+     */
+    public function scopeUnsubscribedAnyLinkedOf(Builder $query, int $id): Builder
+    {
+        return $query->unsubscribed()->orWhere(fn (Builder $query): Builder => $query->where('emplacement_id', $id));
     }
 
     public function scopeFilterBetweenLiaisonDate(Builder $query, ?array $dates, string $status = StatusEquipement::LINKED->value): Builder

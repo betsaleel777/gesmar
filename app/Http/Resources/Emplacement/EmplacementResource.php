@@ -11,14 +11,10 @@ use App\Models\Architecture\Emplacement;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property Emplacement resource
+ * @property Emplacement $resource
  */
 class EmplacementResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
@@ -35,6 +31,7 @@ class EmplacementResource extends JsonResource
             'type' => TypeEmplacementResource::make($this->whenLoaded('type')),
             'zone' => ZoneResource::make($this->whenLoaded('zone')),
             'abonnements' => AbonnementResource::collection($this->whenLoaded('abonnements')),
+            'abonnementsActuels' => AbonnementResource::collection($this->whenLoaded('abonnementsActuels')),
             'personne' => $this->when(
                 $this->relationLoaded('contratActuel') and $this->contratActuel->relationLoaded('personne'),
                 fn () => PersonneResource::make($this->contratActuel->personne)

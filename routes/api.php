@@ -142,6 +142,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     });
     Route::controller(EmplacementsController::class)->prefix('emplacements')->group(function (): void {
         Route::get('/', 'all');
+        Route::get('/for-subscribe/{id}', 'getForSubscribeView');
         Route::get('/select', 'select');
         Route::get('/simple-select', 'simpleSelect');
         Route::get('/autos', 'allAuto');
@@ -355,6 +356,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
             });
             Route::controller(ContratsEmplacementsController::class)->prefix('emplacements')->group(function (): void {
                 Route::get('/', 'all');
+                Route::get('/avec-equipements', 'getWithGear');
                 Route::get('/paginate', 'getPaginate');
                 Route::get('/search/{search}/paginate', 'getSearch');
                 Route::get('/valides/paginate', 'getValidesPaginate');
