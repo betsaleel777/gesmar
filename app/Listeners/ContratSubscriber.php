@@ -29,7 +29,7 @@ class ContratSubscriber
         $facture = new Facture();
         $facture->contrat_id = $event->contrat->id;
         $facture->codeGenerate(config('constants.INITIALE_FACTURE_PREFIXE'));
-        $facture->caution = $emplacement->caution * $emplacement->loyer;
+        $facture->caution = $emplacement->caution;
         $facture->avance = $event->avance * $emplacement->loyer;
         $facture->frais_dossier = $emplacement->type->frais_dossier;
         $facture->frais_amenagement = $emplacement->type->frais_amenagement;

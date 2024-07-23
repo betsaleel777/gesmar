@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Finance\Facture;
 use Illuminate\Support\Collection;
 
 class FactureService
@@ -11,11 +10,6 @@ class FactureService
     public function __construct(public Collection $paiements)
     {
     }
-
-    // private static function checkForAnnexe(Paiement $paiement): void
-    // {
-    //     $paiement->facture;
-    // }
 
     private static function checkForBail(Collection $paiements): void
     {
