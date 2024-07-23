@@ -90,8 +90,7 @@ class Emplacement extends Model implements Auditable
     public function getFullname(): string
     {
         $this->loadMissing('pavillon:id,nom', 'niveau:id,nom', 'site:id,nom');
-        return $this->nom . ' ' . str($this->pavillon?->nom)->lower() . ' ' . str($this->niveau?->nom)
-            ->lower() . str($this->site?->nom)->lower();
+        return $this->nom . ' ' . str($this->pavillon?->nom)->lower() . ' ' . str($this->niveau?->nom)->lower() . str($this->site?->nom)->lower();
     }
 
     public function occuper(): void
@@ -216,8 +215,7 @@ class Emplacement extends Model implements Auditable
     ): Builder {
         [$start, $end] = $dates;
         return $query->when($dates, fn (Builder $query): Builder =>
-        $query->whereHasLiaison(fn (Builder $query): Builder => $query->transitionedTo($status)
-            ->whereBetween('created_at', [$start, $end])));
+        $query->whereHasLiaison(fn (Builder $query): Builder => $query->transitionedTo($status)->whereBetween('created_at', [$start, $end])));
     }
 
     public function scopeFilterBetweenSubscribeDate(Builder $query, ?array $dates, bool $subscribed = true): Builder

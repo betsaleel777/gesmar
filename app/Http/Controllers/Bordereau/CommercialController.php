@@ -39,7 +39,7 @@ class CommercialController extends Controller
         $response = Gate::inspect('viewAny', Commercial::class);
         $query = Commercial::select('id', 'code', 'created_at', 'site_id', 'user_id')->with('site:id,nom', 'user:id,name')
             ->whereRaw("DATE_FORMAT(commercials.created_at,'%d-%m-%Y') LIKE ?", "$search%")->orWhere('code', 'LIKE', "%$search%")
-            ->orWhereHas('user', fn(Builder $query): Builder => $query->where('name', 'LIKE', "%$search%"));
+            ->orWhereHas('user', fn (Builder $query): Builder => $query->where('name', 'LIKE', "%$search%"));
         $commerciaux = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return CommercialListResource::collection($commerciaux);
     }
@@ -72,7 +72,7 @@ class CommercialController extends Controller
         $bordereau->save();
         $bordereau->emplacements()->attach($request->emplacements);
         return response()->json(['message' =>
-            "Le bordereau $bordereau->code a été assigné avec succès au commercial " . str($commercial->user->name)->lower()]);
+        "Le bordereau $bordereau->code a été assigné avec succès au commercial " . str($commercial->user->name)->lower()]);
     }
 
     public function trash(int $id): JsonResponse
@@ -113,7 +113,7 @@ class CommercialController extends Controller
     {
         $response = Gate::inspect('viewAny', Bordereau::class);
         $query = $commercial->bordereaux()->whereYear('jour', now()->year)->whereMonth('jour', now()->month);
-        $bordereaux = $response()->allowed() ? $query->get() : $query->owner()->get();
+        $bordereaux = $response->allowed() ? $query->get() : $query->owner()->get();
         return BordereauResource::collection($bordereaux);
     }
 }

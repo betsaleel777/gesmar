@@ -4,28 +4,20 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+return new class extends Migration
+{
+
+    public function up(): void
     {
         Schema::table('emplacements', function (Blueprint $table) {
-            $table->unsignedTinyInteger('caution')->default(0);
+            $table->unsignedInteger('caution')->default(0);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::table('emplacements', function (Blueprint $table) {
-            $table->unsignedTinyInteger('caution')->default(0);
+            $table->unsignedInteger('caution')->default(0);
         });
     }
 };
