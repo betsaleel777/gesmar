@@ -41,10 +41,6 @@ class TermeContratSubscriber
         }
     }
 
-    /**
-     * Register the listeners for the subscriber.
-     *@return array<class-name, string>
-     */
     public function subscribe(): array
     {
         return [

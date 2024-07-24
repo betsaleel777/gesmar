@@ -23,6 +23,7 @@ class EncaissementResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'code' => $this->whenNotNull($this->code),
             'caissier_id' => $this->whenNotNull($this->caissier_id),
             'payable_id' => $this->whenNotNull($this->payable_id),
             'ordonnancement_id' => $this->whenNotNull($this->ordonnancement_id),

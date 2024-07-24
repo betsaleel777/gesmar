@@ -6,6 +6,7 @@ use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Models\User;
 use App\Traits\HasSites;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -38,8 +39,8 @@ class Commercial extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
-        $this->attributes['code'] = config('constants.COMMERCIAL_CODE_PREFIXE') . str_pad((string) $rang, 7, '0', STR_PAD_LEFT);
+        $rang = $this->whereYear('created_at', Carbon::now()->format('Y'))->whithTrashed()->count() + 1;
+        $this->attributes['code'] = config('constants.COMMERCIAL_CODE_PREFIXE') . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
     public function user(): BelongsTo

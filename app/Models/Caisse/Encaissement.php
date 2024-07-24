@@ -10,6 +10,7 @@ use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasOwnerScope;
 use App\Traits\HasResponsible;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,7 +29,7 @@ class Encaissement extends Model implements Auditable
     use HasResponsible;
     use HasOwnerScope;
 
-    protected $fillable = ['ordonnancement_id', 'bordereau_id', 'payable_id', 'caissier_id', 'ouverture_id'];
+    protected $fillable = ['code', 'ordonnancement_id', 'bordereau_id', 'payable_id', 'caissier_id', 'ouverture_id'];
     protected $dates = ['created_at'];
     protected $appends = ['status'];
     const RULES = ['ordonnancement_id' => 'required_without:bordereau_id', 'bordereau_id' => 'required_without:ordonnancement_id'];
@@ -37,6 +38,13 @@ class Encaissement extends Model implements Auditable
     {
         static::addGlobalScope(new RecentScope);
         static::addGlobalScope(new OwnSiteScope);
+    }
+
+    public function codeGenerate(): void
+    {
+        $prefixe = empty($this->ordonnancement_id) ? config('constants.ENCAISSEMENT_BORDEREAUX') : config('constants.ENCAISSEMENT_ORDONNANCEMENT');
+        $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
+        $this->attributes['code'] = $prefixe . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
     public function setClose(): void

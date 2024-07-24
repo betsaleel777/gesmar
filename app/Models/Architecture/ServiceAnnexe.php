@@ -35,7 +35,7 @@ class ServiceAnnexe extends Model implements Auditable
 
     public function codeGenerate(): void
     {
-        $rang = empty($this->orderBy('id', 'desc')->first()) ? 1 : $this->orderBy('id', 'desc')->first()->id + 1;
+        $rang = $this->whereYear('created_at', Carbon::now()->format('Y'))->withTrashed()->count() + 1;
         $this->attributes['code'] = config('constants.ANNEXE_CODE_PREFIXE') . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 

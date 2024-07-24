@@ -26,6 +26,7 @@ class EncaissementController extends Controller
         $encaissement->ouverture_id = $ouverture->id;
         $espece = Espece::find($espece->id);
         $encaissement->payable()->associate($espece);
+        $encaissement->codeGenerate();
         $encaissement->save();
         EncaissementRegistred::dispatch($encaissement);
     }
@@ -40,6 +41,7 @@ class EncaissementController extends Controller
         $encaissement->ouverture_id = $ouverture->id;
         $cheque = Cheque::find($cheque->id);
         $encaissement->payable()->associate($cheque);
+        $encaissement->codeGenerate();
         $encaissement->save();
         EncaissementRegistred::dispatch($encaissement);
     }
@@ -47,7 +49,7 @@ class EncaissementController extends Controller
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Encaissement::class);
-        $query = Encaissement::with('payable', 'caissier:id,user_id', 'caissier.user:id,name', 'ordonnancement:id,code', 'bordereau:id,code')->opened();
+        $query = Encaissement::with('payable', 'caissier:id,user_id', 'caissier.user:id,name')->opened();
         $encaissements = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['encaissements' => EncaissementListeResource::collection($encaissements)]);
     }
@@ -59,11 +61,11 @@ class EncaissementController extends Controller
             'caissier:id,user_id',
             'caissier.user:id,name',
             'ordonnancement:id,total,code',
-            'ordonnancement.emplacement.type',
+            'ordonnancement.emplacement.type:type_emplacements.id,type_emplacements.nom',
             'ordonnancement.emplacement:emplacements.id,emplacements.code,type_emplacement_id',
             'ordonnancement.annexe:service_annexes.id,service_annexes.nom',
             'ordonnancement.contrat:contrats.id,ordonnancement_id,contrats.code,contrats.code_contrat',
-            'ordonnancement.personne',
+            'ordonnancement.personne:personnes.id,personnes.nom,prenom,personnes.code',
             'ordonnancement.paiements.facture',
             'ouverture:id,guichet_id',
             'ouverture.guichet:id,nom',

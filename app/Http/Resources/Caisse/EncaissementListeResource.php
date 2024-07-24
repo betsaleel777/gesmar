@@ -8,15 +8,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EncaissementListeResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
             'id' => $this->id,
+            'code' => $this->whenNotNull($this->code),
             'ordonnancement_id' => $this->whenNotNull($this->ordonnancement_id),
             'payable_id' => $this->whenNotNull($this->payable_id),
             'caissier_id' => $this->whenNotNull($this->caissier_id),

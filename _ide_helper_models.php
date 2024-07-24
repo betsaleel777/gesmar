@@ -25,9 +25,14 @@ namespace App\Models\Architecture{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int $site_id
  * @property int|null $index_autre
+ * @property int $prix_fixe
+ * @property int $prix_unitaire
+ * @property int $frais_facture
+ * @property int|null $contrat_id
  * @property-read \OwenIt\Auditing\Models\Audit|null $audit
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
+ * @property-read \App\Models\Exploitation\Contrat|null $contrat
  * @property-read \App\Models\Architecture\Emplacement $emplacement
  * @property-read \App\Models\Architecture\Equipement $equipement
  * @property-read \OwenIt\Auditing\Models\Audit|null $shortAudit
@@ -44,13 +49,17 @@ namespace App\Models\Architecture{
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement query()
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement stopped()
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereContratId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereEmplacementId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereEquipementId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereFraisFacture($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereIndexAutre($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereIndexDepart($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereIndexFin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Abonnement wherePrixFixe($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Abonnement wherePrixUnitaire($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereSiteId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Abonnement withNameResponsible()
@@ -105,6 +114,7 @@ namespace App\Models\Architecture{
  * @property-read int|null $state_history_count
  * @property-read \App\Models\Architecture\TypeEmplacement $type
  * @property-read \App\Models\Architecture\Zone $zone
+ * @method static \Illuminate\Database\Eloquent\Builder|Emplacement byPersonneWithoutPending(int $id)
  * @method static \Illuminate\Database\Eloquent\Builder|Emplacement bySite(int $id)
  * @method static \Illuminate\Database\Eloquent\Builder|Emplacement filterBetweenDisponibilityDate(?array $dates, string $status = 'libre')
  * @method static \Illuminate\Database\Eloquent\Builder|Emplacement filterBetweenLiaisonDate(?array $dates, string $status = 'lié')
@@ -167,6 +177,9 @@ namespace App\Models\Architecture{
  * @property int|null $emplacement_id
  * @property string $liaison
  * @property string $abonnement
+ * @property-read \App\Models\Architecture\Abonnement|null $abonnementActuel
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Architecture\Abonnement> $abonnements
+ * @property-read int|null $abonnements_count
  * @property-read mixed $alias
  * @property-read \OwenIt\Auditing\Models\Audit|null $audit
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
@@ -189,6 +202,8 @@ namespace App\Models\Architecture{
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement subscribed()
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement unlinked()
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement unsubscribed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Equipement unsubscribedAnyLinkedOf(int $id)
+ * @method static \Illuminate\Database\Eloquent\Builder|Equipement unsubscribedOf(int $id)
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement whereAbonnement($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Equipement whereCreatedAt($value)
@@ -398,7 +413,6 @@ namespace App\Models\Architecture{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int $site_id
- * @property string $code
  * @property string $prefix
  * @property bool $auto_valid
  * @property bool $equipable
@@ -418,7 +432,6 @@ namespace App\Models\Architecture{
  * @method static \Illuminate\Database\Eloquent\Builder|TypeEmplacement owner()
  * @method static \Illuminate\Database\Eloquent\Builder|TypeEmplacement query()
  * @method static \Illuminate\Database\Eloquent\Builder|TypeEmplacement whereAutoValid($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TypeEmplacement whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TypeEmplacement whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TypeEmplacement whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TypeEmplacement whereEquipable($value)
@@ -720,9 +733,14 @@ namespace App\Models\Caisse{
  * @property-read \OwenIt\Auditing\Models\Audit|null $audit
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Caisse\Ouverture> $ouvertures
+ * @property-read int|null $ouvertures_count
  * @property-read \OwenIt\Auditing\Models\Audit|null $shortAudit
  * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier busy()
  * @method static \Database\Factories\Caisse\CaissierFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier free()
+ * @method static \Illuminate\Database\Eloquent\Builder|Caissier halfFree()
  * @method static \Illuminate\Database\Eloquent\Builder|Caissier newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Caissier newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Caissier owner()
@@ -933,6 +951,7 @@ namespace App\Models\Caisse{
  * @property-read \App\Models\Architecture\Site|null $site
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\ModelStatus\Status> $statuses
  * @property-read int|null $statuses_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Ouverture checked()
  * @method static \Illuminate\Database\Eloquent\Builder|Ouverture confirmed()
  * @method static \Illuminate\Database\Eloquent\Builder|Ouverture currentStatus(...$names)
  * @method static \Illuminate\Database\Eloquent\Builder|Ouverture newModelQuery()
@@ -977,6 +996,8 @@ namespace App\Models\Exploitation{
  * @property bool $equipable
  * @property bool $auto_valid
  * @property string|null $code_contrat
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Architecture\Abonnement> $abonnementsActuels
+ * @property-read int|null $abonnements_actuels_count
  * @property-read \App\Models\Architecture\ServiceAnnexe|null $annexe
  * @property-read \OwenIt\Auditing\Models\Audit|null $audit
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
@@ -1006,6 +1027,7 @@ namespace App\Models\Exploitation{
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat inProcess()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat isAnnexe()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat isBail()
+ * @method static \Illuminate\Database\Eloquent\Builder|Contrat leadExceeded(string $date)
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat notAborted()
@@ -1038,6 +1060,7 @@ namespace App\Models\Exploitation{
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat withNameResponsible()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat withResponsible()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Contrat withValidStatus()
  * @method static \Illuminate\Database\Eloquent\Builder|Contrat withoutTrashed()
  * @mixin \Eloquent
  */
@@ -1406,6 +1429,8 @@ namespace App\Models\Finance{
  * @property int|null $montant_annexe
  * @property int $frais_amenagement
  * @property int $frais_dossier
+ * @property int $montant_equipement
+ * @property int $montant_loyer
  * @property-read \App\Models\Architecture\ServiceAnnexe|null $annexe
  * @property-read \OwenIt\Auditing\Models\Audit|null $audit
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
@@ -1419,6 +1444,7 @@ namespace App\Models\Finance{
  * @property-read \App\Models\Architecture\Site|null $site
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\ModelStatus\Status> $statuses
  * @property-read int|null $statuses_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Facture byPersonne(int $id)
  * @method static \Illuminate\Database\Eloquent\Builder|Facture currentStatus(...$names)
  * @method static \Illuminate\Database\Eloquent\Builder|Facture isAnnexe()
  * @method static \Illuminate\Database\Eloquent\Builder|Facture isEquipement()
@@ -1447,6 +1473,8 @@ namespace App\Models\Finance{
  * @method static \Illuminate\Database\Eloquent\Builder|Facture whereIndexDepart($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Facture whereIndexFin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Facture whereMontantAnnexe($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Facture whereMontantEquipement($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Facture whereMontantLoyer($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Facture wherePasPorte($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Facture wherePeriode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Facture whereUpdatedAt($value)
