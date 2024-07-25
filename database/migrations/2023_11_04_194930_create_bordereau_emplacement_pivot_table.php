@@ -6,27 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('bordereau_emplacement', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bordereau_id')->constrained('bordereaux')->cascadeOnDelete();
             $table->foreignId('emplacement_id')->constrained('emplacements')->cascadeOnDelete();
+            $table->unsignedInteger('loyer');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('bordereau_emplacement');
     }

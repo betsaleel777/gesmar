@@ -10,6 +10,8 @@ use App\Models\Caisse\Encaissement;
 use App\Models\Caisse\Ouverture;
 use App\Models\Finance\Cheque;
 use App\Models\Finance\Espece;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -54,6 +56,9 @@ class EncaissementController extends Controller
         return response()->json(['encaissements' => EncaissementListeResource::collection($encaissements)]);
     }
 
+    /* 
+      TODO: à la modification du bordereau mettre le loyer de l'emplacement dans les données à transmettre
+    */
     public function show(int $id): JsonResponse
     {
         $encaissement = Encaissement::with(
@@ -65,12 +70,17 @@ class EncaissementController extends Controller
             'ordonnancement.emplacement:emplacements.id,emplacements.code,type_emplacement_id',
             'ordonnancement.annexe:service_annexes.id,service_annexes.nom',
             'ordonnancement.contrat:contrats.id,ordonnancement_id,contrats.code,contrats.code_contrat',
-            'ordonnancement.personne:personnes.id,personnes.nom,prenom,personnes.code',
+            'ordonnancement.personne:personnes.id,personnes.nom,prenom,personnes.code,ville,adresse,contact,email',
             'ordonnancement.paiements.facture',
             'ouverture:id,guichet_id',
             'ouverture.guichet:id,nom',
-            'bordereau:id,code'
-        )->find($id);
+            'bordereau:id,code,commercial_id',
+            'bordereau.commercial.user:users.id,users.name'
+        )->with([
+            'bordereau' => function (BelongsTo $query): BelongsTo {
+                return $query->select('id', 'code', 'commercial_id')->withSum('collectes as total', 'montant')->with('commercial.user:id,name', 'emplacements');
+            }
+        ])->find($id);
         $this->authorize('view', $encaissement);
         return response()->json(['encaissement' => EncaissementResource::make($encaissement)]);
     }

@@ -44,6 +44,11 @@ class Bordereau extends Model implements Auditable
         $this->attributes['code'] = config('constants.BORDEREAU_CODE_PREFIXE') . str((string) $rang)->padLeft(5, '0') . Carbon::now()->format('y');
     }
 
+    public function getExactAmountToCollect(): null|int
+    {
+        return $this->relationLoaded('emplacements') ? $this->emplacements->sum('pivot.loyer') : null;
+    }
+
     public function setCashed(): void
     {
         $this->status()->transitionTo(StatusBordereau::CASHED->value);
@@ -71,7 +76,7 @@ class Bordereau extends Model implements Auditable
 
     public function emplacements(): BelongsToMany
     {
-        return $this->belongsToMany(Emplacement::class, 'bordereau_emplacement', 'bordereau_id', 'emplacement_id');
+        return $this->belongsToMany(Emplacement::class, 'bordereau_emplacement', 'bordereau_id', 'emplacement_id')->withPivot('loyer')->withTimestamps();
     }
 
     public function collectes(): HasMany
