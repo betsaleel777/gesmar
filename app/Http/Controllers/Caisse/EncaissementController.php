@@ -73,14 +73,12 @@ class EncaissementController extends Controller
             'ordonnancement.paiements.facture',
             'ouverture:id,guichet_id',
             'ouverture.guichet:id,nom',
-            'bordereau:id,code,commercial_id',
-            'bordereau.commercial.user:users.id,users.name'
         )->with([
             'bordereau' => function (BelongsTo $query): BelongsTo {
                 return $query->select('id', 'code', 'commercial_id')->withSum('collectes as total', 'montant')->withCount('emplacements as nombre')
                     ->with('commercial.user:id,name');
             }
-        ])->find($id);
+        ])->withNameResponsible()->find($id);
         $this->authorize('view', $encaissement);
         return response()->json(['encaissement' => EncaissementResource::make($encaissement)]);
     }

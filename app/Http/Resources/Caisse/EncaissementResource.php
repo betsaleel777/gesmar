@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Caisse;
 
+use App\Http\Resources\AuditResource;
 use App\Http\Resources\Bordereau\BordereauResource;
 use App\Http\Resources\Ordonnancement\OrdonnancementResource;
 use App\Models\Caisse\Encaissement;
@@ -41,6 +42,7 @@ class EncaissementResource extends JsonResource
                     $this->payable instanceof Espece => EspeceResource::make($this->payable),
                 };
             }),
+            'audit' => AuditResource::make($this->whenLoaded('audit')),
         ];
     }
 }
