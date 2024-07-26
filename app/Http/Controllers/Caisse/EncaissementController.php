@@ -10,7 +10,6 @@ use App\Models\Caisse\Encaissement;
 use App\Models\Caisse\Ouverture;
 use App\Models\Finance\Cheque;
 use App\Models\Finance\Espece;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -78,7 +77,8 @@ class EncaissementController extends Controller
             'bordereau.commercial.user:users.id,users.name'
         )->with([
             'bordereau' => function (BelongsTo $query): BelongsTo {
-                return $query->select('id', 'code', 'commercial_id')->withSum('collectes as total', 'montant')->with('commercial.user:id,name', 'emplacements');
+                return $query->select('id', 'code', 'commercial_id')->withSum('collectes as total', 'montant')->withCount('emplacements as nombre')
+                    ->with('commercial.user:id,name');
             }
         ])->find($id);
         $this->authorize('view', $encaissement);

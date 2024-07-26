@@ -21,7 +21,8 @@ class BordereauResource extends JsonResource
             'site_id' => $this->whenNotNull($this->site_id),
             'jour' => $this->whenNotNull($this->jour?->format('d-m-Y')),
             'total' => $this->whenNotNull($this->total),
-            'exacteCollecte' => $this->whenNotNull($this->getExactAmountToCollect()),
+            'exacteCollecte' => $this->whenNotNull($this->getExactAmountToCollect()), // somme qui aurait du être collecté
+            'nombre' => $this->whenNotNull($this->nombre),
             'commercial' => CommercialResource::make($this->whenLoaded('commercial')),
             'site' => SiteResource::make($this->whenLoaded('site')),
             'emplacements' => EmplacementListResource::collection($this->whenLoaded('emplacements')),

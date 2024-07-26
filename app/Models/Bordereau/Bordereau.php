@@ -44,9 +44,9 @@ class Bordereau extends Model implements Auditable
         $this->attributes['code'] = config('constants.BORDEREAU_CODE_PREFIXE') . str((string) $rang)->padLeft(5, '0') . Carbon::now()->format('y');
     }
 
-    public function getExactAmountToCollect(): null|int
+    public function getExactAmountToCollect(): int
     {
-        return $this->relationLoaded('emplacements') ? $this->emplacements->sum('pivot.loyer') : null;
+        return $this->emplacements()->sum('bordereau_emplacement.loyer');
     }
 
     public function setCashed(): void
