@@ -62,17 +62,17 @@ class CommercialController extends Controller
         return response()->json(['message' => "Le commercial: $commercial->code a été enregistré avec succès."]);
     }
 
-    public function attribuer(AssignationRequest $request): JsonResponse
+    public function attribuer(AssignationRequest $request)
     {
         $commercial = Commercial::with('user:id,name')->find($request->commercial_id);
         $this->authorize('attribuate', $commercial);
         $bordereau = Bordereau::make($request->validated());
         $bordereau->codeGenerate();
         $bordereau->site_id = $commercial->site_id;
+        $attaches = collect($request->emplacements)->mapWithKeys(fn ($emplacement) => [$emplacement['id'] => ['loyer' => $emplacement['loyer']]]);
         $bordereau->save();
-        $bordereau->emplacements()->attach($request->emplacements);
-        return response()->json(['message' =>
-        "Le bordereau $bordereau->code a été assigné avec succès au commercial " . str($commercial->user->name)->lower()]);
+        $bordereau->emplacements()->attach($attaches->toArray());
+        return response()->json(['message' => "Le bordereau $bordereau->code a été assigné avec succès au commercial " . str($commercial->user->name)->lower()]);
     }
 
     public function trash(int $id): JsonResponse

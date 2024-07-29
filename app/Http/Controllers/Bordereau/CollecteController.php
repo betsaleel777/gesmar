@@ -13,11 +13,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class CollecteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(): JsonResource
     {
         $collectes = Collecte::get();

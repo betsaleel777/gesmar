@@ -62,7 +62,7 @@ class EmplacementsController extends Controller
     public function allAutoBySite(Request $request): JsonResource
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
-        $query = Emplacement::select('id', 'code', 'zone_id', 'type_emplacement_id')
+        $query = Emplacement::select('id', 'code', 'zone_id', 'type_emplacement_id', 'loyer')
             ->with(
                 'zone:zones.id,zones.nom,niveau_id',
                 'niveau:niveaux.id,niveaux.nom,pavillon_id',
@@ -250,7 +250,7 @@ class EmplacementsController extends Controller
     public function getByZones(Request $request)
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
-        $query = Emplacement::select('id', 'code', 'zone_id', 'type_emplacement_id')
+        $query = Emplacement::select('id', 'code', 'zone_id', 'type_emplacement_id', 'loyer')
             ->with(
                 'zone:zones.id,zones.nom,niveau_id',
                 'niveau:niveaux.id,niveaux.nom,pavillon_id',
