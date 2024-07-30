@@ -182,7 +182,6 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
     });
     Route::controller(ServiceAnnexesController::class)->prefix('annexes')->group(function (): void {
         Route::get('/', 'all');
-        Route::get('/free', 'getFree');
         Route::get('/trashed', 'trashed');
         Route::get('/marche/{id}', 'getByMarche');
         Route::post('/store', 'store');

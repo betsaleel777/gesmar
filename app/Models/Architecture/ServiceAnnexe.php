@@ -39,16 +39,6 @@ class ServiceAnnexe extends Model implements Auditable
         $this->attributes['code'] = config('constants.ANNEXE_CODE_PREFIXE') . str_pad((string) $rang, 5, '0', STR_PAD_LEFT) . Carbon::now()->format('y');
     }
 
-    public function scopeIsBusy(Builder $query): Builder
-    {
-        return $query->whereHas('contrats', fn (Builder $query): Builder => $query->validated());
-    }
-
-    public function scopeIsFree(Builder $query): Builder
-    {
-        return $query->whereHas('contrats', fn (Builder $query): Builder => $query->aborted(), '=')->orDoesntHave('contrats');
-    }
-
     public function contrats(): HasMany
     {
         return $this->hasMany(Contrat::class, 'annexe_id');

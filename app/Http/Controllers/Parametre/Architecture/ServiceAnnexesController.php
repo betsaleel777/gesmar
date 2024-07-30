@@ -71,15 +71,7 @@ class ServiceAnnexesController extends Controller
     public function getByMarche(int $id): JsonResponse
     {
         $response = Gate::inspect('viewAny', ServiceAnnexe::class);
-        $query = ServiceAnnexe::select('id', 'nom')->where('site_id', $id)->isFree();
-        $annexes = $response->allowed() ? $query->get() : $query->owner()->get();
-        return response()->json(['annexes' => ServiceAnnexeResource::collection($annexes)]);
-    }
-
-    public function getFree(): JsonResponse
-    {
-        $response = Gate::inspect('viewAny', ServiceAnnexe::class);
-        $query = ServiceAnnexe::select('id', 'nom')->isFree();
+        $query = ServiceAnnexe::select('id', 'nom')->where('site_id', $id);
         $annexes = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['annexes' => ServiceAnnexeResource::collection($annexes)]);
     }
