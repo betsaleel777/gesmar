@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Enums\StatusContrat;
+use App\Enums\StatusEmplacement;
 use App\Enums\StatusPersonne;
 use App\Events\EncaissementRegistred;
 use App\Events\FermetureRegistred;
@@ -22,7 +23,7 @@ class EncaissementSubscriber
     {
         $event->encaissement->setOpen();
         empty($event->encaissement->bordereau_id) ? $this->updateOrdonnancementDependencies($event) :
-        $this->updateBordereauDependencies($event);
+            $this->updateBordereauDependencies($event);
     }
 
     private function updateBordereauDependencies(EncaissementRegistred $event): void
@@ -41,9 +42,7 @@ class EncaissementSubscriber
         $contrat->save();
         $contrat->status === StatusContrat::VALIDATED->value ?: $contrat->validate();
         $contrat->personne->status === StatusPersonne::CLIENT->name ?: $contrat->personne->client();
-        if ($contrat->emplacement) {
-            $contrat->emplacement->occuper();
-        }
+        $contrat->emplacement->hasStatus(StatusEmplacement::BUSY->value) ?: $contrat->emplacement->occuper();
         $service = new FactureService($ordonnancement->paiements);
         $service->checkPaid();
         $autresContratsEnAttente = Contrat::where('emplacement_id', $contrat->emplacement_id)->inProcess()->get();
@@ -59,7 +58,7 @@ class EncaissementSubscriber
     {
         $ouverture = Ouverture::with('encaissements')->find($event->fermeture->ouverture_id);
         $ouverture->setChecking();
-        $ouverture->encaissements->each(fn(Encaissement $encaissement) => $encaissement->setClose());
+        $ouverture->encaissements->each(fn (Encaissement $encaissement) => $encaissement->setClose());
         Guichet::find($ouverture->guichet_id)->setClose();
     }
 

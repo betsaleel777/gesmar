@@ -35,6 +35,7 @@ class Facture extends Model implements Auditable
     use HasResponsible;
     use HasOwnerScope;
 
+    // TODO: ajouter ici les propriété en migration (avec requete de mise au point) de l'équipement pour prevenir les modification (prix_fixe,frais_facture)
     protected $fillable = [
         'code',
         'contrat_id',
@@ -49,6 +50,8 @@ class Facture extends Model implements Auditable
         'montant_annexe',
         'montant_loyer',
         'montant_equipement',
+        'prix_fixe',
+        'frais_facture',
         'frais_dossier',
         'frais_amenagement',
     ];
@@ -59,7 +62,8 @@ class Facture extends Model implements Auditable
         'avance' => 'integer', 'caution' => 'integer', 'index_fin' => 'integer',
         'pas_porte' => 'integer', 'index_depart' => 'integer', 'contrat_id' => 'integer',
         'equipement_id' => 'integer', 'annexe_id' => 'integer', 'frais_dossier' => 'integer',
-        'frais_amenagement' => 'integer', 'montant_loyer' => 'integer', 'montant_equipement' => 'integer'
+        'frais_amenagement' => 'integer', 'montant_loyer' => 'integer',
+        'montant_equipement' => 'integer', 'prix_fixe' => 'integer', 'frais_facture' => 'integer'
     ];
 
     public const RULES = ['contrat_id' => 'required'];

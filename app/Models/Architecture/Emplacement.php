@@ -40,9 +40,6 @@ class Emplacement extends Model implements Auditable
     use \OwenIt\Auditing\Auditable;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
-    /**
-     * Summary of stateMachines
-     */
     public $stateMachines = ['disponibilite' => StatusDisponibiliteState::class, 'liaison' => StatusLiaisonsState::class];
     protected $fillable = ['nom', 'code', 'superficie', 'type_emplacement_id', 'zone_id', 'loyer', 'pas_porte', 'caution'];
 
@@ -77,9 +74,6 @@ class Emplacement extends Model implements Auditable
         static::addGlobalScope(new OwnSiteScope);
     }
 
-    /**
-     * @return Attribute<string, never>
-     */
     protected function auto(): Attribute
     {
         return Attribute::make(
