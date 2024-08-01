@@ -20,7 +20,7 @@ class ContratResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->codification(),
+            'code' => $this->whenNotNull($this->codification()),
             'debut' => $this->whenNotNull($this->debut),
             'fin' => $this->whenNotNull($this->fin),
             'site_id' => $this->whenNotNull($this->site_id),

@@ -73,6 +73,7 @@ class FactureEquipementController extends Controller
         $this->authorize('create', [Facture::class, 'equipement']);
         foreach ($request->all() as $ligne) {
             $facture = new Facture($ligne);
+            $facture->montant_equipement = $ligne->prix_unitaire;
             $facture->codeGenerate(config('constants.EQUIPEMENT_FACTURE_PREFIXE'));
             $facture->save();
             $facture->facturable();
