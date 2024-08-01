@@ -11,29 +11,29 @@ class FactureService
     {
     }
 
-    private static function checkForBail(Collection $paiements): void
+
+    public function checkPaid(): void
     {
+        $paiements = new Collection();
+        foreach ($this->paiements as $paiement) {
+            $paiements->push($paiement);
+        }
         if (!$paiements->isEmpty()) {
             foreach ($paiements as $paiement) {
                 $facture = $paiement->loadMissing('facture')->facture;
                 if ($facture->isInitiale()) {
                     $facture->loadMissing('paiements');
-                    // vérifier si la facture est soldée
                     $facture->getFactureInitialeTotalAmount() === $facture->paiements->sum('montant') ? $facture->payer() : null;
+                } else if ($facture->isAnnexe()) {
+                    $facture->loadMissing('paiements');
+                    $facture->montant_annexe === $facture->paiements->sum('montant') ? $facture->payer() : null;
+                } else if ($facture->isLoyer()) {
+                    $facture->loadMissing('paiements');
+                    $facture->montant_loyer === $facture->paiements->sum('montant') ? $facture->payer() : null;
                 } else {
                     $facture->payer();
                 }
             }
         }
-    }
-
-    public function checkPaid(): void
-    {
-        $paiementAnnexe = null;
-        $paiementsBails = new Collection();
-        foreach ($this->paiements as $paiement) {
-            $paiement->facture->isAnnexe() ? $paiementAnnexe = $paiement : $paiementsBails->push($paiement);
-        }
-        !empty($paiementAnnexe) ? $paiementAnnexe->facture->payer() : self::checkForBail($paiementsBails);
     }
 }

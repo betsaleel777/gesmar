@@ -26,7 +26,7 @@ class FactureInitialeResource extends JsonResource
             'frais_amenagement' => $this->whenNotNull($this->frais_amenagement),
             'created_at' => $this->whenNotNull($this?->created_at),
             'total' => $this->whenNotNull($this->resource->getFactureInitialeTotalAmount()),
-            'sommeVersee' => $this->sommeVersee ?? 0,
+            'sommeVersee' => (int)$this->sommeVersee ?? 0,
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),
             'personne' => PersonneResource::make($this->whenLoaded('personne')),
             'audit' => AuditResource::make($this->whenLoaded('audit')),

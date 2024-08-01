@@ -22,6 +22,7 @@ class FactureLoyerResource extends JsonResource
             'periode' => $this->whenNotNull($this->resource->periode),
             'loyer' => $this->whenNotNull($this->resource->montant_loyer),
             'created_at' => $this->whenNotNull($this?->created_at),
+            'sommeVersee' => (int)$this->sommeVersee ?? 0,
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),
             'audit' => AuditResource::make($this->whenLoaded('audit')),
             'personne' => PersonneResource::make($this->whenLoaded('personne')),
