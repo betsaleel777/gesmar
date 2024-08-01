@@ -107,6 +107,16 @@ class Emplacement extends Model implements Auditable
         $this->liaison()->transitionTo(StatusEmplacement::UNLINKED->value);
     }
 
+    public function hasFree(): bool
+    {
+        return $this->disponibilite === StatusEmplacement::FREE->value;
+    }
+
+    public function hasBusy(): bool
+    {
+        return $this->disponibilite === StatusEmplacement::BUSY->value;
+    }
+
     //scopes
 
     /**

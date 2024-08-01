@@ -25,9 +25,11 @@ class FactureService
                     $facture->loadMissing('paiements');
                     $facture->getFactureInitialeTotalAmount() === $facture->paiements->sum('montant') ? $facture->payer() : null;
                 } else if ($facture->isAnnexe()) {
-                    $facture->montant_annexe === $facture->paiements->sum('montant') ? $facture->payer : null;
+                    $facture->loadMissing('paiements');
+                    $facture->montant_annexe === $facture->paiements->sum('montant') ? $facture->payer() : null;
                 } else if ($facture->isLoyer()) {
-                    $facture->montant_loyer === $facture->paiements->sum('montant') ? $facture->payer : null;
+                    $facture->loadMissing('paiements');
+                    $facture->montant_loyer === $facture->paiements->sum('montant') ? $facture->payer() : null;
                 } else {
                     $facture->payer();
                 }

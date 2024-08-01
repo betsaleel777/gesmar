@@ -78,8 +78,8 @@ class FactureController extends Controller
     {
         $facturesInitiales = Facture::withSum('paiements as sommeVersee', 'montant')->with(['contrat.emplacement'])->where('contrat_id', $id)
             ->isInitiale()->isFacture()->isSuperMarket()->get();
-        $facturesAnnexes = Facture::with('contrat.annexe')->where('contrat_id', $id)->isAnnexe()->isFacture()->get();
-        $facturesLoyers = Facture::with('contrat.emplacement')->where('contrat_id', $id)->isLoyer()->isFacture()->get();
+        $facturesAnnexes = Facture::withSum('paiements as sommeVersee', 'montant')->with('contrat.annexe')->where('contrat_id', $id)->isAnnexe()->isFacture()->get();
+        $facturesLoyers = Facture::withSum('paiements as sommeVersee', 'montant')->with('contrat.emplacement')->where('contrat_id', $id)->isLoyer()->isFacture()->get();
         $facturesEquipements = Facture::with('contrat', 'equipement')->where('contrat_id', $id)->isEquipement()->isFacture()->get();
         return response()->json([
             'facturesInitiales' => FactureInitialeResource::collection($facturesInitiales),

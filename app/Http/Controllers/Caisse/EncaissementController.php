@@ -55,9 +55,6 @@ class EncaissementController extends Controller
         return response()->json(['encaissements' => EncaissementListeResource::collection($encaissements)]);
     }
 
-    /* 
-      TODO: à la modification du bordereau mettre le loyer de l'emplacement dans les données à transmettre
-    */
     public function show(int $id): JsonResponse
     {
         $encaissement = Encaissement::with(
