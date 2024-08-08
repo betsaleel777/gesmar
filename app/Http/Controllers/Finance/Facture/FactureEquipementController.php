@@ -63,10 +63,10 @@ class FactureEquipementController extends Controller
     public function show(int $id): JsonResponse
     {
         $facture = Facture::with([
-            'contrat:id,code,debut,fin,emplacement_id' => ['emplacement:id,code'],
+            'contrat:id,code,code_contrat,debut,fin,emplacement_id' => ['emplacement:id,code'],
             'equipement:id,code,type_equipement_id' => ['type'],
             'personne'
-        ])->isEquipement()->withNameResponsible()->find($id);
+        ])->isEquipement()->withNameResponsible()->withUnpaidAmount($id)->find($id);
         $this->authorize('view', [$facture, 'equiepement']);
         return response()->json(['facture' => FactureEquipementResource::make($facture)]);
     }

@@ -272,6 +272,15 @@ class Facture extends Model implements Auditable
         return $query->whereHas('contrat', fn(Builder $query) => $query->where('personne_id', $id));
     }
 
+    public function scopeWithUnpaidAmount(Builder $query, int $id): Builder
+    {
+        $facture = self::find($id);
+        return $query->addSelect([
+            'impayes' => self::query()->selectRaw('SUM((index_fin-index_depart)*montant_equipement+prix_fixe+frais_facture)')
+                ->whereDate('periode', '<', $facture->periode)->where('contrat_id', $facture->contrat_id)
+        ])->isEquipement();
+    }
+
     // relations
 
     public function annexe(): BelongsTo

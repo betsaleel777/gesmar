@@ -23,6 +23,7 @@ class FactureEquipementResource extends JsonResource
             'montant_equipement' => $this->whenNotNull($this->montant_equipement),
             'frais_facture' => $this->whenNotNull($this->frais_facture),
             'prix_fixe' => $this->whenNotNull($this->prix_fixe),
+            'impayes' => $this->whenNotNull((int)$this->impayes, 0),
             'total' => $this->whenNotNull($this->getEquipementTotalAmount()),
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),
             'equipement' => EquipementResource::make($this->whenLoaded('equipement')),
