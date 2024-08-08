@@ -62,7 +62,10 @@ class FactureEquipementController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with(['contrat.emplacement', 'equipement' => ['type', 'abonnementActuel'], 'personne'])->isEquipement()
+        $facture = Facture::with([
+            'contrat:id,code,debut,fin,emplacement_id' => ['emplacement:id,code'],
+            'equipement:id,code,type_equipement_id' => ['type'], 'personne'
+        ])->isEquipement()
             ->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'equiepement']);
         return response()->json(['facture' => FactureEquipementResource::make($facture)]);
@@ -71,10 +74,11 @@ class FactureEquipementController extends Controller
     public function store(Request $request): JsonResponse
     {
         $this->authorize('create', [Facture::class, 'equipement']);
-        foreach ($request->all() as $ligne) {
+        foreach ($request->factures as $ligne) {
             $facture = new Facture($ligne);
-            $facture->montant_equipement = $ligne->prix_unitaire;
+            $facture->montant_equipement = $ligne['prix_unitaire'];
             $facture->codeGenerate(config('constants.EQUIPEMENT_FACTURE_PREFIXE'));
+            $facture->date_limite = $request->date_limite;
             $facture->save();
             $facture->facturable();
         }
