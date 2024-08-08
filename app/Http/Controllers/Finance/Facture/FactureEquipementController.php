@@ -36,9 +36,9 @@ class FactureEquipementController extends Controller
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
         $query = Facture::with(['contrat' => ['emplacement', 'personne'], 'equipement.abonnementActuel'])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
             ->isEquipement()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureEquipementListResource::collection($factures);
@@ -64,9 +64,9 @@ class FactureEquipementController extends Controller
     {
         $facture = Facture::with([
             'contrat:id,code,debut,fin,emplacement_id' => ['emplacement:id,code'],
-            'equipement:id,code,type_equipement_id' => ['type'], 'personne'
-        ])->isEquipement()
-            ->withNameResponsible()->find($id);
+            'equipement:id,code,type_equipement_id' => ['type'],
+            'personne'
+        ])->isEquipement()->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'equiepement']);
         return response()->json(['facture' => FactureEquipementResource::make($facture)]);
     }

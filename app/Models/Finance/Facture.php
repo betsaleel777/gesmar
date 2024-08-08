@@ -60,11 +60,20 @@ class Facture extends Model implements Auditable
     protected $appends = ['status'];
 
     protected $casts = [
-        'avance' => 'integer', 'caution' => 'integer', 'index_fin' => 'integer',
-        'pas_porte' => 'integer', 'index_depart' => 'integer', 'contrat_id' => 'integer',
-        'equipement_id' => 'integer', 'annexe_id' => 'integer', 'frais_dossier' => 'integer',
-        'frais_amenagement' => 'integer', 'montant_loyer' => 'integer',
-        'montant_equipement' => 'integer', 'prix_fixe' => 'integer', 'frais_facture' => 'integer',
+        'avance' => 'integer',
+        'caution' => 'integer',
+        'index_fin' => 'integer',
+        'pas_porte' => 'integer',
+        'index_depart' => 'integer',
+        'contrat_id' => 'integer',
+        'equipement_id' => 'integer',
+        'annexe_id' => 'integer',
+        'frais_dossier' => 'integer',
+        'frais_amenagement' => 'integer',
+        'montant_loyer' => 'integer',
+        'montant_equipement' => 'integer',
+        'prix_fixe' => 'integer',
+        'frais_facture' => 'integer',
         'date_limite' => 'date'
     ];
 
@@ -88,7 +97,8 @@ class Facture extends Model implements Auditable
     public static function initialeRules(): array
     {
         return [
-            ...self::RULES, ...[
+            ...self::RULES,
+            ...[
                 'avance' => 'required|numeric',
                 'caution' => 'required|numeric',
                 'pas_porte' => 'required|numeric',
@@ -108,7 +118,8 @@ class Facture extends Model implements Auditable
     public static function gearRules(): array
     {
         return [
-            ...self::RULES, ...[
+            ...self::RULES,
+            ...[
                 'equipement_id' => 'required|numeric',
                 'index_depart' => 'required|numeric',
                 'index_fin' => 'required|numeric',
@@ -251,14 +262,14 @@ class Facture extends Model implements Auditable
      */
     public function scopeIsSuperMarket(Builder $query): Builder
     {
-        return $query->whereHas('contrat', fn (Builder $query) => $query->where('auto_valid', false));
+        return $query->whereHas('contrat', fn(Builder $query) => $query->where('auto_valid', false));
     }
     /**
      * Obtenir les factures d'un client donné
      */
     public function scopeByPersonne(Builder $query, int $id): Builder
     {
-        return $query->whereHas('contrat', fn (Builder $query) => $query->where('personne_id', $id));
+        return $query->whereHas('contrat', fn(Builder $query) => $query->where('personne_id', $id));
     }
 
     // relations
