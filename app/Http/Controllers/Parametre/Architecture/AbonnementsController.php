@@ -47,8 +47,8 @@ class AbonnementsController extends Controller
     {
         $response = Gate::inspect('viewAny', Abonnement::class);
         $query = Abonnement::with('emplacement', 'equipement')->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->orWhereHas('equipement', fn (Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"));
+            ->orWhereHas('emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('equipement', fn(Builder $query): Builder => $query->where('nom', 'LIKE', "%$search%"));
         $abonnements = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return AbonnementListResource::collection($abonnements);
     }
@@ -133,17 +133,17 @@ class AbonnementsController extends Controller
         return response()->json(['message' => "L'abonnement $request->code a été résilié avec succès."]);
     }
 
-    // FIXME: reduire pour ne récuperer que les informations utiles pour réduire la taille
     public function getRentalbyMonthGear(string $date): JsonResponse
     {
         $nestedRelation = 'emplacement.contratActuel.facturesEquipements';
         $abonnements = Abonnement::select('id', 'code', 'equipement_id', 'emplacement_id')
             ->with([
-                'equipement:id,code,prix_unitaire,prix_fixe,frais_facture', 'emplacement:id,code',
+                'equipement:id,code,prix_unitaire,prix_fixe,frais_facture',
+                'emplacement:id,code',
                 'emplacement.contratActuel:id,personne_id,emplacement_id' => ['facturesEquipements:id,index_fin,contrat_id', 'personne:id,nom,prenom,code']
             ])
-            ->progressing()->whereHas('emplacement.contratActuel', fn (Builder $query) => $query->where('auto_valid', false))
-            ->whereDoesntHave($nestedRelation, fn (Builder $query) => $query->where('periode', $date))->get();
+            ->progressing()->whereHas('emplacement.contratActuel', fn(Builder $query) => $query->where('auto_valid', false))
+            ->whereDoesntHave($nestedRelation, fn(Builder $query) => $query->where('periode', $date))->get();
         return response()->json(['abonnements' => AbonnementResource::collection($abonnements)]);
     }
 }
