@@ -276,8 +276,8 @@ class Facture extends Model implements Auditable
     {
         $facture = self::find($id);
         return $query->addSelect([
-            'impayes' => self::query()->selectRaw('SUM((index_fin-index_depart)*montant_equipement+prix_fixe+frais_facture)')
-                ->whereDate('periode', '<', $facture->periode)->where('contrat_id', $facture->contrat_id)
+            'impayes' => self::selectRaw('SUM((index_fin-index_depart)*montant_equipement+prix_fixe+frais_facture)')
+                ->whereDate('periode', '<', $facture->periode)->where('contrat_id', $facture->contrat_id)->isUnpaid()
         ])->isEquipement();
     }
 
