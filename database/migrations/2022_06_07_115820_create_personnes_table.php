@@ -6,12 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('personnes', function (Blueprint $table) {
             $table->id();
@@ -22,6 +17,7 @@ return new class extends Migration
             $table->string('contact', 20);
             $table->string('email', 255)->nullable();
             $table->string('ville', 80);
+            $table->string('numero_carte', 12);
             $table->foreignId('site_id')->constrained('sites')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('type_personne_id')->nullable()->constrained('type_personnes')->onDelete('cascade')->onUpdate('cascade');
             $table->softDeletes();
@@ -29,12 +25,7 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('personnes');
     }

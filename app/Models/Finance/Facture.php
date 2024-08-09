@@ -35,7 +35,7 @@ class Facture extends Model implements Auditable
     use HasResponsible;
     use HasOwnerScope;
 
-    // TODO: ajouter ici les propriété en migration (avec requete de mise au point) de l'équipement pour prevenir les modification (prix_fixe,frais_facture)
+    // TODO: ajouter ici les propriété en migration (avec requete de mise au point) de l'équipement pour prevenir les modification (prix_fixe,frais_facture,date_limite)
     protected $fillable = [
         'code',
         'contrat_id',
@@ -54,16 +54,27 @@ class Facture extends Model implements Auditable
         'frais_facture',
         'frais_dossier',
         'frais_amenagement',
+        'date_limite',
     ];
     protected $auditExclude = ['code'];
     protected $appends = ['status'];
 
     protected $casts = [
-        'avance' => 'integer', 'caution' => 'integer', 'index_fin' => 'integer',
-        'pas_porte' => 'integer', 'index_depart' => 'integer', 'contrat_id' => 'integer',
-        'equipement_id' => 'integer', 'annexe_id' => 'integer', 'frais_dossier' => 'integer',
-        'frais_amenagement' => 'integer', 'montant_loyer' => 'integer',
-        'montant_equipement' => 'integer', 'prix_fixe' => 'integer', 'frais_facture' => 'integer'
+        'avance' => 'integer',
+        'caution' => 'integer',
+        'index_fin' => 'integer',
+        'pas_porte' => 'integer',
+        'index_depart' => 'integer',
+        'contrat_id' => 'integer',
+        'equipement_id' => 'integer',
+        'annexe_id' => 'integer',
+        'frais_dossier' => 'integer',
+        'frais_amenagement' => 'integer',
+        'montant_loyer' => 'integer',
+        'montant_equipement' => 'integer',
+        'prix_fixe' => 'integer',
+        'frais_facture' => 'integer',
+        'date_limite' => 'date'
     ];
 
     public const RULES = ['contrat_id' => 'required'];
@@ -86,7 +97,8 @@ class Facture extends Model implements Auditable
     public static function initialeRules(): array
     {
         return [
-            ...self::RULES, ...[
+            ...self::RULES,
+            ...[
                 'avance' => 'required|numeric',
                 'caution' => 'required|numeric',
                 'pas_porte' => 'required|numeric',
@@ -106,7 +118,8 @@ class Facture extends Model implements Auditable
     public static function gearRules(): array
     {
         return [
-            ...self::RULES, ...[
+            ...self::RULES,
+            ...[
                 'equipement_id' => 'required|numeric',
                 'index_depart' => 'required|numeric',
                 'index_fin' => 'required|numeric',
@@ -126,6 +139,11 @@ class Facture extends Model implements Auditable
     {
         return (int) $this?->pas_porte + (int) $this?->caution + (int) $this?->avance + (int) $this?->frais_dossier +
             (int) $this?->frais_amenagement;
+    }
+
+    public function getEquipementTotalAmount(): int
+    {
+        return ((int)$this?->index_fin - (int)$this?->index_depart) * (int)$this->montant_equipement + (int)$this?->prix_fixe + (int)$this->frais_facture;
     }
 
     public function getType(): string
@@ -244,14 +262,23 @@ class Facture extends Model implements Auditable
      */
     public function scopeIsSuperMarket(Builder $query): Builder
     {
-        return $query->whereHas('contrat', fn (Builder $query) => $query->where('auto_valid', false));
+        return $query->whereHas('contrat', fn(Builder $query) => $query->where('auto_valid', false));
     }
     /**
      * Obtenir les factures d'un client donné
      */
     public function scopeByPersonne(Builder $query, int $id): Builder
     {
-        return $query->whereHas('contrat', fn (Builder $query) => $query->where('personne_id', $id));
+        return $query->whereHas('contrat', fn(Builder $query) => $query->where('personne_id', $id));
+    }
+
+    public function scopeWithUnpaidAmount(Builder $query, int $id): Builder
+    {
+        $facture = self::find($id);
+        return $query->addSelect([
+            'impayes' => self::selectRaw('SUM((index_fin-index_depart)*montant_equipement+prix_fixe+frais_facture)')
+                ->whereDate('periode', '<', $facture->periode)->where('contrat_id', $facture->contrat_id)->isUnpaid()
+        ])->isEquipement();
     }
 
     // relations

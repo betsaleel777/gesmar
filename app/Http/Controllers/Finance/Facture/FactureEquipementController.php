@@ -36,9 +36,9 @@ class FactureEquipementController extends Controller
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
         $query = Facture::with(['contrat' => ['emplacement', 'personne'], 'equipement.abonnementActuel'])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
             ->isEquipement()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureEquipementListResource::collection($factures);
@@ -62,8 +62,11 @@ class FactureEquipementController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::with(['contrat.emplacement', 'equipement' => ['type', 'abonnementActuel'], 'personne'])->isEquipement()
-            ->withNameResponsible()->find($id);
+        $facture = Facture::with([
+            'contrat:id,code,code_contrat,debut,fin,emplacement_id' => ['emplacement:id,code'],
+            'equipement:id,code,type_equipement_id' => ['type'],
+            'personne'
+        ])->isEquipement()->withNameResponsible()->withUnpaidAmount($id)->find($id);
         $this->authorize('view', [$facture, 'equiepement']);
         return response()->json(['facture' => FactureEquipementResource::make($facture)]);
     }
@@ -71,9 +74,11 @@ class FactureEquipementController extends Controller
     public function store(Request $request): JsonResponse
     {
         $this->authorize('create', [Facture::class, 'equipement']);
-        foreach ($request->all() as $ligne) {
+        foreach ($request->factures as $ligne) {
             $facture = new Facture($ligne);
+            $facture->montant_equipement = $ligne['prix_unitaire'];
             $facture->codeGenerate(config('constants.EQUIPEMENT_FACTURE_PREFIXE'));
+            $facture->date_limite = $request->date_limite;
             $facture->save();
             $facture->facturable();
         }

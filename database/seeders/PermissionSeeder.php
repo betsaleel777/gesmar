@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Schema;
 
 class PermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
@@ -218,6 +215,6 @@ class PermissionSeeder extends Seeder
             ['name' => 'create-encaissement', 'description' => "créer un encaissement"],
             ['name' => 'show-encaissement', 'description' => "afficher les informations détaillées d'un point de caisse"],
         ]);
-        $permissions->each(fn ($permission) => Permission::create($permission));
+        $permissions->each(fn($permission) => Permission::create($permission));
     }
 }
