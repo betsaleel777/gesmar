@@ -37,9 +37,9 @@ class FactureLoyerController extends Controller
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
         $query = Facture::with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
             ->isLoyer()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureLoyerListResource::collection($factures);
@@ -73,7 +73,6 @@ class FactureLoyerController extends Controller
         $this->authorize('create', [Facture::class, 'loyer']);
         foreach ($request->all() as $data) {
             $facture = new Facture($data);
-            $facture->montant_loyer = Emplacement::whereHas('contratActuel', fn (Builder $query): Builder => $query->where('id', $facture->contrat_id))->first()->loyer;
             $facture->codeGenerate(config('constants.LOYER_FACTURE_PREFIXE'));
             $facture->save();
             $facture->facturable();

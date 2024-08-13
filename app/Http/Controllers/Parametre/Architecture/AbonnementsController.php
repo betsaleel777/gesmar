@@ -136,7 +136,7 @@ class AbonnementsController extends Controller
     public function getRentalbyMonthGear(string $date): JsonResponse
     {
         $nestedRelation = 'emplacement.contratActuel.facturesEquipements';
-        $abonnements = Abonnement::select('id', 'code', 'equipement_id', 'emplacement_id')
+        $abonnements = Abonnement::select('id', 'code', 'equipement_id', 'emplacement_id', 'index_depart')
             ->with([
                 'equipement:id,code,prix_unitaire,prix_fixe,frais_facture',
                 'emplacement:id,code',

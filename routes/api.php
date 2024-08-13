@@ -151,7 +151,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
         Route::get('/trashed', 'trashed');
         Route::get('/rental/{date}', 'getRentalbyMonthLoyer');
         Route::get('/marche/{id}', 'getByMarche');
-        Route::get('/marche/{marche}/personne/{personne}/free', 'getFreeByMarchePersonne');
+        Route::get('/free/by-site-personne', 'getFreeByMarchePersonne');
         Route::get('/marche-select/{id}', 'getByMarcheSelect');
         Route::get('/marche/gears/{id}', 'getByMarcheWithGearsAndContracts');
         Route::get('/marche/unlinked/{id}', 'getUnlinkedByMarche');
@@ -294,6 +294,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
     Route::prefix('receptions')->group(function (): void {
         Route::controller(PersonnesController::class)->prefix('personnes')->group(function (): void {
             Route::get('/', 'all');
+            Route::get('/select', 'getForSelect');
             Route::post('/store', 'store');
             Route::get('/marche/{id}', 'getByMarche');
             Route::get('{id}', 'show');
