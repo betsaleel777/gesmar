@@ -19,7 +19,7 @@ class SuperAdminSeeder extends Seeder
         $role = Role::create(['name' => 'Super-admin']);
         $user = User::create(['name' => "Ahoussou Jean-Chris Arnaud", 'email' => 'shin.ahoussou@gmail.com', 'password' => Hash::make('ahoussou')]);
         $user->assignRole($role);
-        $clientUser = User::create(['name' => "Admin Dev Sgmt", 'email' => 'adminDev@sgmt.net', 'password' => Hash::make('adminDev2024')]);
+        $clientUser = User::create(['name' => "Admin Dev Sgmt", 'email' => 'adminDev@sgmtci.net', 'password' => Hash::make('adminDev2024')]);
         $clientUser->assignRole($role);
     }
 }

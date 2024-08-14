@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FactureEquipementRequest;
 use App\Http\Resources\Facture\FactureEquipementListResource;
 use App\Http\Resources\Facture\FactureEquipementResource;
 use App\Models\Finance\Facture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 
@@ -64,15 +64,16 @@ class FactureEquipementController extends Controller
     {
         $facture = Facture::with([
             'contrat:id,code,code_contrat,debut,fin,emplacement_id' => ['emplacement:id,code'],
-            'equipement:id,code,type_equipement_id' => ['type'],
-            'personne'
+            'equipement:id,code,type_equipement_id' => ['type:id,nom,frais_penalite'],
+            'personne:personnes.id,personnes.code,nom,prenom,adresse,contact,email,ville'
         ])->isEquipement()->withNameResponsible()->withUnpaidAmount($id)->find($id);
-        $this->authorize('view', [$facture, 'equiepement']);
+        $this->authorize('view', [$facture, 'equipement']);
         return response()->json(['facture' => FactureEquipementResource::make($facture)]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(FactureEquipementRequest $request): JsonResponse
     {
+        $request->validated();
         $this->authorize('create', [Facture::class, 'equipement']);
         foreach ($request->factures as $ligne) {
             $facture = new Facture($ligne);

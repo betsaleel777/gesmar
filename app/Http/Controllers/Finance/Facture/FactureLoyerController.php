@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Finance\Facture;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Facture\FactureLoyerListResource;
 use App\Http\Resources\Facture\FactureLoyerResource;
-use App\Models\Architecture\Emplacement;
 use App\Models\Finance\Facture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
