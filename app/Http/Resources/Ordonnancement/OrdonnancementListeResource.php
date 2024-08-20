@@ -2,15 +2,14 @@
 
 namespace App\Http\Resources\Ordonnancement;
 
+use App\Http\Resources\Contrat\ContratResource;
+use App\Http\Resources\Emplacement\EmplacementResource;
+use App\Http\Resources\Personne\PersonneResource;
+use App\Http\Resources\ServiceAnnexeResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrdonnancementListeResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
     public function toArray($request): array
     {
         return [
@@ -19,18 +18,10 @@ class OrdonnancementListeResource extends JsonResource
             'code' => $this->code,
             'status' => $this->whenAppended('status'),
             'created_at' => $this->created_at->format('d-m-Y'),
-            'personne' => $this->when(
-                $this->relationLoaded('contrat') and $this->contrat->relationLoaded('personne'),
-                fn() => $this->contrat->personne->getAlias()
-            ),
-            'emplacement' => $this->when(
-                $this->relationLoaded('contrat') and $this->contrat->relationLoaded('emplacement'),
-                fn() => $this->contrat->emplacement?->code
-            ),
-            'annexe' => $this->when(
-                $this->relationLoaded('contrat') and $this->contrat->relationLoaded('annexe'),
-                fn() => $this->contrat->annexe?->code
-            ),
+            'personne' => PersonneResource::make($this->whenLoaded('personne')),
+            'annexe' => ServiceAnnexeResource::make($this->whenLoaded('annexe')),
+            'emplacement' => EmplacementResource::make($this->whenLoaded('emplacement')),
+            'contrat' => ContratResource::make($this->whenLoaded('contrat')),
         ];
     }
 }

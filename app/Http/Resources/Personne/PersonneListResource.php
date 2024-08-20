@@ -10,12 +10,14 @@ class PersonneListResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nom' => $this->nom,
-            'prenom' => $this->prenom,
-            'ville' => $this->ville,
-            'contact' => $this->contact,
+            'code' => $this->whenNotNull($this->code),
+            'nom' => $this->whenNotNull($this->nom),
+            'prenom' => $this->whenNotNull($this->prenom),
+            'ville' => $this->whenNotNull($this->ville),
+            'contact' => $this->whenNotNull($this->contact),
+            'adresse' => $this->whenNotNull($this->adresse),
             'dossier' => $this->whenNotNull($this->getComplet()),
-            'site' => $this->whenLoaded('site', fn () => $this->site->nom),
+            'site' => $this->whenLoaded('site', fn() => $this->site->nom),
         ];
     }
 }

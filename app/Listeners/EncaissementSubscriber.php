@@ -44,7 +44,7 @@ class EncaissementSubscriber
         }
         $contrat->hasStatus(StatusContrat::VALIDATED->value) ?: $contrat->validate();
         $contrat->personne->status === StatusPersonne::CLIENT->name ?: $contrat->personne->client();
-        $contrat->emplacement->hasBusy() ?: $contrat->emplacement->occuper();
+        if ($contrat->isBail()) $contrat->emplacement->hasBusy() ?: $contrat->emplacement->occuper();
         $service = new FactureService($ordonnancement->paiements);
         $service->checkPaid();
         $autresContratsEnAttente = Contrat::where('emplacement_id', $contrat->emplacement_id)->inProcess()->get();
@@ -60,7 +60,7 @@ class EncaissementSubscriber
     {
         $ouverture = Ouverture::with('encaissements')->find($event->fermeture->ouverture_id);
         $ouverture->setChecking();
-        $ouverture->encaissements->each(fn (Encaissement $encaissement) => $encaissement->setClose());
+        $ouverture->encaissements->each(fn(Encaissement $encaissement) => $encaissement->setClose());
         Guichet::find($ouverture->guichet_id)->setClose();
     }
 

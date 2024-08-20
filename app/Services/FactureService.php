@@ -7,10 +7,7 @@ use Illuminate\Support\Collection;
 class FactureService
 {
 
-    public function __construct(public Collection $paiements)
-    {
-    }
-
+    public function __construct(public Collection $paiements) {}
 
     public function checkPaid(): void
     {
@@ -19,7 +16,7 @@ class FactureService
             $paiements->push($paiement);
         }
         if (!$paiements->isEmpty()) {
-            foreach ($paiements as $paiement) {
+            $paiements->each(function ($paiement) {
                 $facture = $paiement->loadMissing('facture')->facture;
                 if ($facture->isInitiale()) {
                     $facture->loadMissing('paiements');
@@ -33,7 +30,7 @@ class FactureService
                 } else {
                     $facture->payer();
                 }
-            }
+            });
         }
     }
 }
