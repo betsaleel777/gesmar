@@ -20,7 +20,9 @@ class SocieteSeeder extends Seeder
             'sigle' => 'SGMT',
             'smartphone' => '1111111111',
             'phone' => '9999999999',
-            'email' => 'infos@gesmarci.com'
+            'email' => 'infos@gesmarci.com',
+            'primaire' => '#FF4C00',
+            'secondaire' => '#0E4732',
         ]);
     }
 }

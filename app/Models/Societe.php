@@ -32,6 +32,8 @@ class Societe extends Model implements HasMedia, Auditable
         'smartphone' => 'required',
         'phone' => 'required',
         'email' => 'required|email',
+        'primaire' => 'required',
+        'secondaire' => 'required'
     ];
     const EDIT_RULES = [
         'nom' => 'required',
@@ -41,6 +43,8 @@ class Societe extends Model implements HasMedia, Auditable
         'smartphone' => 'required',
         'phone' => 'required',
         'email' => 'required|email',
+        'primaire' => 'required',
+        'secondaire' => 'required'
     ];
 
     public function registerMediaConversions(Media $media = null): void

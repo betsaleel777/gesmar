@@ -22,8 +22,10 @@ class SocieteResource extends JsonResource
             'smartphone' => $this->smartphone,
             'phone' => $this->phone,
             'email' => $this->email,
+            'primaire' => $this->primaire,
+            'secondaire' => $this->secondaire,
             'created_at' => $this->created_at,
-            'logo' => $this->whenLoaded(config('constants.COLLECTION_MEDIA_LOGO'), fn () => $this->logo->getUrl()),
+            'logo' => $this->whenLoaded(config('constants.COLLECTION_MEDIA_LOGO'), fn() => $this->logo->getUrl()),
         ];
     }
 }
