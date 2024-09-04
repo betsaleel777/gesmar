@@ -42,12 +42,12 @@ class EncaissementSubscriber
             $contrat->codeContratGenerate();
             $contrat->save();
         }
-        $contrat->hasStatus(StatusContrat::VALIDATED->value) ?: $contrat->validate();
+        $contrat->hasStatus(StatusContrat::ONENDORSED->value) ?: $contrat->endorsed();
         $contrat->personne->status === StatusPersonne::CLIENT->name ?: $contrat->personne->client();
         if ($contrat->isBail()) $contrat->emplacement->hasBusy() ?: $contrat->emplacement->occuper();
         $service = new FactureService($ordonnancement->paiements);
         $service->checkPaid();
-        $autresContratsEnAttente = Contrat::where('emplacement_id', $contrat->emplacement_id)->inProcess()->get();
+        $autresContratsEnAttente = Contrat::where('emplacement_id', $contrat->emplacement_id)->enAttente()->get();
         $autresContratsEnAttente->map->delete();
     }
 

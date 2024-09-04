@@ -35,7 +35,6 @@ class Facture extends Model implements Auditable
     use HasResponsible;
     use HasOwnerScope;
 
-    // TODO: ajouter ici les propriété en migration (avec requete de mise au point) de l'équipement pour prevenir les modification (prix_fixe,frais_facture,date_limite)
     protected $fillable = [
         'code',
         'contrat_id',
@@ -194,7 +193,7 @@ class Facture extends Model implements Auditable
     // scopes
 
     /**
-     * Obtenir les facture de service annexes
+     * Obtenir les factures de service annexes
      */
     public function scopeIsAnnexe(Builder $query): Builder
     {
@@ -290,7 +289,7 @@ class Facture extends Model implements Auditable
 
     public function contrat(): BelongsTo
     {
-        return $this->belongsTo(Contrat::class);
+        return $this->belongsTo(Contrat::class, 'contrat_id');
     }
 
     public function equipement(): BelongsTo

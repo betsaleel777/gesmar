@@ -370,7 +370,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
                 Route::get('/details/{id}', 'details');
                 Route::put('{id}', 'update');
                 Route::patch('/restore/{id}', 'restore');
-                Route::patch('/schedule/{id}', 'toSchedule');
+                Route::patch('validate', 'toValidate');
                 Route::delete('{id}', 'trash');
             });
         });

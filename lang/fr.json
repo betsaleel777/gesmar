@@ -2,7 +2,7 @@
     "30 Days": "30 jours",
     "60 Days": "60 jours",
     "90 Days": "90 jours",
-    ":amount Total": ":amount Total",
+    ":amount Total": ":montant Total",
     ":days day trial": ":days jours d'essai",
     ":resource Details": "Détails :resource",
     ":resource Details: :title": " Détails :resource :title :",

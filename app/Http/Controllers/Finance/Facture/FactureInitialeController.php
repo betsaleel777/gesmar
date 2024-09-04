@@ -36,9 +36,9 @@ class FactureInitialeController extends Controller
     {
         $response = Gate::inspect('viewAny', [Facture::class, 'initiale']);
         $query = Facture::withExists('paiements as modifiable')->with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn (Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
             ->isSuperMarket()->isInitiale()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureInitialeListResource::collection($factures);
@@ -62,7 +62,10 @@ class FactureInitialeController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $facture = Facture::withSum('paiements as sommeVersee', 'montant')->with('personne', 'contrat.emplacement.type')
+        $facture = Facture::withSum('paiements as sommeVersee', 'montant')->with([
+            'personne',
+            'contrat' => ['emplacement' => ['zone' => ['niveau' => ['pavillon']], 'type']]
+        ])
             ->isSuperMarket()->isInitiale()->withNameResponsible()->find($id);
         $this->authorize('view', [$facture, 'initiale']);
         return response()->json(['facture' => FactureInitialeResource::make($facture)]);
