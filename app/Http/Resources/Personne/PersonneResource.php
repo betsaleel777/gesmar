@@ -41,8 +41,9 @@ class PersonneResource extends JsonResource
             'nom_complet_mere' => $this->whenNotNull($this->nom_complet_mere),
             'nom_complet_pere' => $this->whenNotNull($this->nom_complet_pere),
             'situation_matrimoniale' => $this->whenNotNull($this->situation_matrimoniale),
-            'photocopie_carte' => $this->whenLoaded(config('constants.COLLECTION_MEDIA_PHOTOCOPIE'), fn () => $this->photocopie->getUrl()),
-            'photo_identite' => $this->whenLoaded(config('constants.COLLECTION_MEDIA_IDENTITE'), fn () => $this->identite->getUrl()),
+            'photocopie_carte' => $this->whenLoaded(config('constants.COLLECTION_MEDIA_PHOTOCOPIE'), fn() => $this->photocopie->getUrl()),
+            'photo_identite' => $this->whenLoaded(config('constants.COLLECTION_MEDIA_IDENTITE'), fn() => $this->identite->getUrl()),
+            'numero_carte' => $this->whenNotNull($this->numero_carte),
             'type' => TypePersonneResource::make($this->whenLoaded('type')),
             'site' => SiteResource::make($this->whenLoaded('site')),
         ];
