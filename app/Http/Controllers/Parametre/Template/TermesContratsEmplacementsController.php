@@ -21,12 +21,10 @@ class TermesContratsEmplacementsController extends TermesContratsController
     {
         $this->authorize('create', TermesContratEmplacement::class);
         $request->validate(TermesContratEmplacement::RULES);
-        TermeContratBailPrepare::dispatch();
         $terme = new TermesContratEmplacement($request->all());
         $terme->codeGenerate();
         $terme->save();
-        TermeContratBailRegistred::dispatch($terme);
-        $message = "Les termes $terme->code ont été crée avec succès.";
+        $message = "Le gabari de contrat de bail $terme->code a été crée avec succès.";
         return response()->json(['message' => $message, 'id' => $terme->id]);
     }
 

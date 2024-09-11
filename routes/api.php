@@ -361,7 +361,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
                 Route::get('/search/{search}/paginate', 'getSearch');
                 Route::get('/valides/paginate', 'getValidesPaginate');
                 Route::get('/valides/search/{search}/paginate', 'getValidesSearch');
-                Route::get('/print/{id}', 'print');
+                Route::get('/content/{id}', 'getContent');
                 Route::get('/valides', 'valides');
                 Route::get('/trashed', 'trashed');
                 Route::post('/store', 'store');

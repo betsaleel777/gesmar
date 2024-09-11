@@ -55,11 +55,6 @@ class TermesContrat extends Model implements Auditable
         return $query->where('status', StatusTermeContrat::NOTUSING->value);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return BelongsTo<User, TermesContrat>
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
