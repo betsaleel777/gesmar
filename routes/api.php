@@ -369,6 +369,7 @@ Route::middleware('auth:sanctum')->prefix('exploitations')->group(function (): v
                 Route::get('personne/{id}', 'getByPersonne');
                 Route::get('/details/{id}', 'details');
                 Route::put('{id}', 'update');
+                Route::put('signer', 'signer');
                 Route::patch('/restore/{id}', 'restore');
                 Route::patch('validate', 'toValidate');
                 Route::delete('{id}', 'trash');

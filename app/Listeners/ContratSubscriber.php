@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Enums\StatusFacture;
 use App\Events\ContratRegistred;
 use App\Events\ContratScheduled;
+use App\Events\ContratSigned;
 use App\Events\FactureStatusChange;
 use App\Models\Architecture\Emplacement;
 use App\Models\Exploitation\Personne;
@@ -65,12 +66,18 @@ class ContratSubscriber
         }
     }
 
+    public function updateAfterSigned(ContratSigned $event): void
+    {
+        $event->contrat->validate();
+    }
+
     public function subscribe(): array
     {
         return [
             ContratRegistred::class => 'createFacture',
             FactureStatusChange::class => 'updateFactureStatus',
             ContratScheduled::class => 'validerSansSigner',
+            ContratSigned::class => 'updateAfterSigned'
         ];
     }
 }

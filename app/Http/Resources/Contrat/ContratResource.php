@@ -35,6 +35,7 @@ class ContratResource extends JsonResource
             'isDemande' => empty($this->code_contrat),
             'status' => $this->whenAppended('status'),
             'apport' => $this->whenNotNull($this->apport_initial, 0),
+            'date_signature' => $this->whenNotNull($this->date_signature?->format('d-m-Y')),
             'site' => SiteResource::make($this->whenLoaded('site')),
             'personne' => PersonneResource::make($this->whenLoaded('personne')),
             'annexe' => ServiceAnnexeResource::make($this->whenLoaded('annexe')),
