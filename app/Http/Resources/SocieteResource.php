@@ -6,12 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class SocieteResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             'id' => $this->id,
@@ -25,6 +20,8 @@ class SocieteResource extends JsonResource
             'primaire' => $this->primaire,
             'secondaire' => $this->secondaire,
             'created_at' => $this->created_at,
+            'timbre_loyer' => $this->timbre_loyer,
+            'boite_postale' => $this->boite_postale,
             'logo' => $this->whenLoaded(config('constants.COLLECTION_MEDIA_LOGO'), fn() => $this->logo->getUrl()),
         ];
     }

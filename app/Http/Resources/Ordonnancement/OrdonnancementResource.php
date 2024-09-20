@@ -18,6 +18,8 @@ class OrdonnancementResource extends JsonResource
             'total' => $this->whenNotNull($this->total, 0),
             'code' => $this->whenNotNull($this->code),
             'created_at' => $this->whenNotNull($this->created_at),
+            'nature' => $this->whenNotNull('nature_paiement'),
+            'timbre' => $this->whenNotNull('timbre', 0),
             'status' => $this->whenAppended('status'),
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),
             'paiements' => PaiementResource::collection($this->whenLoaded('paiements')),

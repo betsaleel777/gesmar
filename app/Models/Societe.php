@@ -18,9 +18,12 @@ class Societe extends Model implements HasMedia, Auditable
     use InteractsWithMedia;
     use \OwenIt\Auditing\Auditable;
 
-    protected $fillable = ['nom', 'sigle', 'siege', 'capital', 'smartphone', 'email', 'phone'];
+    protected $fillable = ['nom', 'sigle', 'siege', 'capital', 'smartphone', 'email', 'phone', 'boite_postale', 'timbre_loyer'];
 
-    protected $casts = ['capital' => 'integer'];
+    protected $casts = [
+        'capital' => 'integer',
+        'timbre_loyer' => 'integer'
+    ];
     protected $with = ['logo'];
 
     const RULES = [
@@ -33,7 +36,9 @@ class Societe extends Model implements HasMedia, Auditable
         'phone' => 'required',
         'email' => 'required|email',
         'primaire' => 'required',
-        'secondaire' => 'required'
+        'secondaire' => 'required',
+        'boite_postale' => 'required',
+        'timbre_loyer' => 'required|numeric',
     ];
     const EDIT_RULES = [
         'nom' => 'required',
@@ -44,7 +49,9 @@ class Societe extends Model implements HasMedia, Auditable
         'phone' => 'required',
         'email' => 'required|email',
         'primaire' => 'required',
-        'secondaire' => 'required'
+        'secondaire' => 'required',
+        'boite_postale' => 'required',
+        'timbre_loyer' => 'required|numeric',
     ];
 
     public function registerMediaConversions(Media $media = null): void
