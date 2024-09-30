@@ -3,7 +3,6 @@
 namespace App\Listeners;
 
 use App\Enums\StatusContrat;
-use App\Enums\StatusEmplacement;
 use App\Enums\StatusPersonne;
 use App\Events\EncaissementRegistred;
 use App\Events\FermetureRegistred;
@@ -23,7 +22,7 @@ class EncaissementSubscriber
     {
         $event->encaissement->setOpen();
         empty($event->encaissement->bordereau_id) ? $this->updateOrdonnancementDependencies($event) :
-            $this->updateBordereauDependencies($event);
+        $this->updateBordereauDependencies($event);
     }
 
     private function updateBordereauDependencies(EncaissementRegistred $event): void
@@ -44,8 +43,10 @@ class EncaissementSubscriber
         }
         $contrat->hasStatus(StatusContrat::ONENDORSED->value) ?: $contrat->endorsed();
         $contrat->personne->status === StatusPersonne::CLIENT->name ?: $contrat->personne->client();
-        if ($contrat->isBail()) $contrat->emplacement->hasBusy() ?: $contrat->emplacement->occuper();
-        $service = new FactureService($ordonnancement->paiements);
+        if ($contrat->isBail()) {
+            $contrat->emplacement->hasBusy() ?: $contrat->emplacement->occuper();
+        }
+        $service = new FactureService($ordonnancement);
         $service->checkPaid();
         $autresContratsEnAttente = Contrat::where('emplacement_id', $contrat->emplacement_id)->enAttente()->get();
         $autresContratsEnAttente->map->delete();

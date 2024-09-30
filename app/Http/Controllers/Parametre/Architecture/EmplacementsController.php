@@ -230,7 +230,6 @@ class EmplacementsController extends Controller
         return response()->json(['emplacements' => EmplacementResource::collection($emplacements)]);
     }
 
-
     /**
      * Récupère les emplacements occupés selon le site
      */
@@ -245,7 +244,8 @@ class EmplacementsController extends Controller
     public function getRentalbyMonthLoyer(string $date): JsonResponse
     {
         $response = Gate::inspect('viewAny', Emplacement::class);
-        $query = Emplacement::with(['contratActuel' => ['facturesLoyers', 'personne']])
+        $query = Emplacement::select('id', 'code', 'loyer')
+            ->with(['contratActuel:id,personne_id,emplacement_id' => ['personne:id,nom,prenom']])
             ->whereHas('contratActuel', fn(Builder $query) => $query->where('auto_valid', false)->leadExceeded($date))
             ->whereDoesntHave('contratActuel.facturesLoyers', fn(Builder $query) => $query->where('periode', $date));
         $emplacements = $response->allowed() ? $query->get() : $query->owner()->get();
@@ -272,8 +272,8 @@ class EmplacementsController extends Controller
 
     public function getForSubscribeView(int $id): JsonResource
     {
-        $emplacement = Emplacement::select('id', 'code', 'nom')->with(['equipements:id,nom,code,abonnement,type_equipement_id,emplacement_id,site_id'
-        => ['type:id,nom']])->find($id);
+        $emplacement = Emplacement::select('id', 'code', 'nom')->with([
+            'equipements:id,nom,code,abonnement,type_equipement_id,emplacement_id,site_id' => ['type:id,nom']])->find($id);
         return EmplacementResource::make($emplacement);
     }
 }
