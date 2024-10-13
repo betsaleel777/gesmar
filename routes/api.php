@@ -27,6 +27,7 @@ use App\Http\Controllers\Finance\Facture\FactureController;
 use App\Http\Controllers\Finance\Facture\FactureEquipementController;
 use App\Http\Controllers\Finance\Facture\FactureInitialeController;
 use App\Http\Controllers\Finance\Facture\FactureLoyerController;
+use App\Http\Controllers\Finance\PaiementController;
 use App\Http\Controllers\Finance\PaiementLigneController;
 use App\Http\Controllers\Parametre\Architecture\AbonnementsController;
 use App\Http\Controllers\Parametre\Architecture\EmplacementsController;
@@ -560,6 +561,9 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
             Route::get('/print/{id}', 'print');
             Route::put('{id}', 'update');
         });
+    });
+    Route::controller(PaiementController::class)->prefix('paiements')->group(function (): void {
+        Route::get('releve', 'getReleve');
     });
 });
 Route::middleware('auth:sanctum')->prefix('dashboard')->group(function (): void {

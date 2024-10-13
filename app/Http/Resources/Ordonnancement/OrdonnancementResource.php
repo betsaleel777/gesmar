@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Ordonnancement;
 
 use App\Http\Resources\AuditResource;
+use App\Http\Resources\Caisse\EncaissementResource;
 use App\Http\Resources\Contrat\ContratResource;
 use App\Http\Resources\Emplacement\EmplacementResource;
 use App\Http\Resources\Personne\PersonneResource;
@@ -21,6 +22,7 @@ class OrdonnancementResource extends JsonResource
             'nature' => $this->whenNotNull($this->nature_paiement),
             'timbre' => $this->whenNotNull($this->timbre, 0),
             'status' => $this->whenAppended('status'),
+            'encaissement' => EncaissementResource::make($this->whenLoaded('encaissement')),
             'contrat' => ContratResource::make($this->whenLoaded('contrat')),
             'paiements' => PaiementResource::collection($this->whenLoaded('paiements')),
             'emplacement' => EmplacementResource::make($this->whenLoaded('emplacement')),
