@@ -73,7 +73,7 @@ class Facture extends Model implements Auditable
         'montant_equipement' => 'integer',
         'prix_fixe' => 'integer',
         'frais_facture' => 'integer',
-        'date_limite' => 'date'
+        'date_limite' => 'date',
     ];
 
     public const RULES = ['contrat_id' => 'required'];
@@ -96,7 +96,7 @@ class Facture extends Model implements Auditable
     public static function initialeRules(): array
     {
         return [
-            ...self::RULES,
+             ...self::RULES,
             ...[
                 'avance' => 'required|numeric',
                 'caution' => 'required|numeric',
@@ -117,7 +117,7 @@ class Facture extends Model implements Auditable
     public static function gearRules(): array
     {
         return [
-            ...self::RULES,
+             ...self::RULES,
             ...[
                 'equipement_id' => 'required|numeric',
                 'index_depart' => 'required|numeric',
@@ -131,18 +131,18 @@ class Facture extends Model implements Auditable
      */
     public static function loyerRules(): array
     {
-        return [...self::RULES, ...['periode' => 'required']];
+        return [ ...self::RULES, ...['periode' => 'required']];
     }
 
     public function getFactureInitialeTotalAmount(): int
     {
         return (int) $this?->pas_porte + (int) $this?->caution + (int) $this?->avance + (int) $this?->frais_dossier +
-            (int) $this?->frais_amenagement;
+        (int) $this?->frais_amenagement;
     }
 
     public function getEquipementTotalAmount(): int
     {
-        return ((int)$this?->index_fin - (int)$this?->index_depart) * (int)$this->montant_equipement + (int)$this?->prix_fixe + (int)$this->frais_facture;
+        return ((int) $this?->index_fin - (int) $this?->index_depart) * (int) $this->montant_equipement + (int) $this?->prix_fixe + (int) $this->frais_facture;
     }
 
     public function getType(): string
@@ -150,7 +150,7 @@ class Facture extends Model implements Auditable
         return match (true) {
             boolval($this->annexe_id) => 'annexe',
             boolval($this->equipement_id) => 'equipement',
-            boolval($this->periode) => 'loyer',
+            boolval($this->montant_loyer) => 'loyer',
             default => 'initiale'
         };
     }
@@ -221,7 +221,7 @@ class Facture extends Model implements Auditable
      */
     public function scopeIsLoyer(Builder $query): Builder
     {
-        return $query->whereNotNull('periode')->whereNull('equipement_id');
+        return $query->where('montant_loyer', '!=', 0);
     }
 
     /**
@@ -276,7 +276,7 @@ class Facture extends Model implements Auditable
         $facture = self::find($id);
         return $query->addSelect([
             'impayes' => self::selectRaw('SUM((index_fin-index_depart)*montant_equipement+prix_fixe+frais_facture)')
-                ->whereDate('periode', '<', $facture->periode)->where('contrat_id', $facture->contrat_id)->isUnpaid()
+                ->whereDate('periode', '<', $facture->periode)->where('contrat_id', $facture->contrat_id)->isUnpaid(),
         ])->isEquipement();
     }
 
