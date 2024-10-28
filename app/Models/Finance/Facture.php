@@ -3,6 +3,7 @@
 namespace App\Models\Finance;
 
 use App\Enums\StatusFacture;
+use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\ServiceAnnexe;
 use App\Models\Architecture\Site;
@@ -54,6 +55,8 @@ class Facture extends Model implements Auditable
         'frais_dossier',
         'frais_amenagement',
         'date_limite',
+        'abonnement_id',
+        'caution_abonnement',
     ];
     protected $auditExclude = ['code'];
     protected $appends = ['status'];
@@ -71,6 +74,8 @@ class Facture extends Model implements Auditable
         'frais_amenagement' => 'integer',
         'montant_loyer' => 'integer',
         'montant_equipement' => 'integer',
+        'montant_annexe' => 'integer',
+        'caution_abonnement' => 'integer',
         'prix_fixe' => 'integer',
         'frais_facture' => 'integer',
         'date_limite' => 'date',
@@ -96,7 +101,7 @@ class Facture extends Model implements Auditable
     public static function initialeRules(): array
     {
         return [
-             ...self::RULES,
+            ...self::RULES,
             ...[
                 'avance' => 'required|numeric',
                 'caution' => 'required|numeric',
@@ -117,7 +122,7 @@ class Facture extends Model implements Auditable
     public static function gearRules(): array
     {
         return [
-             ...self::RULES,
+            ...self::RULES,
             ...[
                 'equipement_id' => 'required|numeric',
                 'index_depart' => 'required|numeric',
@@ -131,13 +136,13 @@ class Facture extends Model implements Auditable
      */
     public static function loyerRules(): array
     {
-        return [ ...self::RULES, ...['periode' => 'required']];
+        return [...self::RULES, ...['periode' => 'required']];
     }
 
     public function getFactureInitialeTotalAmount(): int
     {
         return (int) $this?->pas_porte + (int) $this?->caution + (int) $this?->avance + (int) $this?->frais_dossier +
-        (int) $this?->frais_amenagement;
+            (int) $this?->frais_amenagement;
     }
 
     public function getEquipementTotalAmount(): int
@@ -151,6 +156,7 @@ class Facture extends Model implements Auditable
             boolval($this->annexe_id) => 'annexe',
             boolval($this->equipement_id) => 'equipement',
             boolval($this->montant_loyer) => 'loyer',
+            boolval($this->abonnement_id) => 'abonnement',
             default => 'initiale'
         };
     }
@@ -188,6 +194,11 @@ class Facture extends Model implements Auditable
     public function isLoyer(): bool
     {
         return Str::substr($this->attributes['code'], 0, 3) === config('constants.LOYER_FACTURE_PREFIXE');
+    }
+
+    public function isAbonnement(): bool
+    {
+        return Str::substr($this->attributes['code'], 0, 3) === config('constants.ABONNEMENT_FACTURE_PREFIXE');
     }
 
     // scopes
@@ -290,6 +301,11 @@ class Facture extends Model implements Auditable
     public function contrat(): BelongsTo
     {
         return $this->belongsTo(Contrat::class, 'contrat_id');
+    }
+
+    public function abonnement(): BelongsTo
+    {
+        return $this->belongsTo(Abonnement::class);
     }
 
     public function equipement(): BelongsTo

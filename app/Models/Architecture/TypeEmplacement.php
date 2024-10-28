@@ -22,7 +22,15 @@ class TypeEmplacement extends Model implements Auditable
     use HasFactory, HasSites, HasResponsible, HasOwnerScope, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
-    protected $fillable = ['nom', 'site_id', 'prefix', 'auto_valid', 'frais_dossier', 'frais_amenagement', 'equipable'];
+    protected $fillable = [
+        'nom',
+        'site_id',
+        'prefix',
+        'auto_valid',
+        'frais_dossier',
+        'frais_amenagement',
+        'equipable'
+    ];
     protected $dates = ['created_at'];
 
     protected $casts = [
@@ -37,7 +45,7 @@ class TypeEmplacement extends Model implements Auditable
         'site_id' => 'required',
         'frais_dossier' => 'required|numeric',
         'frais_amenagement' => 'required|numeric',
-        'prefix' => 'required|max:5|min:2|alpha',
+        'prefix' => 'required|max:5|min:2|alpha_num',
     ];
 
     protected static function booted(): void
@@ -48,7 +56,9 @@ class TypeEmplacement extends Model implements Auditable
 
     public function getCode(): string
     {
-        return !empty($this->prefix) and !empty($this->code) ? $this->prefix . str((string) $this->attributes['code'])->padLeft(2, '0') : null;
+        return !empty($this->prefix) and !empty($this->code)
+            ? $this->prefix . str((string) $this->attributes['code'])->padLeft(2, '0')
+            : null;
     }
 
     public function scopeEquipables(Builder $query): Builder

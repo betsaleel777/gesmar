@@ -6,5 +6,6 @@ enum StatusAbonnement: string
 {
     case PROGRESSING = 'en cours';
     case STOPPED = 'résilié';
-    case ERROR ='erreur index';
+    case ERROR = 'erreur index';
+    case EN_ATTENTE = 'en attente';
 }

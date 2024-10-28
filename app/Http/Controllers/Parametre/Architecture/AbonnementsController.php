@@ -16,13 +16,14 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Log;
 
 class AbonnementsController extends Controller
 {
     private static function codeGenerate(): string
     {
         $abonnement = Abonnement::latest()->first();
-        $rang = empty($abonnement) ? 1 : $abonnement->id;
+        $rang = empty($abonnement) ? 1 : $abonnement->id + 1;
         $place = str_pad((string) $rang, 6, '0', STR_PAD_LEFT);
         return 'AB' . $place . Carbon::now()->format('y');
     }
@@ -67,8 +68,9 @@ class AbonnementsController extends Controller
         $request->validate(Abonnement::RULES);
         $abonnement = new Abonnement;
         foreach ($request->equipements as $equipement) {
-            $abonnement->fill($request->all());
             $abonnement->code = self::codeGenerate();
+            $abonnement->contrat_id = $request->contrat_id;
+            $abonnement->emplacement_id = $request->emplacement_id;
             $abonnement->index_depart = $equipement['index_depart'];
             $abonnement->index_autre = $equipement['index_autre'];
             $abonnement->equipement_id = $equipement['id'];
@@ -111,12 +113,13 @@ class AbonnementsController extends Controller
         return response()->json(['abonnement' => $abonnement]);
     }
 
-    public function lastIndex(int $id): JsonResponse
+    public function lastIndex(Request $request): JsonResponse
     {
         $equipement = null;
-        $abonnement = Abonnement::with(['emplacement', 'equipement.type'])->firstWhere('equipement_id', $id);
-        if (empty($abonnement->index_depart)) {
-            $equipement = Equipement::findOrFail($id);
+        $abonnement = Abonnement::select('id', 'equipement_id', 'index_depart', 'index_fin')
+            ->firstWhere('contrat_id', $request->query('contrat_id'));
+        if (empty($abonnement?->index_depart)) {
+            $equipement = Equipement::select('id', 'index')->find($request->query('id'));
         }
         return response()->json(['index' => $abonnement->index_fin ?? $abonnement->index_depart ?? $equipement?->index]);
     }
@@ -140,7 +143,10 @@ class AbonnementsController extends Controller
             ->with([
                 'equipement:id,code,prix_unitaire,prix_fixe,frais_facture',
                 'emplacement:id,code',
-                'emplacement.contratActuel:id,personne_id,emplacement_id' => ['facturesEquipements:id,index_fin,contrat_id', 'personne:id,nom,prenom,code']
+                'emplacement.contratActuel:id,personne_id,emplacement_id' => [
+                    'facturesEquipements:id,index_fin,contrat_id',
+                    'personne:id,nom,prenom,code'
+                ]
             ])
             ->progressing()->whereHas('emplacement.contratActuel', fn(Builder $query) => $query->where('auto_valid', false))
             ->whereDoesntHave($nestedRelation, fn(Builder $query) => $query->where('periode', $date))->get();

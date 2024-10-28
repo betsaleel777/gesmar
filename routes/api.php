@@ -179,7 +179,7 @@ Route::middleware('auth:sanctum')->prefix('parametres')->group(function (): void
         Route::put('{id}', 'update');
         Route::patch('finished/{id}', 'finish');
         Route::patch('/restore/{id}', 'restore');
-        Route::get('/indexing/{id}', 'lastIndex');
+        Route::get('/indexing', 'lastIndex');
     });
     Route::controller(ServiceAnnexesController::class)->prefix('annexes')->group(function (): void {
         Route::get('/', 'all');
