@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Enums\TypeFactureEnum;
 
 class FactureInitialeController extends Controller
 {
@@ -18,7 +19,7 @@ class FactureInitialeController extends Controller
 
     public function all(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'initiale']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::INITIALE->value]);
         $query = Facture::with(self::RELATIONS)->isSuperMarket()->isInitiale()->isFacture();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => FactureInitialeListResource::collection($factures)]);
@@ -26,27 +27,25 @@ class FactureInitialeController extends Controller
 
     public function getPaginate(): JsonResource
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'initiale']);
-        $query = Facture::withExists('paiements as unmodifiable')->with(['contrat' => ['personne', 'emplacement']])->isSuperMarket()->isInitiale()->isFacture();
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::INITIALE->value]);
+        $query = Facture::withExists('paiements as unmodifiable')->with(['contrat' => ['personne', 'emplacement']])
+            ->isSuperMarket()->isInitiale()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureInitialeListResource::collection($factures);
     }
 
     public function getSearch(string $search): JsonResource
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'initiale']);
-        $query = Facture::withExists('paiements as modifiable')->with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->isSuperMarket()->isInitiale()->isFacture();
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::INITIALE->value]);
+        $query = Facture::withExists('paiements as modifiable')->with(['contrat' => ['personne', 'emplacement']])
+            ->searchForBail($search)->isSuperMarket()->isInitiale()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureInitialeListResource::collection($factures);
     }
 
     public function facturesValidees(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'initiale']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::INITIALE->value]);
         $query = Facture::with(self::RELATIONS)->isSuperMarket()->isPaid()->isInitiale();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
@@ -54,7 +53,7 @@ class FactureInitialeController extends Controller
 
     public function facturesNonValidees(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'initiale']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::INITIALE->value]);
         $query = Facture::with(self::RELATIONS)->isSuperMarket()->isUnpaid()->isInitiale();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
@@ -67,14 +66,14 @@ class FactureInitialeController extends Controller
             'contrat' => ['emplacement' => ['zone' => ['niveau' => ['pavillon']], 'type']]
         ])
             ->isSuperMarket()->isInitiale()->withNameResponsible()->find($id);
-        $this->authorize('view', [$facture, 'initiale']);
+        $this->authorize('view', [$facture, TypeFactureEnum::INITIALE->value]);
         return response()->json(['facture' => FactureInitialeResource::make($facture)]);
     }
 
     public function update(int $id, Request $request): JsonResponse
     {
         $facture = Facture::find($id);
-        $this->authorize('update', [$facture, 'initiale']);
+        $this->authorize('update', [$facture, TypeFactureEnum::INITIALE->value]);
         $request->validate(Facture::INITIALE_EDIT_RULES);
         $facture->update($request->all());
         return response()->json(['message' => "La facture initiale: $facture->code a été modifiée avec succès."]);

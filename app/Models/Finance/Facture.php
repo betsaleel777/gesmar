@@ -3,6 +3,7 @@
 namespace App\Models\Finance;
 
 use App\Enums\StatusFacture;
+use App\Enums\TypeFactureEnum;
 use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\Equipement;
 use App\Models\Architecture\ServiceAnnexe;
@@ -152,12 +153,13 @@ class Facture extends Model implements Auditable
 
     public function getType(): string
     {
+
         return match (true) {
-            boolval($this->annexe_id) => 'annexe',
-            boolval($this->equipement_id) => 'equipement',
-            boolval($this->montant_loyer) => 'loyer',
-            boolval($this->abonnement_id) => 'abonnement',
-            default => 'initiale'
+            boolval($this->annexe_id) => TypeFactureEnum::ANNEXE->value,
+            boolval($this->equipement_id) => TypeFactureEnum::EQUIPEMENT->value,
+            boolval($this->montant_loyer) => TypeFactureEnum::LOYER->value,
+            boolval($this->abonnement_id) => TypeFactureEnum::ABONNEMENT->value,
+            default => TypeFactureEnum::INITIALE->value
         };
     }
 
@@ -224,7 +226,22 @@ class Facture extends Model implements Auditable
      */
     public function scopeIsInitiale(Builder $query): Builder
     {
-        return $query->whereNull('annexe_id')->whereNull('periode')->whereNull('equipement_id');
+        return $query->whereNotNull('pas_porte');
+    }
+    /**
+     * Obtenir les factures d'abonnement
+     */
+    public function scopeIsAbonnement(Builder $query): Builder
+    {
+        return $query->whereNotNull('abonnement_id');
+    }
+    /**
+     * Obtenir les autres factures
+     */
+    public function scopeIsAutre(Builder $query): Builder
+    {
+        //les conditions seront completées ici
+        return $query->whereNotNull('abonnement_id');
     }
 
     /**
@@ -291,6 +308,25 @@ class Facture extends Model implements Auditable
         ])->isEquipement();
     }
 
+    public function scopeSearchForBail(Builder $query, string $search): Builder
+    {
+        return $query->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('contrat', fn(Builder $query): Builder =>
+            $query->where('contrats.code', 'LIKE', "%$search%")->orWhere('contrats.code_contrat', 'LIKE', "%$search%"))
+            ->orWhereHas('contrat.personne', fn(Builder $query): Builder =>
+            $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"));
+    }
+
+    public function scopeSearchForAnnexe(Builder $query, string $search): Builder
+    {
+        return $query->where('code', 'LIKE', "%$search%")
+            ->orWhereHas('contrat', fn(Builder $query): Builder =>
+            $query->where('contrats.code', 'LIKE', "%$search%")->orWhere('contrats.code_contrat', 'LIKE', "%$search%"))
+            ->orWhereHas('personne', fn(Builder $query): Builder =>
+            $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
+            ->orWhereHas('annexe', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"));
+    }
     // relations
 
     public function annexe(): BelongsTo

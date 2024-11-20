@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Parametre\Architecture;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\WithoutTrashControllerInterface;
 use App\Models\Architecture\Abonnement;
 use App\Models\Architecture\ValidationAbonnement;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
-class ValidationAbonnementController extends Controller implements WithoutTrashControllerInterface
+class ValidationAbonnementController extends Controller
 {
 
     private static function statusChange(Request $request, ValidationAbonnement $validation): void

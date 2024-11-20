@@ -30,11 +30,13 @@ class EmplacementResource extends JsonResource
             'site' => SiteResource::make($this->whenLoaded('site')),
             'type' => TypeEmplacementResource::make($this->whenLoaded('type')),
             'zone' => ZoneResource::make($this->whenLoaded('zone')),
+            'niveau' => NiveauResource::make($this->whenLoaded('niveau')),
+            'pavillon' => PavillonResource::make($this->whenLoaded('pavillon')),
             'abonnements' => AbonnementResource::collection($this->whenLoaded('abonnements')),
             'abonnementsActuels' => AbonnementResource::collection($this->whenLoaded('abonnementsActuels')),
             'personne' => $this->when(
                 $this->relationLoaded('contratActuel') and $this->contratActuel->relationLoaded('personne'),
-                fn () => PersonneResource::make($this->contratActuel->personne)
+                fn() => PersonneResource::make($this->contratActuel->personne)
             ),
             'equipements' => EquipementResource::collection($this->whenLoaded('equipements')),
             'contrat' => ContratResource::make($this->whenLoaded('contratActuel')),

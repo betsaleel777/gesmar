@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Emplacement\NiveauListResource;
 use App\Http\Resources\Emplacement\NiveauResource;
 use App\Http\Resources\Emplacement\NiveauSelectResource;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Niveau;
 use App\Models\Architecture\Pavillon;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 
-class NiveauxController extends Controller implements StandardControllerInterface
+class NiveauxController extends Controller
 {
     /**
      * Undocumented function

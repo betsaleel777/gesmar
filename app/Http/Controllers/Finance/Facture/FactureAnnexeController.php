@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
+use App\Enums\TypeFactureEnum;
 
 class FactureAnnexeController extends FactureController
 {
@@ -17,7 +18,7 @@ class FactureAnnexeController extends FactureController
 
     public function all(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'annexe']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::ANNEXE->value]);
         $query = Facture::with(self::RELATIONS)->isAnnexe()->isFacture();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => FactureAnnexeListResource::collection($factures)]);
@@ -25,7 +26,7 @@ class FactureAnnexeController extends FactureController
 
     public function getPaginate(): JsonResource
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'annexe']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::ANNEXE->value]);
         $query = Facture::with(
             'personne:personnes.id,personnes.code,personnes.nom,prenom',
             'annexe:id,nom',
@@ -37,25 +38,19 @@ class FactureAnnexeController extends FactureController
 
     public function getSearch(string $search): JsonResource
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'annexe']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::ANNEXE->value]);
         $query = Facture::with(
             'personne:personnes.id,personnes.code,personnes.nom,prenom',
             'annexe:id,nom',
             'contrat:contrats.id,contrats.code,contrats.code_contrat'
-        )
-            ->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->orWhereHas('personne', fn (Builder $query): Builder =>
-            $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('annexe', fn (Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->isAnnexe()->isFacture();
+        )->searchForAnnexe($search)->isAnnexe()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureAnnexeListResource::collection($factures);
     }
 
     public function facturesSoldees(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'annexe']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::ANNEXE->value]);
         $query = Facture::with(self::RELATIONS)->isPaid()->isAnnexe();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
@@ -63,7 +58,7 @@ class FactureAnnexeController extends FactureController
 
     public function facturesNonSoldees(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'annexe']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::ANNEXE->value]);
         $query = Facture::with(self::RELATIONS)->isUnpaid()->isAnnexe()->isAnnexe();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
@@ -72,13 +67,13 @@ class FactureAnnexeController extends FactureController
     public function show(int $id): JsonResponse
     {
         $facture = Facture::with('personne', 'annexe', 'contrat')->isAnnexe()->withNameResponsible()->find($id);
-        $this->authorize('view', [$facture, 'annexe']);
+        $this->authorize('view', [$facture, TypeFactureEnum::ANNEXE->value]);
         return response()->json(['facture' => FactureAnnexeResource::make($facture)]);
     }
 
     public function store(Request $request): JsonResponse
     {
-        $this->authorize('create', [Facture::class, 'annexe']);
+        $this->authorize('create', [Facture::class, TypeFactureEnum::ANNEXE->value]);
         $request->validate(Facture::RULES);
         $facture = new Facture($request->all());
         $facture->proforma();

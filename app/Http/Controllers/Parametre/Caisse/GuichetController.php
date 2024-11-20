@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Parametre\Caisse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Caisse\GuichetListResource;
 use App\Http\Resources\Caisse\GuichetResource;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Caisse\Guichet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class GuichetController extends Controller implements StandardControllerInterface
+class GuichetController extends Controller
 {
     public function all(): JsonResponse
     {

@@ -66,15 +66,17 @@ class AbonnementsController extends Controller
     {
         $this->authorize('create', Abonnement::class);
         $request->validate(Abonnement::RULES);
-        $abonnement = new Abonnement;
+        $abonnement = new Abonnement($request->all());
         foreach ($request->equipements as $equipement) {
+            $equipement = Equipement::find($equipement['id']);
             $abonnement->code = self::codeGenerate();
-            $abonnement->contrat_id = $request->contrat_id;
-            $abonnement->emplacement_id = $request->emplacement_id;
             $abonnement->index_depart = $equipement['index_depart'];
             $abonnement->index_autre = $equipement['index_autre'];
-            $abonnement->equipement_id = $equipement['id'];
-            $abonnement->site_id = $equipement['site_id'];
+            $abonnement->equipement_id = $equipement->id;
+            $abonnement->site_id = $equipement->site_id;
+            $abonnement->prix_fixe = $equipement->prix_fixe;
+            $abonnement->prix_unitaire = $equipement->prix_unitaire;
+            $abonnement->frais_facture = $equipement->frais_facture;
             $abonnement->save();
             AbonnementRegistred::dispatch($abonnement);
         }
@@ -85,13 +87,13 @@ class AbonnementsController extends Controller
     {
         $this->authorize('create', Abonnement::class);
         $request->validate(['equipement_id' => 'required', 'index_depart' => 'required', 'index_autre' => 'required']);
-        $equipement = Equipement::with('type')->find((int) $request->equipement_id);
+        $equipement = Equipement::find($request->equipement_id);
         $abonnement = new Abonnement($request->all());
         $abonnement->site_id = $equipement->site_id;
         $abonnement->prix_fixe = $equipement->prix_fixe;
         $abonnement->prix_unitaire = $equipement->prix_unitaire;
         $abonnement->frais_facture = $equipement->frais_facture;
-        $abonnement->code = self::codeGenerate($equipement->site_id);
+        $abonnement->code = self::codeGenerate();
         $abonnement->save();
         AbonnementRegistred::dispatch($abonnement);
         return response()->json(['message' => "L'abonnement $abonnement->code a été crée avec succès."]);

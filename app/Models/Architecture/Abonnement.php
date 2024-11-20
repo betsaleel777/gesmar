@@ -4,6 +4,7 @@ namespace App\Models\Architecture;
 
 use App\Enums\StatusAbonnement;
 use App\Models\Exploitation\Contrat;
+use App\Models\Exploitation\Personne;
 use App\Models\Scopes\OwnSiteScope;
 use App\Models\Scopes\RecentScope;
 use App\Traits\HasEmplacement;
@@ -14,6 +15,7 @@ use App\Traits\HasSites;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\ModelStatus\HasStatuses;
 
@@ -99,6 +101,13 @@ class Abonnement extends Model implements Auditable
     {
         return $query->currentStatus(StatusAbonnement::PROGRESSING->value);
     }
+    /**
+     * Obtenir les abonnements en processus
+     */
+    public function scopeProcessing(Builder $query): Builder
+    {
+        return $query->otherCurrentStatus(StatusAbonnement::STOPPED->value);
+    }
 
     /**
      * Obtenir les abonnements en erreur d'index
@@ -124,5 +133,10 @@ class Abonnement extends Model implements Auditable
     public function contrat(): BelongsTo
     {
         return $this->belongsTo(Contrat::class);
+    }
+
+    public function personne(): HasOneThrough
+    {
+        return $this->hasOneThrough(Personne::class, Contrat::class, 'id', 'id', 'contrat_id', 'personne_id');
     }
 }

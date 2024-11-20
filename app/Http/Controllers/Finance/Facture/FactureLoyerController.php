@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
+use App\Enums\TypeFactureEnum;
 
 class FactureLoyerController extends Controller
 {
@@ -18,7 +19,7 @@ class FactureLoyerController extends Controller
 
     public function all(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::LOYER->value]);
         $query = Facture::with(self::RELATIONS)->isLoyer()->isFacture();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => FactureLoyerListResource::collection($factures)]);
@@ -26,7 +27,7 @@ class FactureLoyerController extends Controller
 
     public function getPaginate(): JsonResource
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::LOYER->value]);
         $query = Facture::with(['contrat' => ['personne', 'emplacement']])->isLoyer()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureLoyerListResource::collection($factures);
@@ -34,19 +35,15 @@ class FactureLoyerController extends Controller
 
     public function getSearch(string $search): JsonResource
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
-        $query = Facture::with(['contrat' => ['personne', 'emplacement']])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->isLoyer()->isFacture();
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::LOYER->value]);
+        $query = Facture::with(['contrat' => ['personne', 'emplacement']])->searchForBail($search)->isLoyer()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureLoyerListResource::collection($factures);
     }
 
     public function facturesValidees(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::LOYER->value]);
         $query = Facture::with(self::RELATIONS)->isPaid()->isLoyer();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
@@ -54,7 +51,7 @@ class FactureLoyerController extends Controller
 
     public function facturesNonValidees(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'loyer']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::LOYER->value]);
         $query = Facture::with(self::RELATIONS)->isUnpaid()->isLoyer();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
@@ -63,13 +60,13 @@ class FactureLoyerController extends Controller
     public function show(int $id): JsonResponse
     {
         $facture = Facture::with('contrat.emplacement.type', 'personne')->isLoyer()->withNameResponsible()->find($id);
-        $this->authorize('view', [$facture, 'loyer']);
+        $this->authorize('view', [$facture, TypeFactureEnum::LOYER->value]);
         return response()->json(['facture' => FactureLoyerResource::make($facture)]);
     }
 
     public function store(Request $request): JsonResponse
     {
-        $this->authorize('create', [Facture::class, 'loyer']);
+        $this->authorize('create', [Facture::class, TypeFactureEnum::LOYER->value]);
         foreach ($request->all() as $data) {
             $facture = new Facture($data);
             $facture->codeGenerate(config('constants.LOYER_FACTURE_PREFIXE'));

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Finance\Facture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Facture\FactureAnnexeResource;
+use App\Http\Resources\Facture\FactureAutreResource;
 use App\Http\Resources\Facture\FactureEquipementResource;
 use App\Http\Resources\Facture\FactureInitialeResource;
 use App\Http\Resources\Facture\FactureLoyerResource;
@@ -78,14 +79,18 @@ class FactureController extends Controller
     {
         $facturesInitiales = Facture::withSum('paiements as sommeVersee', 'montant')->with(['contrat.emplacement'])
             ->where('contrat_id', $id)->isInitiale()->isFacture()->isSuperMarket()->get();
-        $facturesAnnexes = Facture::withSum('paiements as sommeVersee', 'montant')->with('contrat.annexe')->where('contrat_id', $id)->isAnnexe()->isFacture()->get();
-        $facturesLoyers = Facture::withSum('paiements as sommeVersee', 'montant')->with('contrat.emplacement')->where('contrat_id', $id)->isLoyer()->isFacture()->get();
+        $facturesAnnexes = Facture::withSum('paiements as sommeVersee', 'montant')->with('contrat.annexe')->where('contrat_id', $id)
+            ->isAnnexe()->isFacture()->get();
+        $facturesLoyers = Facture::withSum('paiements as sommeVersee', 'montant')->with('contrat.emplacement')->where('contrat_id', $id)
+            ->isLoyer()->isFacture()->get();
         $facturesEquipements = Facture::with('contrat', 'equipement')->where('contrat_id', $id)->isEquipement()->isFacture()->get();
+        $facturesAutres = Facture::where('contrat_id', $id)->isAutre()->isFacture()->get();
         return response()->json([
             'facturesInitiales' => FactureInitialeResource::collection($facturesInitiales),
             'facturesEquipements' => FactureEquipementResource::collection($facturesEquipements),
             'facturesLoyers' => FactureLoyerResource::collection($facturesLoyers),
             'facturesAnnexes' => FactureAnnexeResource::collection($facturesAnnexes),
+            'facturesAutres' => FactureAutreResource::collection($facturesAutres),
         ]);
     }
 }

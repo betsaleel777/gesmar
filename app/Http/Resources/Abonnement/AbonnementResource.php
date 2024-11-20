@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources\Abonnement;
 
+use App\Http\Resources\Contrat\ContratResource;
 use App\Http\Resources\Emplacement\EmplacementResource;
+use App\Http\Resources\Personne\PersonneResource;
 use App\Http\Resources\SiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\Architecture\Abonnement;
@@ -31,6 +33,8 @@ class AbonnementResource extends JsonResource
             'site' => SiteResource::make($this->whenLoaded('site')),
             'emplacement' => EmplacementResource::make($this->whenLoaded('emplacement')),
             'equipement' => EquipementResource::make($this->whenLoaded('equipement')),
+            'personne' => PersonneResource::make($this->whenLoaded('personne')),
+            'contrat' => ContratResource::make($this->whenLoaded('contrat')),
         ];
     }
 }

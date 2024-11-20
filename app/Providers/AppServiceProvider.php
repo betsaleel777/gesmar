@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\TypeFactureEnum;
 use App\Http\Resources\Caisse\EncaissementListeResource;
 use App\Http\Resources\Caisse\FermetureListResource;
 use App\Http\Resources\Caisse\OuvertureListResource;
@@ -20,30 +21,23 @@ use App\Http\Resources\SiteResource;
 use App\Http\Resources\SocieteResource;
 use App\Http\Resources\TypePersonneResource;
 use App\Http\Resources\UserResource;
+use App\Interfaces\AutreFactureInterface;
 use App\Models\Architecture\Equipement;
+use App\Repositories\FactureAbonnementRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
+    public function register(): void
     {
-        if ($this->app->isLocal()) {
-            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
-        }
+        $this->app->bind(AutreFactureInterface::class, fn() => match (request('type')) {
+            TypeFactureEnum::ABONNEMENT->value => new FactureAbonnementRepository(),
+        });
     }
 
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
         JsonResource::withoutWrapping();
     }

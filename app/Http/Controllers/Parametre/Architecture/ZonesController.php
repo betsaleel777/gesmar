@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Parametre\Architecture;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Emplacement\ZoneListResource;
 use App\Http\Resources\Emplacement\ZoneSelectResource;
-use App\Interfaces\StandardControllerInterface;
 use App\Models\Architecture\Niveau;
 use App\Models\Architecture\Zone;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,7 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
-class ZonesController extends Controller implements StandardControllerInterface
+class ZonesController extends Controller
 {
     /**
      * Undocumented function
@@ -39,8 +38,11 @@ class ZonesController extends Controller implements StandardControllerInterface
     public function all(): JsonResponse
     {
         $response = Gate::inspect('viewAny', Zone::class);
-        $requete = Zone::select('id', 'nom', 'niveau_id', 'created_at')->with('niveau:niveaux.id,niveaux.nom,pavillon_id',
-            'pavillon:pavillons.id,pavillons.nom,site_id', 'site:sites.id,sites.nom');
+        $requete = Zone::select('id', 'nom', 'niveau_id', 'created_at')->with(
+            'niveau:niveaux.id,niveaux.nom,pavillon_id',
+            'pavillon:pavillons.id,pavillons.nom,site_id',
+            'site:sites.id,sites.nom'
+        );
         if ($response->allowed()) {
             $zones = $requete->get();
         } else {
@@ -124,8 +126,11 @@ class ZonesController extends Controller implements StandardControllerInterface
 
     public function show(int $id): JsonResponse
     {
-        $zone = Zone::select('id', 'nom', 'niveau_id')->with('niveau:niveaux.id,niveaux.nom', 'pavillon:pavillons.id,pavillons.nom',
-            'site:sites.id,sites.nom')->find($id);
+        $zone = Zone::select('id', 'nom', 'niveau_id')->with(
+            'niveau:niveaux.id,niveaux.nom',
+            'pavillon:pavillons.id,pavillons.nom',
+            'site:sites.id,sites.nom'
+        )->find($id);
         $this->authorize('view', $zone);
         return response()->json(['zone' => $zone]);
     }

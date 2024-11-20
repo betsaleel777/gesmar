@@ -23,6 +23,7 @@ use App\Http\Controllers\Exploitation\Reception\TypePersonnesController;
 use App\Http\Controllers\FileDownloadManager;
 use App\Http\Controllers\Finance\ChequeController;
 use App\Http\Controllers\Finance\Facture\FactureAnnexeController;
+use App\Http\Controllers\Finance\Facture\FactureAutreController;
 use App\Http\Controllers\Finance\Facture\FactureController;
 use App\Http\Controllers\Finance\Facture\FactureEquipementController;
 use App\Http\Controllers\Finance\Facture\FactureInitialeController;
@@ -474,6 +475,14 @@ Route::middleware('auth:sanctum')->prefix('finances')->group(function (): void {
                 Route::put('{id}', 'update');
                 Route::delete('{id}', 'trash');
                 Route::patch('/restore/{id}', 'restore');
+            }
+        );
+        Route::controller(FactureAutreController::class)->prefix('autres')->group(
+            function (): void {
+                Route::get('/', 'all');
+                Route::get('paginate', 'getPaginate');
+                Route::get('show', 'show');
+                Route::get('search/paginate', 'getSearch');
             }
         );
     });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Finance\Facture;
 
+use App\Enums\TypeFactureEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FactureEquipementRequest;
 use App\Http\Resources\Facture\FactureEquipementListResource;
@@ -18,7 +19,7 @@ class FactureEquipementController extends Controller
 
     public function all(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::EQUIPEMENT->value]);
         $query = Facture::with(self::RELATIONS)->isEquipement()->isFacture();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => FactureEquipementListResource::collection($factures)]);
@@ -26,7 +27,7 @@ class FactureEquipementController extends Controller
 
     public function getPaginate(): JsonResource
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::EQUIPEMENT->value]);
         $query = Facture::with(['contrat' => ['emplacement', 'personne'], 'equipement.abonnementActuel'])->isEquipement()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureEquipementListResource::collection($factures);
@@ -34,19 +35,16 @@ class FactureEquipementController extends Controller
 
     public function getSearch(string $search): JsonResource
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
-        $query = Facture::with(['contrat' => ['emplacement', 'personne'], 'equipement.abonnementActuel'])->where('code', 'LIKE', "%$search%")
-            ->orWhereHas('contrat', fn(Builder $query): Builder => $query->where('contrats.code', 'LIKE', "%$search%"))
-            ->orWhereHas('contrat.personne', fn(Builder $query): Builder => $query->whereRaw("CONCAT(`nom`, ' ', `prenom`) LIKE ?", ['%' . $search . '%']))
-            ->orWhereHas('contrat.emplacement', fn(Builder $query): Builder => $query->where('code', 'LIKE', "%$search%"))
-            ->isEquipement()->isFacture();
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::EQUIPEMENT->value]);
+        $query = Facture::with(['contrat' => ['emplacement', 'personne'], 'equipement.abonnementActuel'])
+            ->searchForBail($search)->isEquipement()->isFacture();
         $factures = $response->allowed() ? $query->paginate(10) : $query->owner()->paginate(10);
         return FactureEquipementListResource::collection($factures);
     }
 
     public function facturesValidees(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::EQUIPEMENT->value]);
         $query = Facture::with(self::RELATIONS)->isPaid()->isEquipement();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
@@ -54,7 +52,7 @@ class FactureEquipementController extends Controller
 
     public function facturesNonValidees(): JsonResponse
     {
-        $response = Gate::inspect('viewAny', [Facture::class, 'equipement']);
+        $response = Gate::inspect('viewAny', [Facture::class, TypeFactureEnum::EQUIPEMENT->value]);
         $query = Facture::with(self::RELATIONS)->isUnpaid()->isEquipement();
         $factures = $response->allowed() ? $query->get() : $query->owner()->get();
         return response()->json(['factures' => $factures]);
