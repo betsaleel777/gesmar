@@ -8,8 +8,5 @@ use Illuminate\Foundation\Events\Dispatchable;
 class AbonnementResilied
 {
     use Dispatchable;
-
-    public function __construct(public Abonnement $abonnement)
-    {
-    }
+    public function __construct(public Abonnement $abonnement) {}
 }

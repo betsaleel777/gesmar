@@ -66,12 +66,12 @@ class AbonnementsController extends Controller
     {
         $this->authorize('create', Abonnement::class);
         $request->validate(Abonnement::RULES);
-        $abonnement = new Abonnement($request->all());
-        foreach ($request->equipements as $equipement) {
-            $equipement = Equipement::find($equipement['id']);
+        foreach ($request->equipements as $data) {
+            $abonnement = new Abonnement($request->all());
+            $equipement = Equipement::find($data['id']);
             $abonnement->code = self::codeGenerate();
-            $abonnement->index_depart = $equipement['index_depart'];
-            $abonnement->index_autre = $equipement['index_autre'];
+            $abonnement->index_depart = $data['index_depart'];
+            $abonnement->index_autre = $data['index_autre'];
             $abonnement->equipement_id = $equipement->id;
             $abonnement->site_id = $equipement->site_id;
             $abonnement->prix_fixe = $equipement->prix_fixe;
@@ -140,18 +140,13 @@ class AbonnementsController extends Controller
 
     public function getRentalbyMonthGear(string $date): JsonResponse
     {
-        $nestedRelation = 'emplacement.contratActuel.facturesEquipements';
-        $abonnements = Abonnement::select('id', 'code', 'equipement_id', 'emplacement_id', 'index_depart')
+        $abonnements = Abonnement::select('id', 'code', 'equipement_id', 'emplacement_id', 'index_depart', 'contrat_id')
             ->with([
                 'equipement:id,code,prix_unitaire,prix_fixe,frais_facture',
                 'emplacement:id,code',
-                'emplacement.contratActuel:id,personne_id,emplacement_id' => [
-                    'facturesEquipements:id,index_fin,contrat_id',
-                    'personne:id,nom,prenom,code'
-                ]
-            ])
-            ->progressing()->whereHas('emplacement.contratActuel', fn(Builder $query) => $query->where('auto_valid', false))
-            ->whereDoesntHave($nestedRelation, fn(Builder $query) => $query->where('periode', $date))->get();
+                'contrat:id,personne_id' => ['facturesEquipements:id,index_fin,contrat_id', 'personne:id,nom,prenom,code']
+            ])->progressing()->whereHas('contrat', fn(Builder $query) => $query->where('equipable', true)->where('date_signature', '<', $date))
+            ->whereDoesntHave('contrat.facturesEquipements', fn(Builder $query) => $query->where('periode', $date))->get();
         return response()->json(['abonnements' => AbonnementResource::collection($abonnements)]);
     }
 }
